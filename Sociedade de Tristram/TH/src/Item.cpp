@@ -7907,6 +7907,10 @@ void __fastcall GetItemAttrs(int itemIndex, int baseItemIndex, int qlvl)
 //		case 4:	goldAmount += goldAmount + goldAmount / 2;	break;
 //		}
 		LimitToMax(goldAmount, 5000);
+		// Sociedade de Tristram: configurable gold multiplier for newly generated dungeon gold.
+		// GoldRate uses percentages internally: 100 = normal, 200 = double, 50 = half.
+		goldAmount = goldAmount * QoLGoldPercent / 100;
+		LimitToRange(goldAmount, QoLGoldPercent > 0 ? 1 : 0, 5000);
 		item.amount = goldAmount;
 		SetGraphicToGold(item);// оптимизация
 	}
