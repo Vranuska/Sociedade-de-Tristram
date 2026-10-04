@@ -1,0 +1,33 @@
+SOCIEDADE DE TRISTRAM - CORRECAO DEFINITIVA DE SLOTS V7.1
+
+Feche completamente o jogo e execute APLICAR.bat.
+Informe a pasta que contem TheHeaven.sln:
+E:\Sociedade de Tristram\TH
+
+CORRECOES DESTA VERSAO:
+- corrige o erro C2117 em GameClientName causado pelo novo nome do jogo;
+- itens unicos e de conjunto agora conservam os slots adicionados;
+- aneis, colares e acessorios unicos podem receber slots;
+- o ouro so e descontado depois que o novo slot realmente aparece;
+- Aquamarine funciona por clique direito e selecao do equipamento;
+- Aquamarine tambem pode ser arrastada diretamente sobre o equipamento;
+- a pedra so e consumida quando o slot e criado com sucesso;
+- itens comuns aceitam ate 4 slots;
+- itens magicos, raros, unicos, conjuntos e acessorios aceitam ate 2 slots;
+- itens de missao, ouro e consumiveis comuns continuam protegidos;
+- mantem a identidade Sociedade de Tristram e todas as correcoes anteriores.
+
+COMO USAR A AQUAMARINE:
+1. Clique com o botao direito na pedra e depois clique no equipamento; ou
+2. Pegue a pedra com o mouse e clique sobre o equipamento.
+
+COMO USAR O PAINEL DE SLOTS:
+Coloque o item no painel e pressione o botao para adicionar slot. O custo em
+ouro somente sera cobrado se o contador de slots aumentar de verdade.
+
+IMPORTANTE:
+O arquivo da solucao continua se chamando TheHeaven.sln para nao quebrar seu
+ambiente de compilacao, mas o projeto e o executavel exibem Sociedade de Tristram.
+
+A evolucao e a fusao hibrida de gemas nao fazem parte desta V7.1; elas serao
+implementadas separadamente na atualizacao do sistema de gemas.

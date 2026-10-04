@@ -1,0 +1,28 @@
+# Arquivos grandes/originais do jogo
+DIABDAT.MPQ
+TH4data.mor
+
+# Relatórios de erro
+*.dmp
+*.log
+
+# Saves
+th4_save_*/
+
+# Backups antigos
+backup_*/
+backup-*/
+
+# Arquivos de build
+Debug/
+Release/
+build/
+.vs/
+.vscode/
+.idea/
+cmake-build-*/
+
+# Temporários
+*.pyc
+__pycache__/
+THscrn*.gif
