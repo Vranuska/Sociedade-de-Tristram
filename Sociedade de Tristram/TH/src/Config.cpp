@@ -464,7 +464,9 @@ void GetParamsFromConfig()
 			QoLBossDropPercent = GetPrivateProfileIntA("AJUSTES", "dropboss", QoLBossDropPercent, ".\\drop_xp.ini");
 			QoLRarePercent = GetPrivateProfileIntA("AJUSTES", "dropraro", QoLRarePercent, ".\\drop_xp.ini");
 			QoLXpPercent = GetPrivateProfileIntA("AJUSTES", "xp", QoLXpPercent, ".\\drop_xp.ini");
-			QoLGoldPercent = GetPrivateProfileIntA("Progressao", "GoldRate", QoLGoldPercent, ".\\drop_xp.ini");
+			char goldRate[32] = "1.0";
+			GetPrivateProfileStringA("Progressao", "GoldRate", "1.0", goldRate, sizeof(goldRate), ".\\drop_xp.ini");
+			QoLGoldPercent = static_cast<int>(atof(goldRate) * 100.0f + 0.5f);
 			QoLEliteMinPerFloor = GetPrivateProfileIntA("AJUSTES", "elitesmin", QoLEliteMinPerFloor, ".\\drop_xp.ini");
 			QoLEliteMaxPerFloor = GetPrivateProfileIntA("AJUSTES", "elitesmax", QoLEliteMaxPerFloor, ".\\drop_xp.ini");
 			QoLWirtSetPercent = GetPrivateProfileIntA("AJUSTES", "wirtconjunto", QoLWirtSetPercent, ".\\drop_xp.ini");
