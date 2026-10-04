@@ -1570,6 +1570,7 @@ extern int QoLEliteDropPercent;
 extern int QoLBossDropPercent;
 extern int QoLRarePercent;
 extern int QoLXpPercent;
+extern int QoLGoldPercent;
 extern int QoLEliteMinPerFloor;
 extern int QoLEliteMaxPerFloor;
 extern int QoLWirtSetPercent;
