@@ -459,11 +459,6 @@ void GetParamsFromConfig()
 		// PT-BR/QoL: arquivo pequeno e independente para ajustes que o jogador
 		// pode trocar sem recompilar e sem arriscar as demais opcoes do config.ini.
 		if( GetFileAttributesA("drop_xp.ini") != INVALID_FILE_ATTRIBUTES ){
-			QoLDropPercent = GetPrivateProfileIntA("AJUSTES", "dropgeral", QoLDropPercent, ".\\drop_xp.ini");
-			QoLEliteDropPercent = GetPrivateProfileIntA("AJUSTES", "dropelite", QoLEliteDropPercent, ".\\drop_xp.ini");
-			QoLBossDropPercent = GetPrivateProfileIntA("AJUSTES", "dropboss", QoLBossDropPercent, ".\\drop_xp.ini");
-			QoLRarePercent = GetPrivateProfileIntA("AJUSTES", "dropraro", QoLRarePercent, ".\\drop_xp.ini");
-			QoLXpPercent = GetPrivateProfileIntA("AJUSTES", "xp", QoLXpPercent, ".\\drop_xp.ini");
 			char xpRate[32] = "";
 			GetPrivateProfileStringA("Progressao", "XPRate", "", xpRate, sizeof(xpRate), ".\\drop_xp.ini");
 			if( xpRate[0] ) QoLXpPercent = static_cast<int>(atof(xpRate) * 100.0f + 0.5f);
