@@ -172,6 +172,7 @@ int QoLEliteDropPercent = 40;
 int QoLBossDropPercent = 100;
 int QoLRarePercent = 10;
 int QoLXpPercent = 100;
+int QoLGoldPercent = 100;
 int QoLEliteMinPerFloor = 4;
 int QoLEliteMaxPerFloor = 7;
 int QoLWirtSetPercent = 25;
@@ -463,6 +464,7 @@ void GetParamsFromConfig()
 			QoLBossDropPercent = GetPrivateProfileIntA("AJUSTES", "dropboss", QoLBossDropPercent, ".\\drop_xp.ini");
 			QoLRarePercent = GetPrivateProfileIntA("AJUSTES", "dropraro", QoLRarePercent, ".\\drop_xp.ini");
 			QoLXpPercent = GetPrivateProfileIntA("AJUSTES", "xp", QoLXpPercent, ".\\drop_xp.ini");
+			QoLGoldPercent = GetPrivateProfileIntA("Progressao", "GoldRate", QoLGoldPercent, ".\\drop_xp.ini");
 			QoLEliteMinPerFloor = GetPrivateProfileIntA("AJUSTES", "elitesmin", QoLEliteMinPerFloor, ".\\drop_xp.ini");
 			QoLEliteMaxPerFloor = GetPrivateProfileIntA("AJUSTES", "elitesmax", QoLEliteMaxPerFloor, ".\\drop_xp.ini");
 			QoLWirtSetPercent = GetPrivateProfileIntA("AJUSTES", "wirtconjunto", QoLWirtSetPercent, ".\\drop_xp.ini");
@@ -472,6 +474,7 @@ void GetParamsFromConfig()
 		LimitToRange(QoLBossDropPercent, 0, 100);
 		LimitToRange(QoLRarePercent, 0, 100);
 		LimitToRange(QoLXpPercent, 0, 1000);
+		LimitToRange(QoLGoldPercent, 0, 1000);
 		LimitToRange(QoLEliteMinPerFloor, 0, 12);
 		LimitToRange(QoLEliteMaxPerFloor, QoLEliteMinPerFloor, 16);
 		LimitToRange(QoLWirtSetPercent, 0, 100);
