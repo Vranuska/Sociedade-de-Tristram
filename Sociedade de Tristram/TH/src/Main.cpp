@@ -3206,8 +3206,12 @@ int __stdcall GameWindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 						}
 						break;
 					}
-                    case VK_73_I_KEY: { // Alt + I, ADM: browse/search unique items
+                    case VK_73_I_KEY: { // Alt + I, ADM: open clickable unique item browser
                         if( !DevelopMode ) break;
+                        AdmItemWindow_Open();
+                        break;
+                        /*
+                        Legacy tooltip browser:
                         int centerId = IsGoldSplitPanelVisible ? HowMuchGoldYouWantToRemove : 0;
                         if( centerId < 0 ) centerId = 0;
                         if( centerId >= int(count_UniqueItems) ) centerId = int(count_UniqueItems) - 1;
@@ -3225,7 +3229,8 @@ int __stdcall GameWindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                                 u.uniqueSetIndex >= 0 ? " [SET]" : "");
                             Tooltip_AddLine(InfoPanelBuffer);
                         }
-                        break; }
+                        break; */
+                    }
                     case VK_74_J_KEY: { // Alt + J, ADM: find next unique whose name contains the chat text
                         if( !DevelopMode ) break;
                         if( !TalkPanelMessage[0] ){
