@@ -3207,10 +3207,6 @@ int __stdcall GameWindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 						break;
 					}
 
-                    case VK_77_M_KEY: { // Alt + M, ADM item browser
-                        AdmItemWindow_Open();
-                        break;
-                    }
                     case VK_74_J_KEY: { // Alt + J, ADM: find next unique whose name contains the chat text
                         if( !DevelopMode ) break;
                         if( !TalkPanelMessage[0] ){
@@ -3308,6 +3304,9 @@ int __stdcall GameWindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 						PutStartItemToInventory( CurrentPlayerIndex, HowMuchGoldYouWantToRemove );
 						//PutStartItemToInventory( CurrentPlayerIndex, 401 );
 						//PutStartItemToInventory( CurrentPlayerIndex, 402 );
+						break;
+					case VK_77_M_KEY: // Alt + M, ADM item browser
+						AdmItemWindow_Open();
 						break;
 					case VK_73_I_KEY: // Alt + I goto next dungeon
 						{DUNGEON next = DUN_28_POISONED_WATER_SUPPLY;//Dungeon + 1;
