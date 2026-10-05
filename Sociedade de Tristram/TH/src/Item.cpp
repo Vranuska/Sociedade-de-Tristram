@@ -5706,6 +5706,8 @@ uint GetRequiredClassMask( const Item* item )
 //----- (th2) -------------------------------------------------------------
 bool CheckBaseItemClassMaskReq( uint playerIndex, int baseItemIndex )
 {
+	extern bool AdmIgnoreItemClassRequirements;
+	if( AdmIgnoreItemClassRequirements ) return true;
 	const Player& player = Players[playerIndex];
 	const BaseItem& baseItem = BaseItems[baseItemIndex];
 
@@ -5716,6 +5718,8 @@ bool CheckBaseItemClassMaskReq( uint playerIndex, int baseItemIndex )
 //----- (th2) -------------------------------------------------------------
 bool CheckBaseItemExilesReq( uint playerIndex, int baseItemIndex )
 {
+	extern bool AdmIgnoreItemClassRequirements;
+	if( AdmIgnoreItemClassRequirements ) return true;
 	const Player& player = Players[playerIndex];
 	const BaseItem& baseItem = BaseItems[baseItemIndex];
 
@@ -5743,7 +5747,8 @@ int __fastcall CheckItemReq(uint playerIndex, Item* item)
         return false;
     }
 
-	if( item->SpellIndex )
+	extern bool AdmIgnoreItemClassRequirements;
+	if( item->SpellIndex && !AdmIgnoreItemClassRequirements )
     {
     	const Spell& spell = Spells[item->SpellIndex];
     	uint playerFullClassMask = (1u << static_cast<uint>( player.fullClassId ) );
