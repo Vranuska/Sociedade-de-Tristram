@@ -3182,12 +3182,15 @@ int __stdcall GameWindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 							SetPlrAnims( CurrentPlayerIndex );
 							ContinueStay( CurrentPlayerIndex );
 						} break;
-					case VK_85_U_KEY: { // Alt + U, drop of a given unique
-						//break;
+					case VK_85_U_KEY: { // Alt + U, ADM: spawn unique by ID entered in gold split input
+						if( !DevelopMode ) break;
 						int itemIndex = -1;
-						//SpawnSomething(2482, Players[CurrentPlayerIndex].Row + 1, Players[CurrentPlayerIndex].Col, 0, 0, 0, 0);
-						int uniqId = 4575; // can change
-						if( IsGoldSplitPanelVisible ) uniqId = HowMuchGoldYouWantToRemove; // if gold split panel opened - use input as uniq id
+						int uniqId = IsGoldSplitPanelVisible ? HowMuchGoldYouWantToRemove : -1;
+						if( uniqId < 0 || uniqId >= int(count_UniqueItems) ){
+							sprintf(InfoPanelHeader, "ADM: ID unico invalido (%d).", uniqId);
+							InfoPanelUsed = 1;
+							break;
+						}
 						UniqueItem& uniq = UniqueItems[uniqId];
 						for( size_t i = 0; i < count_BaseItems; ++i ){ // drop all variants of base with this uniq.uniqLine
 							BaseItem& base = BaseItems[i];
