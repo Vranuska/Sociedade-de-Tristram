@@ -49,13 +49,28 @@ void RecalculateRectRightDown(DisplayObject & obj)
 }
 
 // ---- th2 -------------------------------------------------------------------------------
+static void InfoWindow_ResetListSelection()
+{
+	listStartFromIndex = 0;
+	listStartLastIndex = gc_listIndexes.size() <= rowInList ? 0 : gc_listIndexes.size() - rowInList;
+	lastSelectedInListIndex = 0;
+	memset(textliststates, 0, sizeof(textliststates));
+	textliststates[0] = 1;
+}
+
+static void InfoWindow_LoadGameChangerList()
+{
+	gc_listIndexes.clear();
+	for (int i = 1; i < GC_COUNT; ++i)
+		if (Players[CurrentPlayerIndex].gameChanger & BIT(i))
+			gc_listIndexes.emplace_back(i);
+	InfoWindow_ResetListSelection();
+}
+
 void InfoWindow_Init()
 {
-	if (gc_listIndexes.size()) gc_listIndexes.clear();
-	else gc_listIndexes.reserve(128);
-	listStartFromIndex = 0;
-	listStartLastIndex = 0;
-	lastSelectedInListIndex = 0;
+	gc_listIndexes.clear();
+	gc_listIndexes.reserve(128);
 
 	InfoWindowRect.Left = ScreenWidth / 2 - IW_width / 2;
 	InfoWindowRect.Top = (ScreenHeight - 132) / 2 - IW_height / 2;
@@ -114,11 +129,7 @@ void InfoWindow_Init()
 	}
 	textliststates[lastSelectedInListIndex] = 1;
 
-	for (int i = 1; i < GC_COUNT; ++i)
-		if (Players[CurrentPlayerIndex].gameChanger & BIT(i))
-			gc_listIndexes.emplace_back(i);
-
-	listStartLastIndex = gc_listIndexes.size() <= rowInList ? 0 : gc_listIndexes.size() - rowInList;
+	InfoWindow_LoadGameChangerList();
 
 	IW_IMG_background = (char*)LoadFile("data\\gc_info\\gc_background.cel");
 	IW_IMG_icons = (char*)LoadFile("data\\gc_info\\gc_icons.cel");
@@ -499,6 +510,7 @@ void __fastcall InfoWindow_MouseUp()
 // ---- th2 -------------------------------------------------------------------------------
 void InfoWindow_Open()
 {
+	InfoWindow_LoadGameChangerList();
 	IsAdmItemWindow = false;
 	IsInfoWindowVisible = true;
 }
@@ -506,16 +518,11 @@ void InfoWindow_Open()
 void AdmItemWindow_Open()
 {
 	if( !DevelopMode || count_UniqueItems == 0 ) return;
-	InfoWindow_Init();
 	IsAdmItemWindow = true;
 	gc_listIndexes.clear();
 	gc_listIndexes.reserve(count_UniqueItems);
 	for( size_t i = 0; i < count_UniqueItems; ++i ) gc_listIndexes.emplace_back((int)i);
-	listStartFromIndex = 0;
-	listStartLastIndex = gc_listIndexes.size() <= rowInList ? 0 : gc_listIndexes.size() - rowInList;
-	lastSelectedInListIndex = 0;
-	memset(textliststates, 0, sizeof(textliststates));
-	textliststates[0] = 1;
+	InfoWindow_ResetListSelection();
 	IsInfoWindowVisible = true;
 }
 
