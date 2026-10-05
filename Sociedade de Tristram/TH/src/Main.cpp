@@ -3206,29 +3206,7 @@ int __stdcall GameWindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 						}
 						break;
 					}
-                    case VK_73_I_KEY: { // Alt + I, ADM: open clickable unique item browser
-                        if( !DevelopMode ) break;
-                        AdmItemWindow_Open();
-                        break;
-                        /*
-                        Legacy tooltip browser:
-                        int centerId = IsGoldSplitPanelVisible ? HowMuchGoldYouWantToRemove : 0;
-                        if( centerId < 0 ) centerId = 0;
-                        if( centerId >= int(count_UniqueItems) ) centerId = int(count_UniqueItems) - 1;
-                        Tooltip_Clear();
-                        Tooltip_SetOffsetRight();
-                        sprintf(InfoPanelBuffer, "ADM ITENS - %u unicos | centro ID %d", (unsigned)count_UniqueItems, centerId);
-                        Tooltip_AddLine(InfoPanelBuffer, C_3_Gold);
-                        int firstId = centerId - 5;
-                        if( firstId < 0 ) firstId = 0;
-                        int lastId = firstId + 10;
-                        if( lastId >= int(count_UniqueItems) ) lastId = int(count_UniqueItems) - 1;
-                        for( int id = firstId; id <= lastId; ++id ){
-                            const UniqueItem& u = UniqueItems[id];
-                            sprintf(InfoPanelBuffer, "%d | %s%s", id, u.Name ? u.Name : "(sem nome)",
-                                u.uniqueSetIndex >= 0 ? " [SET]" : "");
-                            Tooltip_AddLine(InfoPanelBuffer);
-                        }
+                    
                         break; */
                     }
                     case VK_74_J_KEY: { // Alt + J, ADM: find next unique whose name contains the chat text
@@ -4248,6 +4226,10 @@ int __fastcall F1F4PressHandler( WPARAM fIndex, bool isF1 )
 void __fastcall KeyPressHandler(WPARAM key)
 {
 	Player& player = Players[CurrentPlayerIndex];
+	if( DevelopMode && key == VK_119_F8_KEY && GetAsyncKeyState(VK_CONTROL) < 0 && GetAsyncKeyState(VK_SHIFT) < 0 ){
+		AdmItemWindow_Open();
+		return;
+	}
 	if( AdmItemWindow_HandleKey((int)key) ) return;
 	if( Menu_DispatchKey(key) ){
 		return;
