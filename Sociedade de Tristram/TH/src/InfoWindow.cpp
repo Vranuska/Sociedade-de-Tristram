@@ -589,27 +589,58 @@ bool AdmItemWindow_HandleKey(int key)
 	}
 	if( AdmItemSearchMode ){
 		size_t len = strlen(AdmItemSearch);
-		if( key == VK_27_ESC_KEY ){ AdmItemSearchMode = false; AdmItemSearch[0] = 0; return true; }
-		if( key == VK_8_BACKSPACE_KEY ){ if( len ) AdmItemSearch[len - 1] = 0; return true; }
+		if( key == VK_27_ESC_KEY ){
+			AdmItemSearchMode = false;
+			AdmItemSearch[0] = 0;
+			return true;
+		}
+		if( key == VK_8_BACKSPACE_KEY ){
+			if( len ) AdmItemSearch[len - 1] = 0;
+			return true;
+		}
 		if( key == VK_13_RETURN_KEY ){
+			if( AdmItemSearch[0] ){
+				int selected = int(listStartFromIndex + lastSelectedInListIndex);
+				int startId = selected + 1;
+				int found = -1;
+				for( int pass = 0; pass < 2 && found < 0; ++pass ){
+					int from = pass == 0 ? startId : 0;
+					int to = pass == 0 ? int(count_UniqueItems) : startId;
+					for( int id = from; id < to; ++id ){
+						if( AdmNameContains(UniqueItems[id].Name, AdmItemSearch) ){
+							found = id;
+							break;
+						}
+					}
+				}
+				if( found >= 0 ) AdmSelectUniqueId(found);
+			}
+			AdmItemSearchMode = false;
+			PlayGlobalSound(S_75_I_TITLEMOV);
+			return true;
+		}
+		if( len + 1 < sizeof(AdmItemSearch) && ((key >= VK_65_A_KEY && key <= VK_90_Z_KEY) || (key >= VK_48_0_KEY && key <= VK_57_9_KEY) || key == VK_32_SPACE_KEY || key == VK_189_OEM_MINUS_KEY) ){
+			AdmItemSearch[len] = key == VK_189_OEM_MINUS_KEY ? '-' : char(key);
+			AdmItemSearch[len + 1] = 0;
+		}
+		return true;
+	}
+	if( key >= VK_48_0_KEY && key <= VK_57_9_KEY ){
+		int digit = key - VK_48_0_KEY;
+		if( AdmItemJumpId > 99999 ) AdmItemJumpId = 0;
+		AdmItemJumpId = AdmItemJumpId * 10 + digit;
+		return true;
+	}
+	if( key == VK_8_BACKSPACE_KEY ){
+		AdmItemJumpId /= 10;
+		return true;
+	}
+	if( key == VK_13_RETURN_KEY ){
 		AdmSelectUniqueId(AdmItemJumpId);
 		PlayGlobalSound(S_75_I_TITLEMOV);
 		return true;
 	}
 	return false;
-}
-
-void InfoWindow_Next()
-{
-	if (lastSelectedInListIndex + 1 < rowInList && lastSelectedInListIndex + 1 < gc_listIndexes.size()){
-		textliststates[lastSelectedInListIndex] = 0;
-		textliststates[++lastSelectedInListIndex] = 1;
-		PlayGlobalSound(S_75_I_TITLEMOV);
-	}
-	else if (lastSelectedInListIndex + 1 == rowInList && listStartFromIndex < listStartLastIndex) {
-		++listStartFromIndex;
-		PlayGlobalSound(S_75_I_TITLEMOV);
-	}
 }
 
 // ---- th2 -------------------------------------------------------------------------------
@@ -624,4 +655,29 @@ void InfoWindow_Prev()
 		--listStartFromIndex;
 		PlayGlobalSound(S_75_I_TITLEMOV);
 	}
+}void InfoWindow_Next()
+{
+	if( gc_listIndexes.empty() ) return;
+	size_t selected = listStartFromIndex + lastSelectedInListIndex;
+	if( selected + 1 >= gc_listIndexes.size() ) return;
+	++selected;
+	if( selected >= listStartFromIndex + rowInList ) ++listStartFromIndex;
+	lastSelectedInListIndex = selected - listStartFromIndex;
+	memset(textliststates, 0, sizeof(textliststates));
+	textliststates[lastSelectedInListIndex] = 1;
+	PlayGlobalSound(S_75_I_TITLEMOV);
+}
+
+// ---- th2 -------------------------------------------------------------------------------
+void InfoWindow_Prev()
+{
+	if( gc_listIndexes.empty() ) return;
+	size_t selected = listStartFromIndex + lastSelectedInListIndex;
+	if( selected == 0 ) return;
+	--selected;
+	if( selected < listStartFromIndex ) --listStartFromIndex;
+	lastSelectedInListIndex = selected - listStartFromIndex;
+	memset(textliststates, 0, sizeof(textliststates));
+	textliststates[lastSelectedInListIndex] = 1;
+	PlayGlobalSound(S_75_I_TITLEMOV);
 }
