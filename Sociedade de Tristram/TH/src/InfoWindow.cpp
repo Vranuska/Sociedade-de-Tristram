@@ -289,12 +289,12 @@ void __fastcall InfoWindow_Draw()
 		int selectedId = gc_listIndexes[selected];
 		const UniqueItem& selectedItem = UniqueItems[selectedId];
 		char admText[512];
-		sprintf(admText, "ID: %d\nNome: %s\nQualidade: %d\nSet: %s\n\nClique em um item da lista para selecionar. Alt+U gera o ID selecionado.", selectedId, selectedItem.Name ? selectedItem.Name : "(sem nome)", selectedItem.qualityLevel, selectedItem.uniqueSetIndex >= 0 ? UniqueSets[selectedItem.uniqueSetIndex].Name : "Nenhum");
+		sprintf(admText, "ID: %d\nNome: %s\nQualidade: %d\nSet: %s\n\nClique em um item da lista para selecionar. Alt+U gera o ID selecionado.", selectedId, selectedItem.Name ? selectedItem.Name : "(sem nome)", selectedItem.qualityLevel, selectedItem.uniqueSetIndex >= 0 && selectedItem.uniqueSetIndex < int(count_UniqueSet) ? UniqueSets[selectedItem.uniqueSetIndex].Name : "Nenhum");
 		InfoWindow_DrawLongText(longTextMidPos.Left, longTextMidPos.Top - 70, admText, C_0_White);
 		InfoWindow_DrawRect(Screen_LeftBorder + admSpawnButton.Left, Screen_TopBorder + admSpawnButton.Top, admSpawnButton.Width, admSpawnButton.Heigth, CursorIntoDisplayObject(admSpawnButton) ? 241 : 197);
 		InfoWindow_DrawRect(Screen_LeftBorder + admSpawnSetButton.Left, Screen_TopBorder + admSpawnSetButton.Top, admSpawnSetButton.Width, admSpawnSetButton.Heigth, CursorIntoDisplayObject(admSpawnSetButton) ? 241 : 197);
 		DrawLevelInfoText(admSpawnButton.Left + 18, admSpawnButton.Top + 17, "GERAR ITEM", C_0_White);
-		DrawLevelInfoText(admSpawnSetButton.Left + 24, admSpawnSetButton.Top + 17, "GERAR SET", selectedItem.uniqueSetIndex >= 0 ? C_0_White : C_8_Gray);
+		DrawLevelInfoText(admSpawnSetButton.Left + 24, admSpawnSetButton.Top + 17, "GERAR SET", selectedItem.uniqueSetIndex >= 0 && selectedItem.uniqueSetIndex < int(count_UniqueSet) ? C_0_White : C_5_Dark);
 		InfoWindow_DrawRect(Screen_LeftBorder + admPrevPageButton.Left, Screen_TopBorder + admPrevPageButton.Top, admPrevPageButton.Width, admPrevPageButton.Heigth, CursorIntoDisplayObject(admPrevPageButton) ? 241 : 197);
 		InfoWindow_DrawRect(Screen_LeftBorder + admNextPageButton.Left, Screen_TopBorder + admNextPageButton.Top, admNextPageButton.Width, admNextPageButton.Heigth, CursorIntoDisplayObject(admNextPageButton) ? 241 : 197);
 		DrawLevelInfoText(admPrevPageButton.Left + 15, admPrevPageButton.Top + 16, "< ANTERIOR", C_0_White);
@@ -461,7 +461,7 @@ void __fastcall InfoWindow_MouseUp()
 				IsLeftButtonDown = false;
 				return;
 			}
-			if( CursorIntoDisplayObject(admSpawnSetButton) && UniqueItems[selectedId].uniqueSetIndex >= 0 ){
+			if( CursorIntoDisplayObject(admSpawnSetButton) && UniqueItems[selectedId].uniqueSetIndex >= 0 && UniqueItems[selectedId].uniqueSetIndex < int(count_UniqueSet) ){
 				int setId = UniqueItems[selectedId].uniqueSetIndex;
 				for( size_t id = 0; id < count_UniqueItems; ++id ){
 					if( UniqueItems[id].uniqueSetIndex == setId ){
