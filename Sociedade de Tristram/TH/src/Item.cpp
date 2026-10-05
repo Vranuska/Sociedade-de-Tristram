@@ -5608,10 +5608,7 @@ void __fastcall RecalcReqMetForOnBodyItems( int playerIndex )
 			if( !item.IsReqMet ){
 				continue;
 			}
-			extern bool AdmIgnoreNumericItemRequirements;
-	if( AdmIgnoreNumericItemRequirements ) return true;
-
-	int advancedUser = PerkValue(PERK_ADVANCED_USER, playerIndex);
+			int advancedUser = PerkValue(PERK_ADVANCED_USER, playerIndex);
 			int itemReqMet = 1;
 			int skilledTraitBenefit = HasTrait(playerIndex, TraitId::Skilled) ? (player.CharLevel + (player.CharLevel * player.CharLevel / 150)) : 0;
 			const int effectiveStrength = statEffects.adds[ST_STRENGTH]
@@ -5881,6 +5878,9 @@ int __fastcall CheckItemReq(uint playerIndex, Item* item)
 	        return false;
 	    }
 	}
+
+	extern bool AdmIgnoreNumericItemRequirements;
+	if( AdmIgnoreNumericItemRequirements ) return true;
 
 	int advancedUser = PerkValue(PERK_ADVANCED_USER, playerIndex);
 	if (is(item->MagicCode, MC_24_BOOKS, MC_21_RELIC_NEED_NO_TARGET, MC_22_RELIC_NEED_TARGET, MC_47_RUNE_OF_FIRE, MC_48_RUNE_OF_LIGHTNING, MC_49_RUNE_OF_SHOCK, MC_50_RUNE_OF_BLAZE, MC_51_RUNE_OF_STONE))
