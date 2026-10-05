@@ -17,6 +17,8 @@ constexpr const char* IW_headTexts[] = {
 
 DisplayObject closeButton;
 char closeButtonState = 0;
+DisplayObject admSpawnButton;
+DisplayObject admSpawnSetButton;
 
 constexpr size_t rowInList = 20;
 DisplayObject textlist[rowInList];
@@ -63,6 +65,17 @@ void InfoWindow_Init()
 	closeButton.Width = 33;
 	closeButton.Heigth = 32;
 	RecalculateRectRightDown(closeButton);
+
+	admSpawnButton.Left = InfoWindowRect.Left + 45;
+	admSpawnButton.Top = InfoWindowRect.Top + 345;
+	admSpawnButton.Width = 110;
+	admSpawnButton.Heigth = 24;
+	RecalculateRectRightDown(admSpawnButton);
+	admSpawnSetButton.Left = InfoWindowRect.Left + 170;
+	admSpawnSetButton.Top = InfoWindowRect.Top + 345;
+	admSpawnSetButton.Width = 110;
+	admSpawnSetButton.Heigth = 24;
+	RecalculateRectRightDown(admSpawnSetButton);
 
 	gc_icon.Width = 120;
 	gc_icon.Heigth = 76;
@@ -260,6 +273,10 @@ void __fastcall InfoWindow_Draw()
 		char admText[512];
 		sprintf(admText, "ID: %d\nNome: %s\nQualidade: %d\nSet: %s\n\nClique em um item da lista para selecionar. Alt+U gera o ID selecionado.", selectedId, selectedItem.Name ? selectedItem.Name : "(sem nome)", selectedItem.qualityLevel, selectedItem.uniqueSetIndex >= 0 ? UniqueSets[selectedItem.uniqueSetIndex].Name : "Nenhum");
 		InfoWindow_DrawLongText(longTextMidPos.Left, longTextMidPos.Top - 70, admText, C_0_White);
+		InfoWindow_DrawRect(Screen_LeftBorder + admSpawnButton.Left, Screen_TopBorder + admSpawnButton.Top, admSpawnButton.Width, admSpawnButton.Heigth, CursorIntoDisplayObject(admSpawnButton) ? 241 : 197);
+		InfoWindow_DrawRect(Screen_LeftBorder + admSpawnSetButton.Left, Screen_TopBorder + admSpawnSetButton.Top, admSpawnSetButton.Width, admSpawnSetButton.Heigth, CursorIntoDisplayObject(admSpawnSetButton) ? 241 : 197);
+		DrawLevelInfoText(admSpawnButton.Left + 18, admSpawnButton.Top + 17, "GERAR ITEM", C_0_White);
+		DrawLevelInfoText(admSpawnSetButton.Left + 24, admSpawnSetButton.Top + 17, "GERAR SET", selectedItem.uniqueSetIndex >= 0 ? C_0_White : C_8_Gray);
 		for( size_t i = 0; i < countof(textlist) && listStartFromIndex + i < gc_listIndexes.size(); ++i ){
 			int id = gc_listIndexes[listStartFromIndex + i];
 			char row[256];
@@ -380,6 +397,31 @@ void __fastcall InfoWindow_MouseDown()
 // ---- th2 -------------------------------------------------------------------------------
 void __fastcall InfoWindow_MouseUp()
 {
+	if( IsAdmItemWindow && !gc_listIndexes.empty() ){
+		size_t selected = lastSelectedInListIndex + listStartFromIndex;
+		if( selected < gc_listIndexes.size() ){
+			int selectedId = gc_listIndexes[selected];
+			if( CursorIntoDisplayObject(admSpawnButton) ){
+				int itemIndex = SpawnUnique(selectedId, Players[CurrentPlayerIndex].Row + 1, Players[CurrentPlayerIndex].Col);
+				if( itemIndex != -1 ) Items[itemIndex].Identified = 1;
+				PlayGlobalSound(S_75_I_TITLEMOV);
+				IsLeftButtonDown = false;
+				return;
+			}
+			if( CursorIntoDisplayObject(admSpawnSetButton) && UniqueItems[selectedId].uniqueSetIndex >= 0 ){
+				int setId = UniqueItems[selectedId].uniqueSetIndex;
+				for( size_t id = 0; id < count_UniqueItems; ++id ){
+					if( UniqueItems[id].uniqueSetIndex == setId ){
+						int itemIndex = SpawnUnique((int)id, Players[CurrentPlayerIndex].Row + 1, Players[CurrentPlayerIndex].Col);
+						if( itemIndex != -1 ) Items[itemIndex].Identified = 1;
+					}
+				}
+				PlayGlobalSound(S_75_I_TITLEMOV);
+				IsLeftButtonDown = false;
+				return;
+			}
+		}
+	}
 	// Close button
 	if (CursorIntoDisplayObject(closeButton)) {
 		closeButtonState = 0;
