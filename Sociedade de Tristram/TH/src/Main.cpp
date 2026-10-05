@@ -4226,10 +4226,12 @@ int __fastcall F1F4PressHandler( WPARAM fIndex, bool isF1 )
 void __fastcall KeyPressHandler(WPARAM key)
 {
 	Player& player = Players[CurrentPlayerIndex];
-	if( DevelopMode && key == VK_119_F8_KEY && GetAsyncKeyState(VK_CONTROL) < 0 && GetAsyncKeyState(VK_SHIFT) < 0 ){
+#ifdef _DEBUG
+	if( key == VK_119_F8_KEY && GetAsyncKeyState(VK_CONTROL) < 0 && GetAsyncKeyState(VK_SHIFT) < 0 ){
 		AdmItemWindow_Open();
 		return;
 	}
+#endif
 	if( AdmItemWindow_HandleKey((int)key) ) return;
 	if( Menu_DispatchKey(key) ){
 		return;
