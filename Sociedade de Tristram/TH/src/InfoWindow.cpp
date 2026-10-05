@@ -13,6 +13,7 @@ char AdmItemSearch[64] = {};
 bool AdmItemSearchMode = false;
 bool AdmIgnoreNumericItemRequirements = false;
 bool AdmIgnoreItemClassRequirements = false;
+bool AdmIgnoreItemClassRequirements = false;
 
 DisplayObject InfoWindowRect;
 constexpr const char* IW_headTexts[] = {
@@ -28,6 +29,7 @@ DisplayObject admPrevPageButton;
 DisplayObject admNextPageButton;
 DisplayObject admGoIdButton;
 DisplayObject admTestModeButton;
+DisplayObject admIgnoreClassButton;
 DisplayObject admIgnoreClassButton;
 
 constexpr size_t rowInList = 20;
@@ -121,6 +123,11 @@ void InfoWindow_Init()
 	admTestModeButton.Width = 235;
 	admTestModeButton.Heigth = 24;
 	RecalculateRectRightDown(admTestModeButton);
+	admIgnoreClassButton.Left = InfoWindowRect.Left + 45;
+	admIgnoreClassButton.Top = InfoWindowRect.Top + 445;
+	admIgnoreClassButton.Width = 235;
+	admIgnoreClassButton.Heigth = 24;
+	RecalculateRectRightDown(admIgnoreClassButton);
 	admIgnoreClassButton.Left = InfoWindowRect.Left + 45;
 	admIgnoreClassButton.Top = InfoWindowRect.Top + 445;
 	admIgnoreClassButton.Width = 235;
@@ -336,6 +343,8 @@ void __fastcall InfoWindow_Draw()
 		DrawLevelInfoText(admTestModeButton.Left + 35, admTestModeButton.Top + 17, AdmIgnoreNumericItemRequirements ? "MODO TESTE: ON" : "MODO TESTE: OFF", AdmIgnoreNumericItemRequirements ? C_5_Yellow : C_0_White);
 		InfoWindow_DrawRect(Screen_LeftBorder + admIgnoreClassButton.Left, Screen_TopBorder + admIgnoreClassButton.Top, admIgnoreClassButton.Width, admIgnoreClassButton.Heigth, CursorIntoDisplayObject(admIgnoreClassButton) ? 8 : 0);
 		DrawLevelInfoText(admIgnoreClassButton.Left + 25, admIgnoreClassButton.Top + 17, AdmIgnoreItemClassRequirements ? "IGNORAR CLASSE: ON" : "IGNORAR CLASSE: OFF", AdmIgnoreItemClassRequirements ? C_5_Yellow : C_0_White);
+		InfoWindow_DrawRect(Screen_LeftBorder + admIgnoreClassButton.Left, Screen_TopBorder + admIgnoreClassButton.Top, admIgnoreClassButton.Width, admIgnoreClassButton.Heigth, CursorIntoDisplayObject(admIgnoreClassButton) ? 8 : 0);
+		DrawLevelInfoText(admIgnoreClassButton.Left + 25, admIgnoreClassButton.Top + 17, AdmIgnoreItemClassRequirements ? "IGNORAR CLASSE: ON" : "IGNORAR CLASSE: OFF", AdmIgnoreItemClassRequirements ? C_5_Yellow : C_0_White);
 		char pageText[64];
 		sprintf(pageText, "%u-%u / %u", (unsigned)(listStartFromIndex + 1), (unsigned)min(listStartFromIndex + rowInList, gc_listIndexes.size()), (unsigned)gc_listIndexes.size());
 		DrawLevelInfoText(InfoWindowRect.Left + 458, InfoWindowRect.Top + 395, pageText, C_3_Gold);
@@ -462,6 +471,11 @@ void __fastcall InfoWindow_MouseUp()
 	if( IsAdmItemWindow && !gc_listIndexes.empty() ){
 		if( CursorIntoDisplayObject(admTestModeButton) ){
 			AdmIgnoreNumericItemRequirements = !AdmIgnoreNumericItemRequirements;
+			RecalcPlayer(CurrentPlayerIndex, 1);
+			PlayGlobalSound(S_75_I_TITLEMOV); IsLeftButtonDown = false; return;
+		}
+		if( CursorIntoDisplayObject(admIgnoreClassButton) ){
+			AdmIgnoreItemClassRequirements = !AdmIgnoreItemClassRequirements;
 			RecalcPlayer(CurrentPlayerIndex, 1);
 			PlayGlobalSound(S_75_I_TITLEMOV); IsLeftButtonDown = false; return;
 		}
