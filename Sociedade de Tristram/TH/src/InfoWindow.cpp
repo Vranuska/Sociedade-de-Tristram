@@ -533,6 +533,11 @@ void InfoWindow_Open()
 void AdmItemWindow_Open()
 {
 	if( !DevelopMode || count_UniqueItems == 0 ) return;
+	AdmItemSearchMode = false;
+	AdmItemSearch[0] = 0;
+	AdmItemJumpId = 0;
+	IsLeftButtonDown = false;
+	closeButtonState = 0;
 	IsAdmItemWindow = true;
 	gc_listIndexes.clear();
 	gc_listIndexes.reserve(count_UniqueItems);
@@ -546,6 +551,11 @@ void InfoWindow_Close()
 {
 	IsInfoWindowVisible = false;
 	IsAdmItemWindow = false;
+	AdmItemSearchMode = false;
+	AdmItemSearch[0] = 0;
+	AdmItemJumpId = 0;
+	IsLeftButtonDown = false;
+	closeButtonState = 0;
 }
 
 // ---- th2 -------------------------------------------------------------------------------
