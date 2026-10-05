@@ -4248,6 +4248,7 @@ int __fastcall F1F4PressHandler( WPARAM fIndex, bool isF1 )
 void __fastcall KeyPressHandler(WPARAM key)
 {
 	Player& player = Players[CurrentPlayerIndex];
+	if( AdmItemWindow_HandleKey((int)key) ) return;
 	if( Menu_DispatchKey(key) ){
 		return;
 	}
