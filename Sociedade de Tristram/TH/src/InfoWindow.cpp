@@ -122,7 +122,7 @@ void InfoWindow_Init()
 	admTestModeButton.Heigth = 24;
 	RecalculateRectRightDown(admTestModeButton);
 	admIgnoreClassButton.Left = InfoWindowRect.Left + 45;
-	admIgnoreClassButton.Top = InfoWindowRect.Top + 415;
+	admIgnoreClassButton.Top = InfoWindowRect.Top + 405;
 	admIgnoreClassButton.Width = 235;
 	admIgnoreClassButton.Heigth = 24;
 	RecalculateRectRightDown(admIgnoreClassButton);
