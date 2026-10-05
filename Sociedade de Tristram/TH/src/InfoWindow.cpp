@@ -300,7 +300,7 @@ void __fastcall InfoWindow_Draw()
 		int selectedId = gc_listIndexes[selected];
 		const UniqueItem& selectedItem = UniqueItems[selectedId];
 		char admText[512];
-		sprintf(admText, "ID: %d\nNome: %s\nQualidade: %d\nSet: %s\n\nClique em um item da lista para selecionar. Alt+U gera o ID selecionado.", selectedId, selectedItem.Name ? selectedItem.Name : "(sem nome)", selectedItem.qualityLevel, selectedItem.uniqueSetIndex >= 0 && selectedItem.uniqueSetIndex < int(count_UniqueSet) ? UniqueSets[selectedItem.uniqueSetIndex].Name : "Nenhum");
+		sprintf(admText, "ID: %d\nNome: %s\nQualidade: %d\nSet: %s\n\nClique em um item da lista e use GERAR ITEM ou GERAR SET.", selectedId, selectedItem.Name ? selectedItem.Name : "(sem nome)", selectedItem.qualityLevel, selectedItem.uniqueSetIndex >= 0 && selectedItem.uniqueSetIndex < int(count_UniqueSet) ? UniqueSets[selectedItem.uniqueSetIndex].Name : "Nenhum");
 		InfoWindow_DrawLongText(longTextMidPos.Left, longTextMidPos.Top - 70, admText, C_0_White);
 		InfoWindow_DrawRect(Screen_LeftBorder + admSpawnButton.Left, Screen_TopBorder + admSpawnButton.Top, admSpawnButton.Width, admSpawnButton.Heigth, CursorIntoDisplayObject(admSpawnButton) ? 241 : 197);
 		InfoWindow_DrawRect(Screen_LeftBorder + admSpawnSetButton.Left, Screen_TopBorder + admSpawnSetButton.Top, admSpawnSetButton.Width, admSpawnSetButton.Heigth, CursorIntoDisplayObject(admSpawnSetButton) ? 241 : 197);
@@ -420,7 +420,7 @@ void __fastcall InfoWindow_MouseMove()
 		closeButtonState = 0;
 
 	// List
-	for (size_t i = 0; i < countof(textlist) && i < gc_listIndexes.size(); ++i) {
+	for (size_t i = 0; i < countof(textlist) && listStartFromIndex + i < gc_listIndexes.size(); ++i) {
 		if (CursorIntoDisplayObject(textlist[i])) {
 			if (textliststates[i] == 0) textliststates[i] = 2;
 		}
@@ -466,8 +466,18 @@ void __fastcall InfoWindow_MouseUp()
 		if( selected < gc_listIndexes.size() ){
 			int selectedId = gc_listIndexes[selected];
 			if( CursorIntoDisplayObject(admSpawnButton) ){
-				int itemIndex = SpawnUnique(selectedId, Players[CurrentPlayerIndex].Row + 1, Players[CurrentPlayerIndex].Col);
-				if( itemIndex != -1 ) Items[itemIndex].Identified = 1;
+				int itemIndex = -1;
+				UniqueItem& uniq = UniqueItems[selectedId];
+				for( size_t i = 0; i < count_BaseItems; ++i ){
+					if( uniq.uniqLine == BaseItems[i].uniqLine ){
+						itemIndex = SpawnUnique(selectedId, Players[CurrentPlayerIndex].Row + 1, Players[CurrentPlayerIndex].Col, false, i);
+						if( itemIndex != -1 ) Items[itemIndex].Identified = 1;
+					}
+				}
+				if( itemIndex == -1 ){
+					itemIndex = SpawnUnique(selectedId, Players[CurrentPlayerIndex].Row + 1, Players[CurrentPlayerIndex].Col);
+					if( itemIndex != -1 ) Items[itemIndex].Identified = 1;
+				}
 				PlayGlobalSound(S_75_I_TITLEMOV);
 				IsLeftButtonDown = false;
 				return;
@@ -494,7 +504,7 @@ void __fastcall InfoWindow_MouseUp()
 	}
 
 	// List
-	for (size_t i = 0; i < countof(textlist) && i < gc_listIndexes.size(); ++i)
+	for (size_t i = 0; i < countof(textlist) && listStartFromIndex + i < gc_listIndexes.size(); ++i)
 		if (CursorIntoDisplayObject(textlist[i])) {
 			if (i == lastSelectedInListIndex) break;
 			textliststates[lastSelectedInListIndex] = 0;
