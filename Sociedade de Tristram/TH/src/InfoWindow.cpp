@@ -92,12 +92,12 @@ void InfoWindow_Init()
 	RecalculateRectRightDown(closeButton);
 
 	admSpawnButton.Left = InfoWindowRect.Left + 45;
-	admSpawnButton.Top = InfoWindowRect.Top + 315;
+	admSpawnButton.Top = InfoWindowRect.Top + 195;
 	admSpawnButton.Width = 110;
 	admSpawnButton.Heigth = 24;
 	RecalculateRectRightDown(admSpawnButton);
 	admSpawnSetButton.Left = InfoWindowRect.Left + 170;
-	admSpawnSetButton.Top = InfoWindowRect.Top + 315;
+	admSpawnSetButton.Top = InfoWindowRect.Top + 195;
 	admSpawnSetButton.Width = 110;
 	admSpawnSetButton.Heigth = 24;
 	RecalculateRectRightDown(admSpawnSetButton);
@@ -112,17 +112,17 @@ void InfoWindow_Init()
 	admNextPageButton.Heigth = 22;
 	RecalculateRectRightDown(admNextPageButton);
 	admGoIdButton.Left = InfoWindowRect.Left + 45;
-	admGoIdButton.Top = InfoWindowRect.Top + 345;
+	admGoIdButton.Top = InfoWindowRect.Top + 225;
 	admGoIdButton.Width = 235;
 	admGoIdButton.Heigth = 24;
 	RecalculateRectRightDown(admGoIdButton);
 	admTestModeButton.Left = InfoWindowRect.Left + 45;
-	admTestModeButton.Top = InfoWindowRect.Top + 375;
+	admTestModeButton.Top = InfoWindowRect.Top + 255;
 	admTestModeButton.Width = 235;
 	admTestModeButton.Heigth = 24;
 	RecalculateRectRightDown(admTestModeButton);
 	admIgnoreClassButton.Left = InfoWindowRect.Left + 45;
-	admIgnoreClassButton.Top = InfoWindowRect.Top + 405;
+	admIgnoreClassButton.Top = InfoWindowRect.Top + 285;
 	admIgnoreClassButton.Width = 235;
 	admIgnoreClassButton.Heigth = 24;
 	RecalculateRectRightDown(admIgnoreClassButton);
