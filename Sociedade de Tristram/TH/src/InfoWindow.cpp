@@ -9,6 +9,8 @@ bool IsInfoWindowVisible = false;
 bool IsLeftButtonDown = false;
 bool IsAdmItemWindow = false;
 int AdmItemJumpId = 0;
+char AdmItemSearch[64] = {};
+bool AdmItemSearchMode = false;
 
 DisplayObject InfoWindowRect;
 constexpr const char* IW_headTexts[] = {
@@ -313,7 +315,8 @@ void __fastcall InfoWindow_Draw()
 		DrawLevelInfoText(admNextPageButton.Left + 17, admNextPageButton.Top + 16, "PROXIMA >", C_0_White);
 		InfoWindow_DrawRect(Screen_LeftBorder + admGoIdButton.Left, Screen_TopBorder + admGoIdButton.Top, admGoIdButton.Width, admGoIdButton.Heigth, CursorIntoDisplayObject(admGoIdButton) ? 241 : 197);
 		char goIdText[96];
-		sprintf(goIdText, "IR PARA ID: %d", AdmItemJumpId);
+		if( AdmItemSearchMode ) sprintf(goIdText, "BUSCAR: %s_", AdmItemSearch);
+		else sprintf(goIdText, "ID: %d | / BUSCAR", AdmItemJumpId);
 		DrawLevelInfoText(admGoIdButton.Left + 35, admGoIdButton.Top + 17, goIdText, C_0_White);
 		char pageText[64];
 		sprintf(pageText, "%u-%u / %u", (unsigned)(listStartFromIndex + 1), (unsigned)min(listStartFromIndex + rowInList, gc_listIndexes.size()), (unsigned)gc_listIndexes.size());
@@ -546,29 +549,50 @@ void InfoWindow_Close()
 }
 
 // ---- th2 -------------------------------------------------------------------------------
+static char AdmAsciiLower(char c)
+{
+	return c >= 'A' && c <= 'Z' ? c + ('a' - 'A') : c;
+}
+
+static bool AdmNameContains(const char* name, const char* query)
+{
+	if( !name || !query || !query[0] ) return false;
+	for( const char* start = name; *start; ++start ){
+		const char* a = start;
+		const char* b = query;
+		while( *a && *b && AdmAsciiLower(*a) == AdmAsciiLower(*b) ){ ++a; ++b; }
+		if( !*b ) return true;
+	}
+	return false;
+}
+
+static void AdmSelectUniqueId(int id)
+{
+	if( gc_listIndexes.empty() ) return;
+	if( id < 0 ) id = 0;
+	if( id >= int(gc_listIndexes.size()) ) id = int(gc_listIndexes.size()) - 1;
+	AdmItemJumpId = id;
+	listStartFromIndex = (size_t(id) / rowInList) * rowInList;
+	if( listStartFromIndex > listStartLastIndex ) listStartFromIndex = listStartLastIndex;
+	lastSelectedInListIndex = size_t(id) - listStartFromIndex;
+	memset(textliststates, 0, sizeof(textliststates));
+	textliststates[lastSelectedInListIndex] = 1;
+}
+
 bool AdmItemWindow_HandleKey(int key)
 {
 	if( !IsAdmItemWindow || !IsInfoWindowVisible ) return false;
-	if( key >= VK_48_0_KEY && key <= VK_57_9_KEY ){
-		int digit = key - VK_48_0_KEY;
-		if( AdmItemJumpId > 99999 ) AdmItemJumpId = 0;
-		AdmItemJumpId = AdmItemJumpId * 10 + digit;
+	if( key == VK_191_SLASH_KEY || key == VK_OEM_2 ){
+		AdmItemSearchMode = true;
+		AdmItemSearch[0] = 0;
 		return true;
 	}
-	if( key == VK_8_BACKSPACE_KEY ){
-		AdmItemJumpId /= 10;
-		return true;
-	}
-	if( key == VK_13_RETURN_KEY ){
-		int id = AdmItemJumpId;
-		if( id < 0 ) id = 0;
-		if( id >= int(gc_listIndexes.size()) ) id = int(gc_listIndexes.size()) - 1;
-		AdmItemJumpId = id;
-		listStartFromIndex = (size_t(id) / rowInList) * rowInList;
-		if( listStartFromIndex > listStartLastIndex ) listStartFromIndex = listStartLastIndex;
-		lastSelectedInListIndex = size_t(id) - listStartFromIndex;
-		memset(textliststates, 0, sizeof(textliststates));
-		textliststates[lastSelectedInListIndex] = 1;
+	if( AdmItemSearchMode ){
+		size_t len = strlen(AdmItemSearch);
+		if( key == VK_27_ESC_KEY ){ AdmItemSearchMode = false; AdmItemSearch[0] = 0; return true; }
+		if( key == VK_8_BACKSPACE_KEY ){ if( len ) AdmItemSearch[len - 1] = 0; return true; }
+		if( key == VK_13_RETURN_KEY ){
+		AdmSelectUniqueId(AdmItemJumpId);
 		PlayGlobalSound(S_75_I_TITLEMOV);
 		return true;
 	}
