@@ -13,7 +13,6 @@ char AdmItemSearch[64] = {};
 bool AdmItemSearchMode = false;
 bool AdmIgnoreNumericItemRequirements = false;
 bool AdmIgnoreItemClassRequirements = false;
-bool AdmIgnoreItemClassRequirements = false;
 
 DisplayObject InfoWindowRect;
 constexpr const char* IW_headTexts[] = {
@@ -29,7 +28,6 @@ DisplayObject admPrevPageButton;
 DisplayObject admNextPageButton;
 DisplayObject admGoIdButton;
 DisplayObject admTestModeButton;
-DisplayObject admIgnoreClassButton;
 DisplayObject admIgnoreClassButton;
 
 constexpr size_t rowInList = 20;
