@@ -5554,6 +5554,7 @@ void Item::getStatEffects(StatEffects& se, Player& player)
 void __fastcall RecalcReqMetForOnBodyItems( int playerIndex )
 {
 	Player& player = Players[playerIndex];
+	extern bool AdmIgnoreNumericItemRequirements;
 
 	// Ensure that full class id is set, else, CheckBaseItemClassReq might fail.
 	// This isn't the ideal spot for this...but I don't know where it should go in this project...
@@ -5582,7 +5583,7 @@ void __fastcall RecalcReqMetForOnBodyItems( int playerIndex )
 	for( Item* itemPtr : equippedItems ){
 		Item& item = *itemPtr;
 		if( item.ItemCode != IC_M1_NONE
-			&& player.CharLevel >= item.RequiredLevel
+			&& (AdmIgnoreNumericItemRequirements || player.CharLevel >= item.RequiredLevel)
 			&& CheckBaseItemClassReq( playerIndex, item.baseItemIndex )
 			&& !isItemBroken( item ) )
 		{
@@ -5610,6 +5611,7 @@ void __fastcall RecalcReqMetForOnBodyItems( int playerIndex )
 			}
 			int advancedUser = PerkValue(PERK_ADVANCED_USER, playerIndex);
 			int itemReqMet = 1;
+			if( AdmIgnoreNumericItemRequirements ) continue;
 			int skilledTraitBenefit = HasTrait(playerIndex, TraitId::Skilled) ? (player.CharLevel + (player.CharLevel * player.CharLevel / 150)) : 0;
 			const int effectiveStrength = statEffects.adds[ST_STRENGTH]
 				+ advancedUser
