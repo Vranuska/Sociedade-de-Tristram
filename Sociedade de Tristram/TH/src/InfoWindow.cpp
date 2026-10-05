@@ -126,11 +126,6 @@ void InfoWindow_Init()
 	admIgnoreClassButton.Width = 235;
 	admIgnoreClassButton.Heigth = 24;
 	RecalculateRectRightDown(admIgnoreClassButton);
-	admIgnoreClassButton.Left = InfoWindowRect.Left + 45;
-	admIgnoreClassButton.Top = InfoWindowRect.Top + 445;
-	admIgnoreClassButton.Width = 235;
-	admIgnoreClassButton.Heigth = 24;
-	RecalculateRectRightDown(admIgnoreClassButton);
 
 	gc_icon.Width = 120;
 	gc_icon.Heigth = 76;
@@ -339,8 +334,6 @@ void __fastcall InfoWindow_Draw()
 		DrawLevelInfoText(admGoIdButton.Left + 35, admGoIdButton.Top + 17, goIdText, C_0_White);
 		InfoWindow_DrawRect(Screen_LeftBorder + admTestModeButton.Left, Screen_TopBorder + admTestModeButton.Top, admTestModeButton.Width, admTestModeButton.Heigth, CursorIntoDisplayObject(admTestModeButton) ? 8 : 0);
 		DrawLevelInfoText(admTestModeButton.Left + 35, admTestModeButton.Top + 17, AdmIgnoreNumericItemRequirements ? "MODO TESTE: ON" : "MODO TESTE: OFF", AdmIgnoreNumericItemRequirements ? C_5_Yellow : C_0_White);
-		InfoWindow_DrawRect(Screen_LeftBorder + admIgnoreClassButton.Left, Screen_TopBorder + admIgnoreClassButton.Top, admIgnoreClassButton.Width, admIgnoreClassButton.Heigth, CursorIntoDisplayObject(admIgnoreClassButton) ? 8 : 0);
-		DrawLevelInfoText(admIgnoreClassButton.Left + 25, admIgnoreClassButton.Top + 17, AdmIgnoreItemClassRequirements ? "IGNORAR CLASSE: ON" : "IGNORAR CLASSE: OFF", AdmIgnoreItemClassRequirements ? C_5_Yellow : C_0_White);
 		InfoWindow_DrawRect(Screen_LeftBorder + admIgnoreClassButton.Left, Screen_TopBorder + admIgnoreClassButton.Top, admIgnoreClassButton.Width, admIgnoreClassButton.Heigth, CursorIntoDisplayObject(admIgnoreClassButton) ? 8 : 0);
 		DrawLevelInfoText(admIgnoreClassButton.Left + 25, admIgnoreClassButton.Top + 17, AdmIgnoreItemClassRequirements ? "IGNORAR CLASSE: ON" : "IGNORAR CLASSE: OFF", AdmIgnoreItemClassRequirements ? C_5_Yellow : C_0_White);
 		char pageText[64];
