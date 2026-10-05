@@ -11,6 +11,7 @@ bool IsAdmItemWindow = false;
 int AdmItemJumpId = 0;
 char AdmItemSearch[64] = {};
 bool AdmItemSearchMode = false;
+bool AdmIgnoreNumericItemRequirements = false;
 
 DisplayObject InfoWindowRect;
 constexpr const char* IW_headTexts[] = {
@@ -25,6 +26,7 @@ DisplayObject admSpawnSetButton;
 DisplayObject admPrevPageButton;
 DisplayObject admNextPageButton;
 DisplayObject admGoIdButton;
+DisplayObject admTestModeButton;
 
 constexpr size_t rowInList = 20;
 DisplayObject textlist[rowInList];
@@ -112,6 +114,11 @@ void InfoWindow_Init()
 	admGoIdButton.Width = 235;
 	admGoIdButton.Heigth = 24;
 	RecalculateRectRightDown(admGoIdButton);
+	admTestModeButton.Left = InfoWindowRect.Left + 45;
+	admTestModeButton.Top = InfoWindowRect.Top + 415;
+	admTestModeButton.Width = 235;
+	admTestModeButton.Heigth = 24;
+	RecalculateRectRightDown(admTestModeButton);
 
 	gc_icon.Width = 120;
 	gc_icon.Heigth = 76;
@@ -318,6 +325,8 @@ void __fastcall InfoWindow_Draw()
 		if( AdmItemSearchMode ) sprintf(goIdText, "BUSCAR: %s_", AdmItemSearch);
 		else sprintf(goIdText, "ID: %d | / BUSCAR", AdmItemJumpId);
 		DrawLevelInfoText(admGoIdButton.Left + 35, admGoIdButton.Top + 17, goIdText, C_0_White);
+		InfoWindow_DrawRect(Screen_LeftBorder + admTestModeButton.Left, Screen_TopBorder + admTestModeButton.Top, admTestModeButton.Width, admTestModeButton.Heigth, CursorIntoDisplayObject(admTestModeButton) ? 8 : 0);
+		DrawLevelInfoText(admTestModeButton.Left + 35, admTestModeButton.Top + 17, AdmIgnoreNumericItemRequirements ? "MODO TESTE: ON" : "MODO TESTE: OFF", AdmIgnoreNumericItemRequirements ? C_5_Yellow : C_0_White);
 		char pageText[64];
 		sprintf(pageText, "%u-%u / %u", (unsigned)(listStartFromIndex + 1), (unsigned)min(listStartFromIndex + rowInList, gc_listIndexes.size()), (unsigned)gc_listIndexes.size());
 		DrawLevelInfoText(InfoWindowRect.Left + 458, InfoWindowRect.Top + 395, pageText, C_3_Gold);
@@ -442,6 +451,11 @@ void __fastcall InfoWindow_MouseDown()
 void __fastcall InfoWindow_MouseUp()
 {
 	if( IsAdmItemWindow && !gc_listIndexes.empty() ){
+		if( CursorIntoDisplayObject(admTestModeButton) ){
+			AdmIgnoreNumericItemRequirements = !AdmIgnoreNumericItemRequirements;
+			RecalcPlayer(CurrentPlayerIndex, 1);
+			PlayGlobalSound(S_75_I_TITLEMOV); IsLeftButtonDown = false; return;
+		}
 		if( CursorIntoDisplayObject(admGoIdButton) ){
 			int id = AdmItemJumpId;
 			if( id < 0 ) id = 0;
