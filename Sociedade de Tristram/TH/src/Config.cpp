@@ -478,6 +478,8 @@ void GetParamsFromConfig()
 		LimitToRange(QoLEliteDropPercent, 0, 100);
 		LimitToRange(QoLBossDropPercent, 0, 100);
 		LimitToRange(QoLRarePercent, 0, 100);
+		LimitToRange(QoLUniqueRatePercent, 0, 1000);
+		LimitToRange(QoLRareRatePercent, 0, 1000);
 		LimitToRange(QoLXpPercent, 0, 1000);
 		LimitToRange(QoLGoldPercent, 0, 1000);
 		LimitToRange(QoLEliteMinPerFloor, 0, 12);
