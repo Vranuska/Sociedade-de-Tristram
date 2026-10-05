@@ -532,7 +532,7 @@ void InfoWindow_Open()
 
 void AdmItemWindow_Open()
 {
-#ifdef _DEBUG
+#if CHEATS
 	if( count_UniqueItems == 0 ) return;
 #else
 	if( !DevelopMode || count_UniqueItems == 0 ) return;
