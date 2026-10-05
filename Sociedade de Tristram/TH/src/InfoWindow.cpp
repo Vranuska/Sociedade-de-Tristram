@@ -19,6 +19,8 @@ DisplayObject closeButton;
 char closeButtonState = 0;
 DisplayObject admSpawnButton;
 DisplayObject admSpawnSetButton;
+DisplayObject admPrevPageButton;
+DisplayObject admNextPageButton;
 
 constexpr size_t rowInList = 20;
 DisplayObject textlist[rowInList];
@@ -76,6 +78,16 @@ void InfoWindow_Init()
 	admSpawnSetButton.Width = 110;
 	admSpawnSetButton.Heigth = 24;
 	RecalculateRectRightDown(admSpawnSetButton);
+	admPrevPageButton.Left = InfoWindowRect.Left + 350;
+	admPrevPageButton.Top = InfoWindowRect.Top + 405;
+	admPrevPageButton.Width = 100;
+	admPrevPageButton.Heigth = 22;
+	RecalculateRectRightDown(admPrevPageButton);
+	admNextPageButton.Left = InfoWindowRect.Left + 500;
+	admNextPageButton.Top = InfoWindowRect.Top + 405;
+	admNextPageButton.Width = 100;
+	admNextPageButton.Heigth = 22;
+	RecalculateRectRightDown(admNextPageButton);
 
 	gc_icon.Width = 120;
 	gc_icon.Heigth = 76;
@@ -277,6 +289,13 @@ void __fastcall InfoWindow_Draw()
 		InfoWindow_DrawRect(Screen_LeftBorder + admSpawnSetButton.Left, Screen_TopBorder + admSpawnSetButton.Top, admSpawnSetButton.Width, admSpawnSetButton.Heigth, CursorIntoDisplayObject(admSpawnSetButton) ? 241 : 197);
 		DrawLevelInfoText(admSpawnButton.Left + 18, admSpawnButton.Top + 17, "GERAR ITEM", C_0_White);
 		DrawLevelInfoText(admSpawnSetButton.Left + 24, admSpawnSetButton.Top + 17, "GERAR SET", selectedItem.uniqueSetIndex >= 0 ? C_0_White : C_8_Gray);
+		InfoWindow_DrawRect(Screen_LeftBorder + admPrevPageButton.Left, Screen_TopBorder + admPrevPageButton.Top, admPrevPageButton.Width, admPrevPageButton.Heigth, CursorIntoDisplayObject(admPrevPageButton) ? 241 : 197);
+		InfoWindow_DrawRect(Screen_LeftBorder + admNextPageButton.Left, Screen_TopBorder + admNextPageButton.Top, admNextPageButton.Width, admNextPageButton.Heigth, CursorIntoDisplayObject(admNextPageButton) ? 241 : 197);
+		DrawLevelInfoText(admPrevPageButton.Left + 15, admPrevPageButton.Top + 16, "< ANTERIOR", C_0_White);
+		DrawLevelInfoText(admNextPageButton.Left + 17, admNextPageButton.Top + 16, "PROXIMA >", C_0_White);
+		char pageText[64];
+		sprintf(pageText, "%u-%u / %u", (unsigned)(listStartFromIndex + 1), (unsigned)min(listStartFromIndex + rowInList, gc_listIndexes.size()), (unsigned)gc_listIndexes.size());
+		DrawLevelInfoText(InfoWindowRect.Left + 458, InfoWindowRect.Top + 395, pageText, C_3_Gold);
 		for( size_t i = 0; i < countof(textlist) && listStartFromIndex + i < gc_listIndexes.size(); ++i ){
 			int id = gc_listIndexes[listStartFromIndex + i];
 			char row[256];
@@ -398,6 +417,18 @@ void __fastcall InfoWindow_MouseDown()
 void __fastcall InfoWindow_MouseUp()
 {
 	if( IsAdmItemWindow && !gc_listIndexes.empty() ){
+		if( CursorIntoDisplayObject(admPrevPageButton) ){
+			listStartFromIndex = listStartFromIndex >= rowInList ? listStartFromIndex - rowInList : 0;
+			lastSelectedInListIndex = 0;
+			memset(textliststates, 0, sizeof(textliststates)); textliststates[0] = 1;
+			PlayGlobalSound(S_75_I_TITLEMOV); IsLeftButtonDown = false; return;
+		}
+		if( CursorIntoDisplayObject(admNextPageButton) ){
+			listStartFromIndex = min(listStartFromIndex + rowInList, listStartLastIndex);
+			lastSelectedInListIndex = 0;
+			memset(textliststates, 0, sizeof(textliststates)); textliststates[0] = 1;
+			PlayGlobalSound(S_75_I_TITLEMOV); IsLeftButtonDown = false; return;
+		}
 		size_t selected = lastSelectedInListIndex + listStartFromIndex;
 		if( selected < gc_listIndexes.size() ){
 			int selectedId = gc_listIndexes[selected];
