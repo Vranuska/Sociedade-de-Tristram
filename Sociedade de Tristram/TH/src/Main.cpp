@@ -4226,7 +4226,7 @@ int __fastcall F1F4PressHandler( WPARAM fIndex, bool isF1 )
 void __fastcall KeyPressHandler(WPARAM key)
 {
 	Player& player = Players[CurrentPlayerIndex];
-#ifdef _DEBUG
+#if CHEATS
 	if( key == VK_119_F8_KEY && GetAsyncKeyState(VK_CONTROL) < 0 && GetAsyncKeyState(VK_SHIFT) < 0 ){
 		AdmItemWindow_Open();
 		return;
