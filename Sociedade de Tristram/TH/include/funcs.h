@@ -2430,6 +2430,7 @@ void __fastcall InfoWindow_Draw();
 void __fastcall InfoWindow_MouseMove();
 void __fastcall InfoWindow_MouseDown();
 void InfoWindow_Open();
+void AdmItemWindow_Open();
 void InfoWindow_Close();
 void __fastcall InfoWindow_MouseUp();
 void InfoWindow_Prev();
