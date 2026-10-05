@@ -3206,8 +3206,10 @@ int __stdcall GameWindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 						}
 						break;
 					}
-                    
-                        break; */
+
+                    case VK_77_M_KEY: { // Alt + M, ADM item browser
+                        AdmItemWindow_Open();
+                        break;
                     }
                     case VK_74_J_KEY: { // Alt + J, ADM: find next unique whose name contains the chat text
                         if( !DevelopMode ) break;
@@ -4226,12 +4228,6 @@ int __fastcall F1F4PressHandler( WPARAM fIndex, bool isF1 )
 void __fastcall KeyPressHandler(WPARAM key)
 {
 	Player& player = Players[CurrentPlayerIndex];
-#if CHEATS
-	if( key == VK_119_F8_KEY && GetAsyncKeyState(VK_CONTROL) < 0 && GetAsyncKeyState(VK_SHIFT) < 0 ){
-		AdmItemWindow_Open();
-		return;
-	}
-#endif
 	if( AdmItemWindow_HandleKey((int)key) ) return;
 	if( Menu_DispatchKey(key) ){
 		return;
