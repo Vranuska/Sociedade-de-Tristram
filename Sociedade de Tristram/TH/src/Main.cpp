@@ -3206,6 +3206,26 @@ int __stdcall GameWindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 						}
 						break;
 					}
+                    case VK_73_I_KEY: { // Alt + I, ADM: show unique item ID/name around selected ID
+                        if( !DevelopMode ) break;
+                        int centerId = IsGoldSplitPanelVisible ? HowMuchGoldYouWantToRemove : 0;
+                        if( centerId < 0 ) centerId = 0;
+                        if( centerId >= int(count_UniqueItems) ) centerId = int(count_UniqueItems) - 1;
+                        Tooltip_Clear();
+                        Tooltip_SetOffsetRight();
+                        sprintf(InfoPanelBuffer, "ADM ITENS - %u unicos | centro ID %d", (unsigned)count_UniqueItems, centerId);
+                        Tooltip_AddLine(InfoPanelBuffer, C_3_Gold);
+                        int firstId = centerId - 5;
+                        if( firstId < 0 ) firstId = 0;
+                        int lastId = firstId + 10;
+                        if( lastId >= int(count_UniqueItems) ) lastId = int(count_UniqueItems) - 1;
+                        for( int id = firstId; id <= lastId; ++id ){
+                            const UniqueItem& u = UniqueItems[id];
+                            sprintf(InfoPanelBuffer, "%d | %s%s", id, u.Name ? u.Name : "(sem nome)",
+                                u.uniqueSetIndex >= 0 ? " [SET]" : "");
+                            Tooltip_AddLine(InfoPanelBuffer);
+                        }
+                        break; }
                     case VK_75_K_KEY: { // Alt + K, drop of a given line of unique items
                         for( size_t i = 0; i < count_UniqueItems; ++i ){
                             UniqueItem& uniq = UniqueItems[i];
