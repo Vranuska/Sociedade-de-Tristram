@@ -532,7 +532,11 @@ void InfoWindow_Open()
 
 void AdmItemWindow_Open()
 {
+#ifdef _DEBUG
+	if( count_UniqueItems == 0 ) return;
+#else
 	if( !DevelopMode || count_UniqueItems == 0 ) return;
+#endif
 	AdmItemSearchMode = false;
 	AdmItemSearch[0] = 0;
 	AdmItemJumpId = 0;
