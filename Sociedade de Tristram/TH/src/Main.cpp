@@ -3206,7 +3206,7 @@ int __stdcall GameWindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 						}
 						break;
 					}
-                    case VK_73_I_KEY: { // Alt + I, ADM: show unique item ID/name around selected ID
+                    case VK_73_I_KEY: { // Alt + I, ADM: browse/search unique items
                         if( !DevelopMode ) break;
                         int centerId = IsGoldSplitPanelVisible ? HowMuchGoldYouWantToRemove : 0;
                         if( centerId < 0 ) centerId = 0;
@@ -3225,6 +3225,35 @@ int __stdcall GameWindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                                 u.uniqueSetIndex >= 0 ? " [SET]" : "");
                             Tooltip_AddLine(InfoPanelBuffer);
                         }
+                        break; }
+                    case VK_74_J_KEY: { // Alt + J, ADM: find next unique whose name contains the chat text
+                        if( !DevelopMode ) break;
+                        if( !TalkPanelMessage[0] ){
+                            sprintf(InfoPanelHeader, "ADM: digite parte do nome no chat e use Alt+J.");
+                            InfoPanelUsed = 1;
+                            break;
+                        }
+                        int startId = IsGoldSplitPanelVisible ? HowMuchGoldYouWantToRemove + 1 : 0;
+                        if( startId < 0 || startId >= int(count_UniqueItems) ) startId = 0;
+                        int foundId = -1;
+                        for( int pass = 0; pass < 2 && foundId < 0; ++pass ){
+                            int from = pass == 0 ? startId : 0;
+                            int to = pass == 0 ? int(count_UniqueItems) : startId;
+                            for( int id = from; id < to; ++id ){
+                                const char* name = UniqueItems[id].Name;
+                                if( name && StrStrIA(name, TalkPanelMessage) ){
+                                    foundId = id;
+                                    break;
+                                }
+                            }
+                        }
+                        if( foundId >= 0 ){
+                            HowMuchGoldYouWantToRemove = foundId;
+                            sprintf(InfoPanelHeader, "ADM: %d | %s", foundId, UniqueItems[foundId].Name);
+                        }else{
+                            sprintf(InfoPanelHeader, "ADM: nenhum unico contem '%s'.", TalkPanelMessage);
+                        }
+                        InfoPanelUsed = 1;
                         break; }
                     case VK_75_K_KEY: { // Alt + K, drop of a given line of unique items
                         for( size_t i = 0; i < count_UniqueItems; ++i ){
