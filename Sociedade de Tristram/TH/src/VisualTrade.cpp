@@ -648,12 +648,12 @@ void __fastcall VisualTrade_MouseMove()
                         uchar griswoldLevel = VisualTrade_GetGriswoldLevel();
                         if (griswoldLevel >= 25)
                         {
-						sprintf(InfoPanelBuffer, "Nivel dos itens: +%i (max)", griswoldLevel);
+						sprintf(InfoPanelBuffer, "Qualidade PREMIUM: +%i (max)", griswoldLevel);
 							Tooltip_AddLine(InfoPanelBuffer, C_3_Gold);
                         }
                         else
                         {
-                            sprintf(InfoPanelBuffer, "Nivel dos itens: +%i ", griswoldLevel);
+                            sprintf(InfoPanelBuffer, "Qualidade PREMIUM: +%i ", griswoldLevel);
                             Tooltip_AddLine(InfoPanelBuffer);
                             int price = VisualTrade_GetGriswoldUpgradePrice();
                             sprintf(InfoPanelBuffer, "APRIMORAR por %i ouro", price);
@@ -1470,6 +1470,15 @@ void VisualTrade_GriswoldUpgrade()
                 Player& player = Players[CurrentPlayerIndex];
                 player.griswoldLevel++;
                 ClearGoldByInventoryAsPrice(price);
+
+                // Sociedade de Tristram: the upgrade affects newly generated
+                // Griswold premium affixes, so refresh that stock immediately.
+                for( auto& item : MagicItemsStoreArray ){
+                    item.ItemCode = IC_M1_NONE;
+                }
+                GriswoldMagicItemCount = 0;
+                SetRndSeed(DungeonRandSeed[(DUNGEON)Dungeon] * ms(GetTickCountTh()));
+                MagicItemsGeneration(CurrentPlayerIndex);
             }
 			else
 			{
