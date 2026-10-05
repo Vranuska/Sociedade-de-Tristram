@@ -21,6 +21,7 @@ DisplayObject admSpawnButton;
 DisplayObject admSpawnSetButton;
 DisplayObject admPrevPageButton;
 DisplayObject admNextPageButton;
+DisplayObject admGoIdButton;
 
 constexpr size_t rowInList = 20;
 DisplayObject textlist[rowInList];
@@ -88,6 +89,11 @@ void InfoWindow_Init()
 	admNextPageButton.Width = 100;
 	admNextPageButton.Heigth = 22;
 	RecalculateRectRightDown(admNextPageButton);
+	admGoIdButton.Left = InfoWindowRect.Left + 45;
+	admGoIdButton.Top = InfoWindowRect.Top + 385;
+	admGoIdButton.Width = 235;
+	admGoIdButton.Heigth = 24;
+	RecalculateRectRightDown(admGoIdButton);
 
 	gc_icon.Width = 120;
 	gc_icon.Heigth = 76;
@@ -293,6 +299,10 @@ void __fastcall InfoWindow_Draw()
 		InfoWindow_DrawRect(Screen_LeftBorder + admNextPageButton.Left, Screen_TopBorder + admNextPageButton.Top, admNextPageButton.Width, admNextPageButton.Heigth, CursorIntoDisplayObject(admNextPageButton) ? 241 : 197);
 		DrawLevelInfoText(admPrevPageButton.Left + 15, admPrevPageButton.Top + 16, "< ANTERIOR", C_0_White);
 		DrawLevelInfoText(admNextPageButton.Left + 17, admNextPageButton.Top + 16, "PROXIMA >", C_0_White);
+		InfoWindow_DrawRect(Screen_LeftBorder + admGoIdButton.Left, Screen_TopBorder + admGoIdButton.Top, admGoIdButton.Width, admGoIdButton.Heigth, CursorIntoDisplayObject(admGoIdButton) ? 241 : 197);
+		char goIdText[96];
+		sprintf(goIdText, "IR PARA ID: %d", HowMuchGoldYouWantToRemove);
+		DrawLevelInfoText(admGoIdButton.Left + 35, admGoIdButton.Top + 17, goIdText, C_0_White);
 		char pageText[64];
 		sprintf(pageText, "%u-%u / %u", (unsigned)(listStartFromIndex + 1), (unsigned)min(listStartFromIndex + rowInList, gc_listIndexes.size()), (unsigned)gc_listIndexes.size());
 		DrawLevelInfoText(InfoWindowRect.Left + 458, InfoWindowRect.Top + 395, pageText, C_3_Gold);
@@ -417,6 +427,18 @@ void __fastcall InfoWindow_MouseDown()
 void __fastcall InfoWindow_MouseUp()
 {
 	if( IsAdmItemWindow && !gc_listIndexes.empty() ){
+		if( CursorIntoDisplayObject(admGoIdButton) ){
+			int id = HowMuchGoldYouWantToRemove;
+			if( id < 0 ) id = 0;
+			if( id >= int(gc_listIndexes.size()) ) id = int(gc_listIndexes.size()) - 1;
+			listStartFromIndex = (id / int(rowInList)) * rowInList;
+			if( listStartFromIndex > listStartLastIndex ) listStartFromIndex = listStartLastIndex;
+			lastSelectedInListIndex = id - listStartFromIndex;
+			if( lastSelectedInListIndex >= rowInList ) lastSelectedInListIndex = rowInList - 1;
+			memset(textliststates, 0, sizeof(textliststates));
+			textliststates[lastSelectedInListIndex] = 1;
+			PlayGlobalSound(S_75_I_TITLEMOV); IsLeftButtonDown = false; return;
+		}
 		if( CursorIntoDisplayObject(admPrevPageButton) ){
 			listStartFromIndex = listStartFromIndex >= rowInList ? listStartFromIndex - rowInList : 0;
 			lastSelectedInListIndex = 0;
