@@ -384,7 +384,7 @@ void __fastcall InfoWindow_Draw()
 	textptr = nullptr;
 	// List
 	size_t index;
-	for (size_t i = 0; i < countof(textlist) && i < gc_listIndexes.size(); ++i) {
+	for (size_t i = 0; i < countof(textlist) && listStartFromIndex + i < gc_listIndexes.size(); ++i) {
 		index = listStartFromIndex + i;
 		textptr = GC_Names_InfoWindow[gc_listIndexes[index]];
 		DrawLevelInfoText(
@@ -582,7 +582,7 @@ static void AdmSelectUniqueId(int id)
 bool AdmItemWindow_HandleKey(int key)
 {
 	if( !IsAdmItemWindow || !IsInfoWindowVisible ) return false;
-	if( key == VK_191_SLASH_KEY || key == VK_OEM_2 ){
+	if( key == VK_OEM_2 ){
 		AdmItemSearchMode = true;
 		AdmItemSearch[0] = 0;
 		return true;
