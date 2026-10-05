@@ -658,18 +658,7 @@ bool AdmItemWindow_HandleKey(int key)
 }
 
 // ---- th2 -------------------------------------------------------------------------------
-void InfoWindow_Prev()
-{
-	if (lastSelectedInListIndex > 0) {
-		textliststates[lastSelectedInListIndex] = 0;
-		textliststates[--lastSelectedInListIndex] = 1;
-		PlayGlobalSound(S_75_I_TITLEMOV);
-	}
-	else if (lastSelectedInListIndex == 0 && listStartFromIndex > 0) {
-		--listStartFromIndex;
-		PlayGlobalSound(S_75_I_TITLEMOV);
-	}
-}void InfoWindow_Next()
+void InfoWindow_Next()
 {
 	if( gc_listIndexes.empty() ) return;
 	size_t selected = listStartFromIndex + lastSelectedInListIndex;
