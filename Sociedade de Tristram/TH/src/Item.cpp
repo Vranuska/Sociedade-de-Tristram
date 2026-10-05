@@ -9476,6 +9476,10 @@ void __fastcall SetupAllItems(int itemIndex, int baseItemIndex, i64 seed, int ql
 			if (chanceInPercent == ChanceUniqueBoss[genVersion]) {
 				uniqueChance *= 10;
 			}
+			if (isNewGeneration) {
+				uniqueChance = uniqueChance * QoLUniqueRatePercent / 100;
+				LimitToRange(uniqueChance, 0, 1000);
+			}
 			if (magicFind) {
 				uniqueChance += uniqueChance * magicFind / 100 / MagicFindUniqueDiv;
 			}
