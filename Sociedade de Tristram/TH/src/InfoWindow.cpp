@@ -311,9 +311,7 @@ void __fastcall InfoWindow_Draw()
 		DrawLevelInfoText(admPrevPageButton.Left + 15, admPrevPageButton.Top + 16, "< ANTERIOR", C_0_White);
 		DrawLevelInfoText(admNextPageButton.Left + 17, admNextPageButton.Top + 16, "PROXIMA >", C_0_White);
 		InfoWindow_DrawRect(Screen_LeftBorder + admGoIdButton.Left, Screen_TopBorder + admGoIdButton.Top, admGoIdButton.Width, admGoIdButton.Heigth, CursorIntoDisplayObject(admGoIdButton) ? 241 : 197);
-		char goIdText[96];
-		sprintf(goIdText, "IR PARA ID: %d", HowMuchGoldYouWantToRemove);
-		DrawLevelInfoText(admGoIdButton.Left + 35, admGoIdButton.Top + 17, goIdText, C_0_White);
+		DrawLevelInfoText(admGoIdButton.Left + 35, admGoIdButton.Top + 17, "CENTRALIZAR SELECAO", C_0_White);
 		char pageText[64];
 		sprintf(pageText, "%u-%u / %u", (unsigned)(listStartFromIndex + 1), (unsigned)min(listStartFromIndex + rowInList, gc_listIndexes.size()), (unsigned)gc_listIndexes.size());
 		DrawLevelInfoText(InfoWindowRect.Left + 458, InfoWindowRect.Top + 395, pageText, C_3_Gold);
@@ -439,12 +437,11 @@ void __fastcall InfoWindow_MouseUp()
 {
 	if( IsAdmItemWindow && !gc_listIndexes.empty() ){
 		if( CursorIntoDisplayObject(admGoIdButton) ){
-			int id = HowMuchGoldYouWantToRemove;
-			if( id < 0 ) id = 0;
-			if( id >= int(gc_listIndexes.size()) ) id = int(gc_listIndexes.size()) - 1;
-			listStartFromIndex = (id / int(rowInList)) * rowInList;
+			size_t selected = listStartFromIndex + lastSelectedInListIndex;
+			if( selected >= gc_listIndexes.size() ) selected = gc_listIndexes.size() - 1;
+			listStartFromIndex = (selected / rowInList) * rowInList;
 			if( listStartFromIndex > listStartLastIndex ) listStartFromIndex = listStartLastIndex;
-			lastSelectedInListIndex = id - listStartFromIndex;
+			lastSelectedInListIndex = selected - listStartFromIndex;
 			if( lastSelectedInListIndex >= rowInList ) lastSelectedInListIndex = rowInList - 1;
 			memset(textliststates, 0, sizeof(textliststates));
 			textliststates[lastSelectedInListIndex] = 1;
