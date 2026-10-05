@@ -7,6 +7,7 @@ constexpr int IW_width = 640;
 constexpr int IW_height = 462;
 bool IsInfoWindowVisible = false;
 bool IsLeftButtonDown = false;
+bool IsAdmItemWindow = false;
 
 DisplayObject InfoWindowRect;
 constexpr const char* IW_headTexts[] = {
@@ -245,6 +246,28 @@ void __fastcall InfoWindow_DrawRect(int xPosition, int yPosition, int width, int
 // ---- th2 -------------------------------------------------------------------------------
 void __fastcall InfoWindow_Draw()
 {
+	if( IsAdmItemWindow ){
+		IW_TransparentBackground(InfoWindowRect.Left + Screen_LeftBorder + 16, InfoWindowRect.Top + Screen_TopBorder + 16, IW_width - 32, IW_height - 32);
+		IW_DrawRegularCel(Screen_LeftBorder + InfoWindowRect.Left, Screen_TopBorder + InfoWindowRect.Top + IW_height, IW_IMG_background, 1, 640);
+		DrawLevelInfoText(InfoWindowRect.Left + 70, InfoWindowRect.Top + 44, "Ferramentas ADM", C_3_Gold);
+		DrawLevelInfoText(InfoWindowRect.Left + 365, InfoWindowRect.Top + 44, "Lista de Itens Unicos", C_3_Gold);
+		IW_DrawRegularCel(Screen_LeftBorder + closeButton.Left, Screen_TopBorder + closeButton.Top + closeButton.Heigth, IW_IMG_buttons, closeButtonState ? 20 : 19, closeButton.Width);
+		if( gc_listIndexes.empty() ) return;
+		size_t selected = lastSelectedInListIndex + listStartFromIndex;
+		if( selected >= gc_listIndexes.size() ) selected = gc_listIndexes.size() - 1;
+		int selectedId = gc_listIndexes[selected];
+		const UniqueItem& selectedItem = UniqueItems[selectedId];
+		char admText[512];
+		sprintf(admText, "ID: %d\nNome: %s\nQualidade: %d\nSet: %s\n\nClique em um item da lista para selecionar. Alt+U gera o ID selecionado.", selectedId, selectedItem.Name ? selectedItem.Name : "(sem nome)", selectedItem.qualityLevel, selectedItem.uniqueSetIndex >= 0 ? UniqueSets[selectedItem.uniqueSetIndex].Name : "Nenhum");
+		InfoWindow_DrawLongText(longTextMidPos.Left, longTextMidPos.Top - 70, admText, C_0_White);
+		for( size_t i = 0; i < countof(textlist) && listStartFromIndex + i < gc_listIndexes.size(); ++i ){
+			int id = gc_listIndexes[listStartFromIndex + i];
+			char row[256];
+			sprintf(row, "%d | %s%s", id, UniqueItems[id].Name ? UniqueItems[id].Name : "(sem nome)", UniqueItems[id].uniqueSetIndex >= 0 ? " [SET]" : "");
+			DrawLevelInfoText(-GetTextWidth(row) / 2 + textlist[i].Left + textlist[i].Width / 2, textlist[i].Top + 12, row, textliststates[i] ? textliststates[i] == 1 ? C_1_Blue : C_4_Orange : C_0_White);
+		}
+		return;
+	}
 	// Background (transparent)
 	IW_TransparentBackground(
 		InfoWindowRect.Left + Screen_LeftBorder + 16,
@@ -381,6 +404,23 @@ void __fastcall InfoWindow_MouseUp()
 // ---- th2 -------------------------------------------------------------------------------
 void InfoWindow_Open()
 {
+	IsAdmItemWindow = false;
+	IsInfoWindowVisible = true;
+}
+
+void AdmItemWindow_Open()
+{
+	if( !DevelopMode || count_UniqueItems == 0 ) return;
+	InfoWindow_Init();
+	IsAdmItemWindow = true;
+	gc_listIndexes.clear();
+	gc_listIndexes.reserve(count_UniqueItems);
+	for( size_t i = 0; i < count_UniqueItems; ++i ) gc_listIndexes.emplace_back((int)i);
+	listStartFromIndex = 0;
+	listStartLastIndex = gc_listIndexes.size() <= rowInList ? 0 : gc_listIndexes.size() - rowInList;
+	lastSelectedInListIndex = 0;
+	memset(textliststates, 0, sizeof(textliststates));
+	textliststates[0] = 1;
 	IsInfoWindowVisible = true;
 }
 
@@ -388,6 +428,7 @@ void InfoWindow_Open()
 void InfoWindow_Close()
 {
 	IsInfoWindowVisible = false;
+	IsAdmItemWindow = false;
 }
 
 // ---- th2 -------------------------------------------------------------------------------
