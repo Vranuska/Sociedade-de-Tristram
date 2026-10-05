@@ -9509,7 +9509,7 @@ void __fastcall SetupAllItems(int itemIndex, int baseItemIndex, i64 seed, int ql
 			}
 			// Independent rare roll - only fires when unique roll failed outright
 			if (!rare && DropRares && GameMode != GM_CLASSIC && magicLevel != ML_1_MAGIC) {
-				int rareChance = isNewGeneration ? QoLRarePercent * 10 : ChanceRareBase[genVersion];
+				int rareChance = isNewGeneration ? QoLRarePercent * 10 * QoLRareRatePercent / 100 : ChanceRareBase[genVersion];
 				if (chanceInPercent == ChanceUniqueBoss[genVersion]) {
 					rareChance *= BossRareMultiplier;
 				}
