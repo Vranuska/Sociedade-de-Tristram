@@ -92,12 +92,12 @@ void InfoWindow_Init()
 	RecalculateRectRightDown(closeButton);
 
 	admSpawnButton.Left = InfoWindowRect.Left + 45;
-	admSpawnButton.Top = InfoWindowRect.Top + 345;
+	admSpawnButton.Top = InfoWindowRect.Top + 315;
 	admSpawnButton.Width = 110;
 	admSpawnButton.Heigth = 24;
 	RecalculateRectRightDown(admSpawnButton);
 	admSpawnSetButton.Left = InfoWindowRect.Left + 170;
-	admSpawnSetButton.Top = InfoWindowRect.Top + 345;
+	admSpawnSetButton.Top = InfoWindowRect.Top + 315;
 	admSpawnSetButton.Width = 110;
 	admSpawnSetButton.Heigth = 24;
 	RecalculateRectRightDown(admSpawnSetButton);
@@ -112,17 +112,17 @@ void InfoWindow_Init()
 	admNextPageButton.Heigth = 22;
 	RecalculateRectRightDown(admNextPageButton);
 	admGoIdButton.Left = InfoWindowRect.Left + 45;
-	admGoIdButton.Top = InfoWindowRect.Top + 385;
+	admGoIdButton.Top = InfoWindowRect.Top + 345;
 	admGoIdButton.Width = 235;
 	admGoIdButton.Heigth = 24;
 	RecalculateRectRightDown(admGoIdButton);
 	admTestModeButton.Left = InfoWindowRect.Left + 45;
-	admTestModeButton.Top = InfoWindowRect.Top + 405;
+	admTestModeButton.Top = InfoWindowRect.Top + 375;
 	admTestModeButton.Width = 235;
 	admTestModeButton.Heigth = 24;
 	RecalculateRectRightDown(admTestModeButton);
 	admIgnoreClassButton.Left = InfoWindowRect.Left + 45;
-	admIgnoreClassButton.Top = InfoWindowRect.Top + 380;
+	admIgnoreClassButton.Top = InfoWindowRect.Top + 405;
 	admIgnoreClassButton.Width = 235;
 	admIgnoreClassButton.Heigth = 24;
 	RecalculateRectRightDown(admIgnoreClassButton);
@@ -308,8 +308,8 @@ void __fastcall InfoWindow_Draw()
 	if( IsAdmItemWindow ){
 		IW_TransparentBackground(InfoWindowRect.Left + Screen_LeftBorder + 16, InfoWindowRect.Top + Screen_TopBorder + 16, IW_width - 32, IW_height - 32);
 		IW_DrawRegularCel(Screen_LeftBorder + InfoWindowRect.Left, Screen_TopBorder + InfoWindowRect.Top + IW_height, IW_IMG_background, 1, 640);
-		DrawLevelInfoText(InfoWindowRect.Left + 70, InfoWindowRect.Top + 44, "Ferramentas ADM", C_3_Gold);
-		DrawLevelInfoText(InfoWindowRect.Left + 365, InfoWindowRect.Top + 44, "Lista de Itens Unicos", C_3_Gold);
+		DrawLevelInfoText(-GetTextWidth("Ferramentas ADM") / 2 + InfoWindowRect.Left + 165, InfoWindowRect.Top + 44, "Ferramentas ADM", C_3_Gold);
+		DrawLevelInfoText(-GetTextWidth("Lista de Itens Unicos") / 2 + InfoWindowRect.Left + 475, InfoWindowRect.Top + 44, "Lista de Itens Unicos", C_3_Gold);
 		IW_DrawRegularCel(Screen_LeftBorder + closeButton.Left, Screen_TopBorder + closeButton.Top + closeButton.Heigth, IW_IMG_buttons, closeButtonState ? 20 : 19, closeButton.Width);
 		if( gc_listIndexes.empty() ) return;
 		size_t selected = lastSelectedInListIndex + listStartFromIndex;
@@ -462,11 +462,6 @@ void __fastcall InfoWindow_MouseUp()
 	if( IsAdmItemWindow && !gc_listIndexes.empty() ){
 		if( CursorIntoDisplayObject(admTestModeButton) ){
 			AdmIgnoreNumericItemRequirements = !AdmIgnoreNumericItemRequirements;
-			RecalcPlayer(CurrentPlayerIndex, 1);
-			PlayGlobalSound(S_75_I_TITLEMOV); IsLeftButtonDown = false; return;
-		}
-		if( CursorIntoDisplayObject(admIgnoreClassButton) ){
-			AdmIgnoreItemClassRequirements = !AdmIgnoreItemClassRequirements;
 			RecalcPlayer(CurrentPlayerIndex, 1);
 			PlayGlobalSound(S_75_I_TITLEMOV); IsLeftButtonDown = false; return;
 		}
