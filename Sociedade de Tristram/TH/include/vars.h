@@ -1569,6 +1569,8 @@ extern int QoLDropPercent;
 extern int QoLEliteDropPercent;
 extern int QoLBossDropPercent;
 extern int QoLRarePercent;
+extern int QoLUniqueRatePercent;
+extern int QoLRareRatePercent;
 extern int QoLXpPercent;
 extern int QoLGoldPercent;
 extern int QoLEliteMinPerFloor;
