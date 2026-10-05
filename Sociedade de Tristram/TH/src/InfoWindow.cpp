@@ -8,6 +8,7 @@ constexpr int IW_height = 462;
 bool IsInfoWindowVisible = false;
 bool IsLeftButtonDown = false;
 bool IsAdmItemWindow = false;
+int AdmItemJumpId = 0;
 
 DisplayObject InfoWindowRect;
 constexpr const char* IW_headTexts[] = {
@@ -311,7 +312,9 @@ void __fastcall InfoWindow_Draw()
 		DrawLevelInfoText(admPrevPageButton.Left + 15, admPrevPageButton.Top + 16, "< ANTERIOR", C_0_White);
 		DrawLevelInfoText(admNextPageButton.Left + 17, admNextPageButton.Top + 16, "PROXIMA >", C_0_White);
 		InfoWindow_DrawRect(Screen_LeftBorder + admGoIdButton.Left, Screen_TopBorder + admGoIdButton.Top, admGoIdButton.Width, admGoIdButton.Heigth, CursorIntoDisplayObject(admGoIdButton) ? 241 : 197);
-		DrawLevelInfoText(admGoIdButton.Left + 35, admGoIdButton.Top + 17, "CENTRALIZAR SELECAO", C_0_White);
+		char goIdText[96];
+		sprintf(goIdText, "IR PARA ID: %d", AdmItemJumpId);
+		DrawLevelInfoText(admGoIdButton.Left + 35, admGoIdButton.Top + 17, goIdText, C_0_White);
 		char pageText[64];
 		sprintf(pageText, "%u-%u / %u", (unsigned)(listStartFromIndex + 1), (unsigned)min(listStartFromIndex + rowInList, gc_listIndexes.size()), (unsigned)gc_listIndexes.size());
 		DrawLevelInfoText(InfoWindowRect.Left + 458, InfoWindowRect.Top + 395, pageText, C_3_Gold);
@@ -437,11 +440,13 @@ void __fastcall InfoWindow_MouseUp()
 {
 	if( IsAdmItemWindow && !gc_listIndexes.empty() ){
 		if( CursorIntoDisplayObject(admGoIdButton) ){
-			size_t selected = listStartFromIndex + lastSelectedInListIndex;
-			if( selected >= gc_listIndexes.size() ) selected = gc_listIndexes.size() - 1;
-			listStartFromIndex = (selected / rowInList) * rowInList;
+			int id = AdmItemJumpId;
+			if( id < 0 ) id = 0;
+			if( id >= int(gc_listIndexes.size()) ) id = int(gc_listIndexes.size()) - 1;
+			AdmItemJumpId = id;
+			listStartFromIndex = (size_t(id) / rowInList) * rowInList;
 			if( listStartFromIndex > listStartLastIndex ) listStartFromIndex = listStartLastIndex;
-			lastSelectedInListIndex = selected - listStartFromIndex;
+			lastSelectedInListIndex = size_t(id) - listStartFromIndex;
 			if( lastSelectedInListIndex >= rowInList ) lastSelectedInListIndex = rowInList - 1;
 			memset(textliststates, 0, sizeof(textliststates));
 			textliststates[lastSelectedInListIndex] = 1;
@@ -541,6 +546,35 @@ void InfoWindow_Close()
 }
 
 // ---- th2 -------------------------------------------------------------------------------
+bool AdmItemWindow_HandleKey(int key)
+{
+	if( !IsAdmItemWindow || !IsInfoWindowVisible ) return false;
+	if( key >= VK_48_0_KEY && key <= VK_57_9_KEY ){
+		int digit = key - VK_48_0_KEY;
+		if( AdmItemJumpId > 99999 ) AdmItemJumpId = 0;
+		AdmItemJumpId = AdmItemJumpId * 10 + digit;
+		return true;
+	}
+	if( key == VK_8_BACKSPACE_KEY ){
+		AdmItemJumpId /= 10;
+		return true;
+	}
+	if( key == VK_13_RETURN_KEY ){
+		int id = AdmItemJumpId;
+		if( id < 0 ) id = 0;
+		if( id >= int(gc_listIndexes.size()) ) id = int(gc_listIndexes.size()) - 1;
+		AdmItemJumpId = id;
+		listStartFromIndex = (size_t(id) / rowInList) * rowInList;
+		if( listStartFromIndex > listStartLastIndex ) listStartFromIndex = listStartLastIndex;
+		lastSelectedInListIndex = size_t(id) - listStartFromIndex;
+		memset(textliststates, 0, sizeof(textliststates));
+		textliststates[lastSelectedInListIndex] = 1;
+		PlayGlobalSound(S_75_I_TITLEMOV);
+		return true;
+	}
+	return false;
+}
+
 void InfoWindow_Next()
 {
 	if (lastSelectedInListIndex + 1 < rowInList && lastSelectedInListIndex + 1 < gc_listIndexes.size()){
