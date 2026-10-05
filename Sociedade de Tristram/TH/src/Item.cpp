@@ -5608,7 +5608,10 @@ void __fastcall RecalcReqMetForOnBodyItems( int playerIndex )
 			if( !item.IsReqMet ){
 				continue;
 			}
-			int advancedUser = PerkValue(PERK_ADVANCED_USER, playerIndex);
+			extern bool AdmIgnoreNumericItemRequirements;
+	if( AdmIgnoreNumericItemRequirements ) return true;
+
+	int advancedUser = PerkValue(PERK_ADVANCED_USER, playerIndex);
 			int itemReqMet = 1;
 			int skilledTraitBenefit = HasTrait(playerIndex, TraitId::Skilled) ? (player.CharLevel + (player.CharLevel * player.CharLevel / 150)) : 0;
 			const int effectiveStrength = statEffects.adds[ST_STRENGTH]
