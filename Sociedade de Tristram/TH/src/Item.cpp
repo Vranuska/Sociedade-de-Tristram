@@ -445,7 +445,7 @@ void printItemClassReqInfoInBuffer( const Item* aItem )
 						sprintf(InfoPanelBuffer, "[Barbarian only]");
 					}
 					else {
-						sprintf(InfoPanelBuffer, "[%s and %s only]", FullPlayerClasses[classes[0]].name, FullPlayerClasses[classes[1]].name);
+						sprintf(InfoPanelBuffer, "[apenas %s e %s]", LocalizeDisplayName(FullPlayerClasses[classes[0]].name), LocalizeDisplayName(FullPlayerClasses[classes[1]].name));
 					}
                 }
             }
@@ -466,7 +466,7 @@ void printItemClassReqInfoInBuffer( const Item* aItem )
 							sprintf(InfoPanelBuffer, "[%s only]", ClassGroupsNames[classGroups[0]]);
 						}
 						else {
-							sprintf(InfoPanelBuffer, "[%s and %s only]", ClassGroupsNames[classGroups[0]], ClassGroupsNames[classGroups[1]]);
+							sprintf(InfoPanelBuffer, "[apenas %s e %s]", LocalizeDisplayName(ClassGroupsNames[classGroups[0]]), LocalizeDisplayName(ClassGroupsNames[classGroups[1]]));
 						}
 					}
 				}
