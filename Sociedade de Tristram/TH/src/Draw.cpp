@@ -324,6 +324,58 @@ const char* LocalizeDisplayName( const char* text )
 			return localized;
 		}
 	}
+
+	// Sociedade de Tristram: translate equipment names only at display time.
+	// Keep BaseItems/Affixes internal English strings untouched because gameplay
+	// code may compare them directly.
+	static const Translation equipmentNames[] = {
+		{ "Winged Helmet", "Elmo Alado" }, { "Horned Helmet", "Elmo com Chifres" },
+		{ "Dread Helm", "Elmo do Pavor" }, { "Fur Cape", "Capa de Pele" },
+		{ "Winter Boots", "Botas de Inverno" }, { "Leather Bracers", "Bracadeiras de Couro" },
+		{ "Skull Cap", "Casquete" }, { "Mail Coif", "Coifa de Malha" },
+		{ "Chain Coif", "Coifa de Correntes" }, { "Battle Helmet", "Elmo de Batalha" },
+		{ "Full Helm", "Elmo Completo" }, { "Visored Helmet", "Elmo com Viseira" },
+		{ "Soldier Helmet", "Elmo de Soldado" }, { "Siege Helm", "Elmo de Cerco" },
+		{ "Great Helmet", "Grande Elmo" }, { "Gothic Sallet", "Celada Gotica" },
+		{ "War Sallet", "Celada de Guerra" }, { "Wizard Circlet", "Diadema de Mago" },
+		{ "Crown", "Coroa" }, { "Tiara", "Tiara" }, { "Circlet", "Diadema" },
+		{ "Cape", "Capa" }, { "Thick Cloak", "Manto Grosso" }, { "Wizard Cape", "Capa de Mago" },
+		{ "Cloth Armor", "Armadura de Tecido" }, { "Leather Armor", "Armadura de Couro" },
+		{ "Light Armor", "Armadura Leve" }, { "Scale Armor", "Armadura de Escamas" },
+		{ "Breast Plate", "Peitoral de Placas" }, { "Full Plate Mail", "Armadura de Placas Completa" },
+		{ "Gothic Plate Mail", "Armadura de Placas Gotica" }, { "Battle Plate", "Placas de Batalha" },
+		{ "Shadow Plate", "Placas das Sombras" }, { "Light Plate", "Placas Leves" },
+		{ "Boots", "Botas" }, { "Leather Boots", "Botas de Couro" },
+		{ "Soft Leather Boots", "Botas de Couro Macio" }, { "Hard Leather Boots", "Botas de Couro Rigido" },
+		{ "Thick Leather Boots", "Botas de Couro Grosso" }, { "Chainmail Boots", "Botas de Cota de Malha" },
+		{ "Plate Greaves", "Grevas de Placas" }, { "Full Plate Greaves", "Grevas de Placas Completas" },
+		{ "Cloth Gloves", "Luvas de Tecido" }, { "Leather Gloves", "Luvas de Couro" },
+		{ "Hardened Leather Gloves", "Luvas de Couro Endurecido" }, { "Chainmail Gloves", "Luvas de Cota de Malha" },
+		{ "Plate Gauntlets", "Manoplas de Placas" }, { "Articulated Gauntlets", "Manoplas Articuladas" },
+		{ "Belt", "Cinto" }, { "Leather Belt", "Cinto de Couro" }, { "Padded Belt", "Cinto Acolchoado" },
+		{ "Plated Belt", "Cinto de Placas" }, { "Sorcery Girdle", "Cinturao de Feiticaria" },
+		{ "Wooden Shield", "Escudo de Madeira" }, { "Round Shield", "Escudo Redondo" },
+		{ "Tower Shield", "Escudo Torre" }, { "Gothic Shield", "Escudo Gotico" },
+		{ "Battle Shield", "Escudo de Batalha" }, { "Heater Shield", "Escudo Aquecedor" },
+		{ "Short Sword", "Espada Curta" }, { "Broad Sword", "Espada Larga" },
+		{ "Battle Sword", "Espada de Batalha" }, { "War Sword", "Espada de Guerra" },
+		{ "Two-Handed Sword", "Espada de Duas Maos" }, { "GreatSword", "Montante" },
+		{ "Short Bow", "Arco Curto" }, { "Hunting Bow", "Arco de Caca" },
+		{ "Battle Bow", "Arco de Batalha" }, { "War Bow", "Arco de Guerra" },
+		{ "Long Bow", "Arco Longo" }, { "Crossbow", "Besta" }, { "Heavy Crossbow", "Besta Pesada" },
+		{ "Light Crossbow", "Besta Leve" }, { "Battle Crossbow", "Besta de Batalha" },
+		{ "War Crossbow", "Besta de Guerra" }, { "Knife", "Faca" }, { "Short Knife", "Faca Curta" },
+		{ "Dagger", "Adaga" }, { "Light Dagger", "Adaga Leve" }, { "Axe", "Machado" },
+		{ "Light Axe", "Machado Leve" }, { "Battle Axe", "Machado de Batalha" },
+		{ "Great Axe", "Grande Machado" }, { "War Axe", "Machado de Guerra" },
+		{ "Mace", "Maca" }, { "War Mace", "Maca de Guerra" }, { "Flail", "Mangual" },
+		{ "War Hammer", "Martelo de Guerra" }, { "Battle Hammer", "Martelo de Batalha" },
+		{ "Staff", "Cajado" }, { "Light Staff", "Cajado Leve" }, { "Long Staff", "Cajado Longo" },
+		{ "War Staff", "Cajado de Guerra" }, { "Great Staff", "Grande Cajado" }
+	};
+	for( const Translation& name : equipmentNames ){
+		if( !strcmp(text, name.en) ) return name.pt;
+	}
 	return text;
 }
 
