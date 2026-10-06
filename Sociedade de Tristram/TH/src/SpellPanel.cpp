@@ -156,11 +156,11 @@ void WriteSummonSpellBookInfo(PLAYER_SPELL minionTypeSpell, int LINE_HEIGHT, int
 			maxArmor = minArmor + (clvl / 10) + 2;
 		}
 
-		sprintf(InfoPanelBuffer, "creates a golem");
+		sprintf(InfoPanelBuffer, "cria um golem");
 		drawLine(InfoPanelBuffer);
-		sprintf(InfoPanelBuffer, "to serve you");
+		sprintf(InfoPanelBuffer, "para servir voce");
 		drawLine(InfoPanelBuffer);
-		sprintf(InfoPanelBuffer, "(does physical damage)");
+		sprintf(InfoPanelBuffer, "(causa dano fisico)");
 		drawLine(InfoPanelBuffer);
 		sprintf(InfoPanelBuffer, " ");
 		drawLine(InfoPanelBuffer);
@@ -174,15 +174,15 @@ void WriteSummonSpellBookInfo(PLAYER_SPELL minionTypeSpell, int LINE_HEIGHT, int
 		case PS_53_COMMON_SUMMON: summontype = SUM_COMMON;	break;
 		case PS_54_GREATER_SUMMON: summontype = SUM_GREATER; break;
 		}
-		sprintf(InfoPanelBuffer, "Max amount: %i", CalculateSummonsMaxAmount(summontype, slvl, CurrentPlayerIndex));
+		sprintf(InfoPanelBuffer, "Quantidade maxima: %i", CalculateSummonsMaxAmount(summontype, slvl, CurrentPlayerIndex));
 		drawLine(InfoPanelBuffer);
 		sprintf(InfoPanelBuffer, " ");
 		drawLine(InfoPanelBuffer);
 	}
 	else if (is(fclass, PFC_ARCHER, PFC_SHARPSHOOTER, PFC_SCOUT)){
-		sprintf(InfoPanelBuffer, "Extra resistance to");
+		sprintf(InfoPanelBuffer, "Resistencia extra a");
 		drawLine(InfoPanelBuffer);
-		sprintf(InfoPanelBuffer, "elemental damage: %i%%", PerkValue(PERK_GOLEM_MASTERY, CurrentPlayerIndex, 0));
+		sprintf(InfoPanelBuffer, "dano elemental: %i%%", PerkValue(PERK_GOLEM_MASTERY, CurrentPlayerIndex, 0));
 		drawLine(InfoPanelBuffer);
 		sprintf(InfoPanelBuffer, " ");
 		drawLine(InfoPanelBuffer);
@@ -209,7 +209,7 @@ void WriteSummonSpellBookInfo(PLAYER_SPELL minionTypeSpell, int LINE_HEIGHT, int
 					minArmor = owner.CurMagic * clvl / 2000 + clvl / 2 + slvl;
 					maxArmor = minArmor + (clvl / 10) + 5;
 
-					sprintf(InfoPanelBuffer, "summons a flying imp");
+					sprintf(InfoPanelBuffer, "invoca um diabrete voador");
 					drawLine(InfoPanelBuffer);
 					break;
 				}
@@ -231,7 +231,7 @@ void WriteSummonSpellBookInfo(PLAYER_SPELL minionTypeSpell, int LINE_HEIGHT, int
 						minArmor = owner.CurMagic * clvl / 2000 + clvl / 2 + slvl;
 						maxArmor = minArmor + (clvl / 10) + 5;
 
-						sprintf(InfoPanelBuffer, "summons goat archer");
+						sprintf(InfoPanelBuffer, "invoca um arqueiro bode");
 						drawLine(InfoPanelBuffer);
 						break;
 				}
@@ -253,7 +253,7 @@ void WriteSummonSpellBookInfo(PLAYER_SPELL minionTypeSpell, int LINE_HEIGHT, int
 						minArmor = owner.CurMagic * clvl / 300 + clvl / 2 + 2 * slvl + 1;
 						maxArmor = minArmor + (clvl / 10) + 5;
 
-						sprintf(InfoPanelBuffer, "summons satyr lord");
+						sprintf(InfoPanelBuffer, "invoca um senhor satiro");
 						drawLine(InfoPanelBuffer);
 						break;
 				}
@@ -278,7 +278,7 @@ void WriteSummonSpellBookInfo(PLAYER_SPELL minionTypeSpell, int LINE_HEIGHT, int
 						minArmor = owner.CurMagic * clvl / 2000 + clvl / 2 + slvl;
 						maxArmor = minArmor + (clvl / 10) + 5;
 
-						sprintf(InfoPanelBuffer, "summons skeletal archer");
+						sprintf(InfoPanelBuffer, "invoca um arqueiro esqueletico");
 						drawLine(InfoPanelBuffer);
 						break;
 				}
@@ -300,7 +300,7 @@ void WriteSummonSpellBookInfo(PLAYER_SPELL minionTypeSpell, int LINE_HEIGHT, int
 						minArmor = owner.CurMagic * clvl / 500 + clvl / 2 + slvl;
 						maxArmor = minArmor + (clvl / 10) + 5;
 
-						sprintf(InfoPanelBuffer, "summons skeleton warrior");
+						sprintf(InfoPanelBuffer, "invoca um guerreiro esqueletico");
 						drawLine(InfoPanelBuffer);
 						break;
 				}
@@ -322,7 +322,7 @@ void WriteSummonSpellBookInfo(PLAYER_SPELL minionTypeSpell, int LINE_HEIGHT, int
 						minArmor = owner.CurMagic * clvl / 500 + clvl / 2 + slvl;
 						maxArmor = minArmor + (clvl / 10) + 5;
 
-						sprintf(InfoPanelBuffer, "summons skeleton lord");
+						sprintf(InfoPanelBuffer, "invoca um senhor esqueletico");
 						drawLine(InfoPanelBuffer);
 						break;
 				}
@@ -347,7 +347,7 @@ void WriteSummonSpellBookInfo(PLAYER_SPELL minionTypeSpell, int LINE_HEIGHT, int
 						minArmor = owner.CurMagic * clvl / 800 + clvl / 2 + slvl;
 						maxArmor = minArmor + (clvl / 10) + 5;
 
-						sprintf(InfoPanelBuffer, "summons a stinger");
+						sprintf(InfoPanelBuffer, "invoca um ferrador");
 						drawLine(InfoPanelBuffer);
 						break;
 				}
@@ -369,7 +369,7 @@ void WriteSummonSpellBookInfo(PLAYER_SPELL minionTypeSpell, int LINE_HEIGHT, int
 						minArmor = owner.CurMagic * clvl / 500 + clvl / 2 + slvl;
 						maxArmor = minArmor + (clvl / 10) + 5;
 
-						sprintf(InfoPanelBuffer, "summons hulking boar");
+						sprintf(InfoPanelBuffer, "invoca um javali gigante");
 						drawLine(InfoPanelBuffer);
 						break;
 				}
@@ -391,14 +391,14 @@ void WriteSummonSpellBookInfo(PLAYER_SPELL minionTypeSpell, int LINE_HEIGHT, int
 						minArmor = owner.CurMagic * clvl / 400 + clvl / 2 + slvl + 1;
 						maxArmor = minArmor + (clvl / 10) + 5;
 
-						sprintf(InfoPanelBuffer, "summons greater beast");
+						sprintf(InfoPanelBuffer, "invoca uma fera superior");
 						drawLine(InfoPanelBuffer);
 						break;
 				}
 			}
 	}
 	if (minionTypeSpell != PS_21_GOLEM) {
-		sprintf(InfoPanelBuffer, "to fight enemies for you");
+		sprintf(InfoPanelBuffer, "para lutar por voce");
 		drawLine(InfoPanelBuffer);
 		sprintf(InfoPanelBuffer, " ");
 		drawLine(InfoPanelBuffer);
@@ -874,7 +874,7 @@ void DrawSpellBook()
 			drawLine(InfoPanelBuffer);
 			sprintf(InfoPanelBuffer, " ");
 			drawLine(InfoPanelBuffer);
-			sprintf(InfoPanelBuffer, "Max amount: %i", MaxCountOfHydrasForPlayer(CurrentPlayerIndex));
+			sprintf(InfoPanelBuffer, "Quantidade maxima: %i", MaxCountOfHydrasForPlayer(CurrentPlayerIndex));
 			drawLine(InfoPanelBuffer);
 			sprintf(InfoPanelBuffer, " ");
 			drawLine(InfoPanelBuffer);
@@ -1016,7 +1016,7 @@ void DrawSpellBook()
 			drawLine(InfoPanelBuffer);
 			sprintf(InfoPanelBuffer, "to knock back enemies");
 			drawLine(InfoPanelBuffer);
-			sprintf(InfoPanelBuffer, "(does physical damage)");
+			sprintf(InfoPanelBuffer, "(causa dano fisico)");
 			drawLine(InfoPanelBuffer);
 			sprintf(InfoPanelBuffer, " ");
 			drawLine(InfoPanelBuffer);
@@ -1031,7 +1031,7 @@ void DrawSpellBook()
 			drawLine(InfoPanelBuffer);
 			sprintf(InfoPanelBuffer, "live creatures");
 			drawLine(InfoPanelBuffer);
-			sprintf(InfoPanelBuffer, "(does physical damage)");
+			sprintf(InfoPanelBuffer, "(causa dano fisico)");
 			drawLine(InfoPanelBuffer);
 			if (GameMode != GM_CLASSIC) {
 				sprintf(InfoPanelBuffer, "(knocks target back)");
@@ -1111,7 +1111,7 @@ void DrawSpellBook()
 			drawLine("engulfs visible enemies");
 			drawLine("in infernal flames");
 			drawLine("obliterating everything");
-			drawLine("(does physical damage)");
+			drawLine("(causa dano fisico)");
 		}
 		else if (spellIndex == PS_25_ETHEREAL) {
 			drawLine("makes caster invulnerable");
