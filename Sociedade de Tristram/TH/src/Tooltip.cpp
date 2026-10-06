@@ -359,7 +359,7 @@ void __fastcall Tooltip_ShowItemInfo_2(int slot)
     if (item.TypeID == ITEM_1_WEAPON || item.TypeID == ITEM_2_ARMOR) {
         if (item.BaseDurability) {
             if (item.BaseDurability == ITEM_DUR_INDESTRUBLE) {
-                Tooltip_AddLine_2("indestructible", C_3_Gold);
+                Tooltip_AddLine_2("indestrutivel", C_3_Gold);
             }
             else {
                 char curDurColor = C_0_White;
@@ -1211,7 +1211,7 @@ void __fastcall Tooltip_ShowItemInfo_3(int slot)
     if (item.TypeID == ITEM_1_WEAPON || item.TypeID == ITEM_2_ARMOR) {
         if (item.BaseDurability) {
             if (item.BaseDurability == ITEM_DUR_INDESTRUBLE) {
-                Tooltip_AddLine_3("indestructible", C_3_Gold);
+                Tooltip_AddLine_3("indestrutivel", C_3_Gold);
             }
             else {
                 char curDurColor = C_0_White;
@@ -2179,7 +2179,7 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
     if( item.TypeID == ITEM_1_WEAPON || item.TypeID == ITEM_2_ARMOR ){
         if( item.BaseDurability ){
             if( item.BaseDurability == ITEM_DUR_INDESTRUBLE ){
-                Tooltip_AddLine("indestructible", C_3_Gold);
+                Tooltip_AddLine("indestrutivel", C_3_Gold);
             }else{
                 char curDurColor = C_0_White;
                 char baseDurColor = C_0_White;
