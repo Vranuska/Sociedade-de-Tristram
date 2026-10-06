@@ -500,7 +500,7 @@ void __fastcall Tooltip_ShowItemInfo_2(int slot)
             if (item.ItemCode == IC_19_TRAP) {
                 BaseItem& baseItem = BaseItems[item.baseItemIndex];
                 TrapInfo& trapInfo = TrapsInfo[baseItem.FlaskOrTrapCode];
-                sprintf(InfoPanelBuffer, "%s: %.2f", "Delay time", trapInfo.ShootDelay / 20.00);
+                sprintf(InfoPanelBuffer, "%s: %.2f", "tempo de atraso", trapInfo.ShootDelay / 20.00);
                 Tooltip_AddLine_2(InfoPanelBuffer);
             }
 
@@ -508,11 +508,11 @@ void __fastcall Tooltip_ShowItemInfo_2(int slot)
                 int ac = item.ArmorClass;
                 const char* modificationSrt;
                 if (ac > 0) {
-                    modificationSrt = "increased";
+                    modificationSrt = "aumentada";
                 }
                 else {
                     ac = -ac;
-                    modificationSrt = "reduced";
+                    modificationSrt = "reduzida";
                 }
                 sprintf(InfoPanelBuffer, "armadura %s em: %i", modificationSrt, ac);
                 Tooltip_AddLine_2(InfoPanelBuffer);
@@ -535,7 +535,7 @@ void __fastcall Tooltip_ShowItemInfo_2(int slot)
                 sprintf(InfoPanelBuffer, "%s%i", InfoPanelBuffer, item.maxMeleeAbsorbPercent);
             }
             else {
-                sprintf(InfoPanelBuffer, "%s%i to %i", InfoPanelBuffer, item.minMeleeAbsorbPercent, item.maxMeleeAbsorbPercent);
+                sprintf(InfoPanelBuffer, "%s%i a %i", InfoPanelBuffer, item.minMeleeAbsorbPercent, item.maxMeleeAbsorbPercent);
             }
             Tooltip_AddLine_2(InfoPanelBuffer);
         }
@@ -545,7 +545,7 @@ void __fastcall Tooltip_ShowItemInfo_2(int slot)
                 sprintf(InfoPanelBuffer, "%s%i", InfoPanelBuffer, item.maxArrowAbsorbPercent);
             }
             else {
-                sprintf(InfoPanelBuffer, "%s%i to %i", InfoPanelBuffer, item.minArrowAbsorbPercent, item.maxArrowAbsorbPercent);
+                sprintf(InfoPanelBuffer, "%s%i a %i", InfoPanelBuffer, item.minArrowAbsorbPercent, item.maxArrowAbsorbPercent);
             }
             Tooltip_AddLine_2(InfoPanelBuffer);
         }
@@ -564,12 +564,12 @@ void __fastcall Tooltip_ShowItemInfo_2(int slot)
             int maxDmg = item.MaxDamage;
             const char* modificationSrt;
             if (minDmg > 0) {
-                modificationSrt = "increased";
+                modificationSrt = "aumentada";
             }
             else {
                 minDmg = -minDmg;
                 maxDmg = -maxDmg;
-                modificationSrt = "reduced";
+                modificationSrt = "reduzida";
             }
             if (item.MinDamage == item.MaxDamage) {
                 sprintf(InfoPanelBuffer, "dano %s em: %i", modificationSrt, minDmg);
@@ -837,7 +837,7 @@ void __fastcall Tooltip_ShowItemInfo_2(int slot)
             Tooltip_AddLine_2(InfoPanelBuffer);
 
             if (addDurLimit) {
-                sprintf(InfoPanelBuffer, "up to %i points", addDurLimit);
+                sprintf(InfoPanelBuffer, "ate %i pontos", addDurLimit);
                 Tooltip_AddLine_2(InfoPanelBuffer);
                 int elTorso = addDurLimit * 2;
                 sprintf(InfoPanelBuffer, "(%i para armadura corporal)", elTorso);
@@ -1352,7 +1352,7 @@ void __fastcall Tooltip_ShowItemInfo_3(int slot)
             if (item.ItemCode == IC_19_TRAP) {
                 BaseItem& baseItem = BaseItems[item.baseItemIndex];
                 TrapInfo& trapInfo = TrapsInfo[baseItem.FlaskOrTrapCode];
-                sprintf(InfoPanelBuffer, "%s: %.2f", "Delay time", trapInfo.ShootDelay / 20.00);
+                sprintf(InfoPanelBuffer, "%s: %.2f", "tempo de atraso", trapInfo.ShootDelay / 20.00);
                 Tooltip_AddLine_3(InfoPanelBuffer);
             }
 
@@ -1360,11 +1360,11 @@ void __fastcall Tooltip_ShowItemInfo_3(int slot)
                 int ac = item.ArmorClass;
                 const char* modificationSrt;
                 if (ac > 0) {
-                    modificationSrt = "increased";
+                    modificationSrt = "aumentada";
                 }
                 else {
                     ac = -ac;
-                    modificationSrt = "reduced";
+                    modificationSrt = "reduzida";
                 }
                 sprintf(InfoPanelBuffer, "armadura %s em: %i", modificationSrt, ac);
                 Tooltip_AddLine_3(InfoPanelBuffer);
@@ -1387,7 +1387,7 @@ void __fastcall Tooltip_ShowItemInfo_3(int slot)
                 sprintf(InfoPanelBuffer, "%s%i", InfoPanelBuffer, item.maxMeleeAbsorbPercent);
             }
             else {
-                sprintf(InfoPanelBuffer, "%s%i to %i", InfoPanelBuffer, item.minMeleeAbsorbPercent, item.maxMeleeAbsorbPercent);
+                sprintf(InfoPanelBuffer, "%s%i a %i", InfoPanelBuffer, item.minMeleeAbsorbPercent, item.maxMeleeAbsorbPercent);
             }
             Tooltip_AddLine_3(InfoPanelBuffer);
         }
@@ -1397,7 +1397,7 @@ void __fastcall Tooltip_ShowItemInfo_3(int slot)
                 sprintf(InfoPanelBuffer, "%s%i", InfoPanelBuffer, item.maxArrowAbsorbPercent);
             }
             else {
-                sprintf(InfoPanelBuffer, "%s%i to %i", InfoPanelBuffer, item.minArrowAbsorbPercent, item.maxArrowAbsorbPercent);
+                sprintf(InfoPanelBuffer, "%s%i a %i", InfoPanelBuffer, item.minArrowAbsorbPercent, item.maxArrowAbsorbPercent);
             }
             Tooltip_AddLine_3(InfoPanelBuffer);
         }
@@ -1416,12 +1416,12 @@ void __fastcall Tooltip_ShowItemInfo_3(int slot)
             int maxDmg = item.MaxDamage;
             const char* modificationSrt;
             if (minDmg > 0) {
-                modificationSrt = "increased";
+                modificationSrt = "aumentada";
             }
             else {
                 minDmg = -minDmg;
                 maxDmg = -maxDmg;
-                modificationSrt = "reduced";
+                modificationSrt = "reduzida";
             }
             if (item.MinDamage == item.MaxDamage) {
                 sprintf(InfoPanelBuffer, "dano %s em: %i", modificationSrt, minDmg);
@@ -1689,7 +1689,7 @@ void __fastcall Tooltip_ShowItemInfo_3(int slot)
             Tooltip_AddLine_3(InfoPanelBuffer);
 
             if (addDurLimit) {
-                sprintf(InfoPanelBuffer, "up to %i points", addDurLimit);
+                sprintf(InfoPanelBuffer, "ate %i pontos", addDurLimit);
                 Tooltip_AddLine_3(InfoPanelBuffer);
                 int elTorso = addDurLimit * 2;
                 sprintf(InfoPanelBuffer, "(%i para armadura corporal)", elTorso);
@@ -2317,7 +2317,7 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
             if (item.ItemCode == IC_19_TRAP) {
                 const BaseItem& baseItem = BaseItems[item.baseItemIndex];
                 const TrapInfo& trapInfo = TrapsInfo[baseItem.FlaskOrTrapCode];
-                sprintf(InfoPanelBuffer, "%s: %.2f", "Delay time", trapInfo.ShootDelay / 20.00);
+                sprintf(InfoPanelBuffer, "%s: %.2f", "tempo de atraso", trapInfo.ShootDelay / 20.00);
                 Tooltip_AddLine(InfoPanelBuffer);
             }
 
@@ -2325,11 +2325,11 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
                 int ac = item.ArmorClass;
                 const char* modificationSrt;
                 if (ac > 0) {
-                    modificationSrt = "increased";
+                    modificationSrt = "aumentada";
                 }
                 else {
                     ac = -ac;
-                    modificationSrt = "reduced";
+                    modificationSrt = "reduzida";
                 }
                 sprintf(InfoPanelBuffer, "armadura %s em: %i", modificationSrt, ac);
                 Tooltip_AddLine(InfoPanelBuffer);
@@ -2351,7 +2351,7 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
             if( item.minMeleeAbsorbPercent == item.maxMeleeAbsorbPercent ){
                 sprintf(InfoPanelBuffer, "%s%i", InfoPanelBuffer, item.maxMeleeAbsorbPercent);
             }else{
-                sprintf(InfoPanelBuffer, "%s%i to %i", InfoPanelBuffer, item.minMeleeAbsorbPercent, item.maxMeleeAbsorbPercent);
+                sprintf(InfoPanelBuffer, "%s%i a %i", InfoPanelBuffer, item.minMeleeAbsorbPercent, item.maxMeleeAbsorbPercent);
             }
             Tooltip_AddLine(InfoPanelBuffer);
         }
@@ -2360,7 +2360,7 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
             if( item.minArrowAbsorbPercent == item.maxArrowAbsorbPercent ){
                 sprintf(InfoPanelBuffer, "%s%i", InfoPanelBuffer, item.maxArrowAbsorbPercent);
             }else{
-                sprintf(InfoPanelBuffer, "%s%i to %i", InfoPanelBuffer, item.minArrowAbsorbPercent, item.maxArrowAbsorbPercent);
+                sprintf(InfoPanelBuffer, "%s%i a %i", InfoPanelBuffer, item.minArrowAbsorbPercent, item.maxArrowAbsorbPercent);
             }
             Tooltip_AddLine(InfoPanelBuffer);
         }
@@ -2378,11 +2378,11 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
             int maxDmg = item.MaxDamage;
             const char* modificationSrt;
             if( minDmg > 0 ){
-                modificationSrt = "increased";
+                modificationSrt = "aumentada";
             }else{
                 minDmg = -minDmg;
                 maxDmg = -maxDmg;
-                modificationSrt = "reduced";
+                modificationSrt = "reduzida";
             }
 			if( item.MinDamage == item.MaxDamage ){
 				sprintf(InfoPanelBuffer, "dano %s em: %i", modificationSrt, minDmg);
@@ -2615,7 +2615,7 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
                 }
                 if (IsCraftPanelVisible && CurrentCraftPage == CraftPage::CP_Gems && !isCraftSlot) {
                     if (IsController() && !XinputNotInUse(true)) {
-                        Tooltip_AddLine("Right Trigger + A to move to crafting slot");
+                        Tooltip_AddLine("Gatilho direito + A para mover ao espaco de criacao");
                     }
                     else {
                         Tooltip_AddLine("Shift + clique para mover ao espaco de criacao");
@@ -2650,7 +2650,7 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
             Tooltip_AddLine( InfoPanelBuffer );
             
             if( addDurLimit ){
-                sprintf(InfoPanelBuffer, "up to %i points", addDurLimit);
+                sprintf(InfoPanelBuffer, "ate %i pontos", addDurLimit);
                 Tooltip_AddLine( InfoPanelBuffer ); 
                 int elTorso = addDurLimit * 2;
                 sprintf(InfoPanelBuffer, "(%i para armadura corporal)", elTorso);
@@ -2768,10 +2768,10 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
         if( IsItemAllowedForBelt(item) ){
                 if (IsController() && !XinputNotInUse(true)) {
                     if (slot >= IS_50_47_Belt_Start && slot < IS_50_47_Belt_End) {
-                        Tooltip_AddLine("Right trigger to move left");
+                        Tooltip_AddLine("Gatilho direito para mover para a esquerda");
                     }
                     else {
-                        Tooltip_AddLine("Right trigger to move to belt");
+                        Tooltip_AddLine("Gatilho direito para mover ao cinto");
                     }
                 }
                 else {
@@ -2878,7 +2878,7 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
                 sprintf(InfoPanelBuffer, "Buy price: %i", price);
                 Tooltip_AddLine(InfoPanelBuffer, player.TotalGold >= price ? C_0_White : C_2_Red);
                 if (IsController() && !XinputNotInUse(true)) {
-                    Tooltip_AddLine("Right Trigger + A to buy fast");
+                    Tooltip_AddLine("Gatilho direito + A para comprar rapidamente");
                 }
                 else {
                     Tooltip_AddLine("Shift + clique para comprar rapidamente");
@@ -2891,7 +2891,7 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
                         sprintf(InfoPanelBuffer, "Sell price: %i", price);
                         Tooltip_AddLine(InfoPanelBuffer);
                         if (IsController() && !XinputNotInUse(true)) {
-                            Tooltip_AddLine("Right Trigger + A to sell fast");
+                            Tooltip_AddLine("Gatilho direito + A para vender rapidamente");
                         }
                         else {
                             Tooltip_AddLine("Shift + clique para vender rapidamente");
@@ -2931,10 +2931,10 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
             }else{
                 if (IsController() && !XinputNotInUse(true)) {
                     if (isVisualStashSlot) {
-                        Tooltip_AddLine("Right Trigger + A to move to inventory");
+                        Tooltip_AddLine("Gatilho direito + A para mover ao inventario");
                     }
                     else {
-                        Tooltip_AddLine("Right Trigger + A to move to stash");
+                        Tooltip_AddLine("Gatilho direito + A para mover ao bau");
                     }
                 }
                 else {
@@ -2966,16 +2966,16 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
 			&& !is(item.ItemCode, IC_0_OTHER, IC_11_GOLD)
             )
             if (IsController() && !XinputNotInUse(true)) {
-                Tooltip_AddLine("Press Left Trigger to compare", C_7_Grey);
+                Tooltip_AddLine("Pressione o gatilho esquerdo para comparar", C_7_Grey);
             }
             else {
-                Tooltip_AddLine("Press ALT to compare", C_7_Grey);
+                Tooltip_AddLine("Pressione ALT para comparar", C_7_Grey);
             }
     }
 
     if (slot <= IS_50_47_Belt_End) {
         if (IsController() && !XinputNotInUse(true)) {
-            Tooltip_AddLine("Press X to drop", C_7_Grey);
+            Tooltip_AddLine("Pressione X para soltar", C_7_Grey);
         } 
         else if (DropItemOnCtrl) {
             Tooltip_AddLine("Ctrl + clique: largar", C_7_Grey);
