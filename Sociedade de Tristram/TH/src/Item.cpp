@@ -422,27 +422,27 @@ void printItemClassReqInfoInBuffer( const Item* aItem )
 
                 if( allowedClassesCount == 1u ){
 					if (HasTrait(CurrentPlayerIndex, TraitId::Mamluk)) {
-						sprintf(InfoPanelBuffer, "[Mamluk only]");
+						sprintf(InfoPanelBuffer, "[apenas Mameluco]");
 					}
 					else if (Players[CurrentPlayerIndex].fullClassId == PFC_ELEMENTALIST && !HasTrait(CurrentPlayerIndex, TraitId::Mamluk)) {
-						sprintf(InfoPanelBuffer, "[Elementalist only]");
+						sprintf(InfoPanelBuffer, "[apenas Elementalista]");
 					}
 					else if (HasTrait(CurrentPlayerIndex, TraitId::Pistoleer) && baseItem.ItemCode == IC_23_PISTOL) {
-						sprintf(InfoPanelBuffer, "[Pistoleer only]");
+						sprintf(InfoPanelBuffer, "[apenas Pistoleiro]");
 					}
 					else if (HasTrait(CurrentPlayerIndex, TraitId::Ranger) && baseItem.ItemCode == IC_3_BOW) {
-						sprintf(InfoPanelBuffer, "[Ranger only]");
+						sprintf(InfoPanelBuffer, "[apenas Patrulheiro]");
 					}
 					else if (HasTrait(CurrentPlayerIndex, TraitId::Barbarian) && baseItem.ItemCode == IC_7_HELM) {
-						sprintf(InfoPanelBuffer, "[Barbarian only]");
+						sprintf(InfoPanelBuffer, "[apenas Barbaro]");
 					}
 					else {
-						sprintf(InfoPanelBuffer, "[%s only]", FullPlayerClasses[classes[0]].name);
+						sprintf(InfoPanelBuffer, "[apenas %s]", LocalizeDisplayName(FullPlayerClasses[classes[0]].name));
 					}
                 }
 				else{
 					if (HasTrait(CurrentPlayerIndex, TraitId::Barbarian) && baseItem.ItemCode == IC_7_HELM) {
-						sprintf(InfoPanelBuffer, "[Barbarian only]");
+						sprintf(InfoPanelBuffer, "[apenas Barbaro]");
 					}
 					else {
 						sprintf(InfoPanelBuffer, "[apenas %s e %s]", LocalizeDisplayName(FullPlayerClasses[classes[0]].name), LocalizeDisplayName(FullPlayerClasses[classes[1]].name));
@@ -459,11 +459,11 @@ void printItemClassReqInfoInBuffer( const Item* aItem )
 				}
 				else{
 					if (HasTrait(CurrentPlayerIndex, TraitId::Barbarian) && baseItem.ItemCode == IC_7_HELM) {
-						sprintf(InfoPanelBuffer, "[Barbarian only]");
+						sprintf(InfoPanelBuffer, "[apenas Barbaro]");
 					}
 					else {
 						if (classGroupsFound == 1u) {
-							sprintf(InfoPanelBuffer, "[%s only]", ClassGroupsNames[classGroups[0]]);
+							sprintf(InfoPanelBuffer, "[apenas %s]", LocalizeDisplayName(ClassGroupsNames[classGroups[0]]));
 						}
 						else {
 							sprintf(InfoPanelBuffer, "[apenas %s e %s]", LocalizeDisplayName(ClassGroupsNames[classGroups[0]]), LocalizeDisplayName(ClassGroupsNames[classGroups[1]]));
