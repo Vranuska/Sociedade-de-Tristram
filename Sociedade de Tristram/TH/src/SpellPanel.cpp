@@ -846,7 +846,7 @@ void DrawSpellBook()
 			drawLine(InfoPanelBuffer);
 			sprintf(InfoPanelBuffer, "of fireballs around caster");
 			drawLine(InfoPanelBuffer);
-			sprintf(InfoPanelBuffer, "to destroy enemies");
+			sprintf(InfoPanelBuffer, "para destruir inimigos");
 			drawLine(InfoPanelBuffer);
 			sprintf(InfoPanelBuffer, " ");
 			drawLine(InfoPanelBuffer);
@@ -904,35 +904,35 @@ void DrawSpellBook()
 			drawLine(InfoPanelBuffer);
 		}
 		else if (spellIndex == PS_30_CHARGED_BOLT) {
-			sprintf(InfoPanelBuffer, "creates multiple bolts");
+			sprintf(InfoPanelBuffer, "cria varios raios");
 			drawLine(InfoPanelBuffer);
-			sprintf(InfoPanelBuffer, "of electrical energy");
+			sprintf(InfoPanelBuffer, "de energia eletrica");
 			drawLine(InfoPanelBuffer);
 			sprintf(InfoPanelBuffer, " ");
 			drawLine(InfoPanelBuffer);
 		}
 		else if (spellIndex == PS_3_LIGHTNING) {
-			sprintf(InfoPanelBuffer, "sends a lightning torrent");
+			sprintf(InfoPanelBuffer, "dispara uma corrente de raios");
 			drawLine(InfoPanelBuffer);
-			sprintf(InfoPanelBuffer, "that strikes targets");
+			sprintf(InfoPanelBuffer, "que atinge os alvos");
 			drawLine(InfoPanelBuffer);
 			sprintf(InfoPanelBuffer, " ");
 			drawLine(InfoPanelBuffer);
 		}
 		else if (spellIndex == PS_14_BALL_LIGHTNING) {
-			sprintf(InfoPanelBuffer, "launches massive charged");
+			sprintf(InfoPanelBuffer, "lanca uma grande esfera");
 			drawLine(InfoPanelBuffer);
-			sprintf(InfoPanelBuffer, "ball of electricity");
+			sprintf(InfoPanelBuffer, "de energia eletrica");
 			drawLine(InfoPanelBuffer);
 			sprintf(InfoPanelBuffer, " ");
 			drawLine(InfoPanelBuffer);
 		}
 		else if (spellIndex == PS_18_LIGHTNING_NOVA) {
-			sprintf(InfoPanelBuffer, "casts expanding ring");
+			sprintf(InfoPanelBuffer, "lanca um anel expansivo");
 			drawLine(InfoPanelBuffer);
-			sprintf(InfoPanelBuffer, "of electric charges");
+			sprintf(InfoPanelBuffer, "de descargas eletricas");
 			drawLine(InfoPanelBuffer);
-			sprintf(InfoPanelBuffer, "to destroy enemies");
+			sprintf(InfoPanelBuffer, "para destruir inimigos");
 			drawLine(InfoPanelBuffer);
 			sprintf(InfoPanelBuffer, " ");
 			drawLine(InfoPanelBuffer);
@@ -960,7 +960,7 @@ void DrawSpellBook()
 			drawLine(InfoPanelBuffer);
 			sprintf(InfoPanelBuffer, "of stars around caster");
 			drawLine(InfoPanelBuffer);
-			sprintf(InfoPanelBuffer, "to destroy enemies");
+			sprintf(InfoPanelBuffer, "para destruir inimigos");
 			drawLine(InfoPanelBuffer);
 			sprintf(InfoPanelBuffer, " ");
 			drawLine(InfoPanelBuffer);
@@ -978,11 +978,11 @@ void DrawSpellBook()
 			drawLine(InfoPanelBuffer);
 		}
 		else if (spellIndex == PS_39_HOLY_NOVA) {
-			sprintf(InfoPanelBuffer, "creates a massive ring");
+			sprintf(InfoPanelBuffer, "cria um grande anel");
 			drawLine(InfoPanelBuffer);
-			sprintf(InfoPanelBuffer, "of expanding holy bolts");
+			sprintf(InfoPanelBuffer, "de raios sagrados expansivos");
 			drawLine(InfoPanelBuffer);
-			sprintf(InfoPanelBuffer, "to destroy undead");
+			sprintf(InfoPanelBuffer, "para destruir mortos-vivos");
 			drawLine(InfoPanelBuffer);
 			sprintf(InfoPanelBuffer, " ");
 			drawLine(InfoPanelBuffer);
@@ -1000,11 +1000,11 @@ void DrawSpellBook()
 			drawLine(InfoPanelBuffer);
 		}
 		else if (spellIndex == PS_36_BONE_SPIRIT) {
-			sprintf(InfoPanelBuffer, "releases a restless soul");
+			sprintf(InfoPanelBuffer, "liberta uma alma inquieta");
 			drawLine(InfoPanelBuffer);
-			sprintf(InfoPanelBuffer, "that devours the living");
+			sprintf(InfoPanelBuffer, "que devora os vivos");
 			drawLine(InfoPanelBuffer);
-			sprintf(InfoPanelBuffer, "for a percentage of life");
+			sprintf(InfoPanelBuffer, "causando dano proporcional a vida");
 			drawLine(InfoPanelBuffer);
 			sprintf(InfoPanelBuffer, " ");
 			drawLine(InfoPanelBuffer);
@@ -1059,7 +1059,7 @@ void DrawSpellBook()
 			drawLine(InfoPanelBuffer);
 			sprintf(InfoPanelBuffer, "of ice around caster");
 			drawLine(InfoPanelBuffer);
-			sprintf(InfoPanelBuffer, "to destroy enemies");
+			sprintf(InfoPanelBuffer, "para destruir inimigos");
 			drawLine(InfoPanelBuffer);
 			sprintf(InfoPanelBuffer, " ");
 			drawLine(InfoPanelBuffer);
@@ -1085,7 +1085,7 @@ void DrawSpellBook()
 			drawLine(InfoPanelBuffer);
 			sprintf(InfoPanelBuffer, "of acid around caster");
 			drawLine(InfoPanelBuffer);
-			sprintf(InfoPanelBuffer, "to destroy enemies");
+			sprintf(InfoPanelBuffer, "para destruir inimigos");
 			drawLine(InfoPanelBuffer);
 			sprintf(InfoPanelBuffer, " ");
 			drawLine(InfoPanelBuffer);
@@ -1257,7 +1257,7 @@ void DrawSpellBook()
 
 				if (PlayerSpellLevel(CurrentPlayerIndex, PS_30_CHARGED_BOLT) > 0) {
 					GetDamageOfPlayerSpell(CurrentPlayerIndex, spellIndex, PlayerSpellLevel(CurrentPlayerIndex, spellIndex), ET_2_LIGHTNING, &minDamage, &maxDamage);
-					sprintf(InfoPanelBuffer, "Lightning Damage: %i-%i", minDamage, maxDamage);
+					sprintf(InfoPanelBuffer, "Dano eletrico: %i-%i", minDamage, maxDamage);
 					drawLine(InfoPanelBuffer, C_1_Blue);
 				}
 
