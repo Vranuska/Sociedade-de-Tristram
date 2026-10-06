@@ -710,7 +710,7 @@ void __fastcall Tooltip_ShowItemInfo_2(int slot)
             Tooltip_AddLine_2("aumenta a vitalidade");
             break;
         case MC_44_SPECTRAL_ELIXIR:
-            Tooltip_AddLine_2("increases all stats");
+            Tooltip_AddLine_2("aumenta todos os atributos");
             break;
         case MC_18_POTION_OF_REJUVENATION:
             Tooltip_AddLine_2("recupera vida e mana");
@@ -718,7 +718,7 @@ void __fastcall Tooltip_ShowItemInfo_2(int slot)
         case MC_19_POTION_OF_FULL_REJUVENATION:
         {
             if (HasTrait(CurrentPlayerIndex, TraitId::Giant)) {
-                Tooltip_AddLine_2("recupera 50% da vida and mana");
+                Tooltip_AddLine_2("recupera 50% da vida e mana");
             }
             else {
                 Tooltip_AddLine_2("recupera toda vida e mana");
@@ -1562,7 +1562,7 @@ void __fastcall Tooltip_ShowItemInfo_3(int slot)
             Tooltip_AddLine_3("aumenta a vitalidade");
             break;
         case MC_44_SPECTRAL_ELIXIR:
-            Tooltip_AddLine_3("increases all stats");
+            Tooltip_AddLine_3("aumenta todos os atributos");
             break;
         case MC_18_POTION_OF_REJUVENATION:
             Tooltip_AddLine_3("recupera vida e mana");
@@ -1570,7 +1570,7 @@ void __fastcall Tooltip_ShowItemInfo_3(int slot)
         case MC_19_POTION_OF_FULL_REJUVENATION:
         {
             if (HasTrait(CurrentPlayerIndex, TraitId::Giant)) {
-                Tooltip_AddLine_3("recupera 50% da vida and mana");
+                Tooltip_AddLine_3("recupera 50% da vida e mana");
             }
             else {
                 Tooltip_AddLine_3("recupera toda vida e mana");
@@ -2522,7 +2522,7 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
             Tooltip_AddLine( "aumenta a vitalidade");
             break;
         case MC_44_SPECTRAL_ELIXIR:
-            Tooltip_AddLine( "increases all stats");
+            Tooltip_AddLine( "aumenta todos os atributos");
             break;
         case MC_18_POTION_OF_REJUVENATION:
             Tooltip_AddLine( "recupera vida e mana");
@@ -2530,7 +2530,7 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
         case MC_19_POTION_OF_FULL_REJUVENATION:
         {
             if (HasTrait(CurrentPlayerIndex, TraitId::Giant)) {
-                Tooltip_AddLine("recupera 50% da vida and mana");
+                Tooltip_AddLine("recupera 50% da vida e mana");
             }
             else {
                 Tooltip_AddLine("recupera toda vida e mana");
