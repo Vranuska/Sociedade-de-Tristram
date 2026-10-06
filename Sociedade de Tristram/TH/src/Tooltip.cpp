@@ -413,13 +413,13 @@ void __fastcall Tooltip_ShowItemInfo_2(int slot)
                 goto MUMZ_4;
             }
             if (BaseItems[item.baseItemIndex].AnimationDelay) {
-                damageName = "slow damage";
+                damageName = "dano lento";
             }
             else if (item.ItemCode == IC_1_SWORD && player.fullClassId != PFC_INQUISITOR && player.fullClassId != PFC_DRUID) {
-                damageName = "slashing damage";
+                damageName = "dano cortante";
             }
             else if (item.ItemCode == IC_4_MACE && player.fullClassId != PFC_INQUISITOR && player.fullClassId != PFC_DRUID) {
-                damageName = "crushing damage";
+                damageName = "dano contundente";
             }
         MUMZ_4:
             sprintf(InfoPanelBuffer, "%s: ", damageName);
@@ -444,55 +444,55 @@ void __fastcall Tooltip_ShowItemInfo_2(int slot)
             if (!(player.gameChanger & BIT(GC_10_HACKNSLASH)) && GameMode != GM_COLISEUM) {
                 if (item.ItemCode == IC_1_SWORD) {
                     if (player.fullClassId == PFC_THRAEX) {
-                        Tooltip_AddLine_2("(+50% to beasts)");
+                        Tooltip_AddLine_2("(+50% contra feras)");
                     }
                     else if (player.fullClassId == PFC_INQUISITOR || player.fullClassId == PFC_DRUID || HasTrait(CurrentPlayerIndex, TraitId::Mamluk)) {
-                        //Tooltip_AddLine("(+50% to beasts, -50% to undead)");
+                        //Tooltip_AddLine("(+50% contra feras, -50% contra mortos-vivos)");
                     }
                     else if (player.fullClassId == PFC_ROGUE || player.fullClassId == PFC_DIMACHAERUS) {
-                        Tooltip_AddLine_2("(+15% to beasts, -50% to undead)");
+                        Tooltip_AddLine_2("(+15% contra feras, -50% contra mortos-vivos)");
                     }
                     else if (player.fullClassId == PFC_SECUTOR && HasTrait(CurrentPlayerIndex, TraitId::Bestiarius)) {
-                        Tooltip_AddLine_2("(+80% to beasts, -50% to undead)");
+                        Tooltip_AddLine_2("(+80% contra feras, -50% contra mortos-vivos)");
                     }
                     else if (player.fullClassId == PFC_KENSEI) {
-                        Tooltip_AddLine_2("(+30% to beasts, -50% to undead)");
+                        Tooltip_AddLine_2("(+30% contra feras, -50% contra mortos-vivos)");
                     }
                     else if (player.fullClassId == PFC_GUARDIAN) {
-                        Tooltip_AddLine_2("(+40% to beasts, -50% to undead)");
+                        Tooltip_AddLine_2("(+40% contra feras, -50% contra mortos-vivos)");
                     }
                     else {
-                        Tooltip_AddLine_2("(+50% to beasts, -50% to undead)");
+                        Tooltip_AddLine_2("(+50% contra feras, -50% contra mortos-vivos)");
                     }
                 }
                 else if (item.ItemCode == IC_4_MACE) {
                     if (player.fullClassId == PFC_TEMPLAR) {
-                        Tooltip_AddLine_2("(+70% to undead, -50% to beasts)");
+                        Tooltip_AddLine_2("(+70% contra mortos-vivos, -50% contra feras)");
                     }
                     else if (player.fullClassId == PFC_INQUISITOR || player.fullClassId == PFC_DRUID) {
-                        //Tooltip_AddLine("(+70% to undead, -50% to beasts)");
+                        //Tooltip_AddLine("(+70% contra mortos-vivos, -50% contra feras)");
                     }
                     else if (player.fullClassId == PFC_ROGUE || player.fullClassId == PFC_DIMACHAERUS) {
-                        Tooltip_AddLine_2("(+15% to undead, -50% to beasts)");
+                        Tooltip_AddLine_2("(+15% contra mortos-vivos, -50% contra feras)");
                     }
                     else if (player.fullClassId == PFC_SECUTOR && HasTrait(CurrentPlayerIndex, TraitId::Bestiarius)) {
-                        Tooltip_AddLine_2("(+25% to undead, -50% to beasts)");
+                        Tooltip_AddLine_2("(+25% contra mortos-vivos, -50% contra feras)");
                     }
                     else if (player.fullClassId == PFC_KENSEI) {
-                        Tooltip_AddLine_2("(+30% to undead, -50% to beasts)");
+                        Tooltip_AddLine_2("(+30% contra mortos-vivos, -50% contra feras)");
                     }
                     else if (player.fullClassId == PFC_GUARDIAN) {
-                        Tooltip_AddLine_2("(+40% to undead, -50% to beasts)");
+                        Tooltip_AddLine_2("(+40% contra mortos-vivos, -50% contra feras)");
                     }
                     else {
-                        Tooltip_AddLine_2("(+50% to undead, -50% to beasts)");
+                        Tooltip_AddLine_2("(+50% contra mortos-vivos, -50% contra feras)");
                     }
                 }
                 else if (item.ItemCode == IC_10_STAFF && player.fullClassId == PFC_MONK) {
-                    Tooltip_AddLine_2("(+20% to demons, -20% to beasts)");
+                    Tooltip_AddLine_2("(+20% contra demonios, -20% contra feras)");
                 }
                 else if (item.ItemCode == IC_20_CLAW && player.fullClassId == PFC_ASSASSIN) {//as if smb else wields claws...
-                    Tooltip_AddLine_2("(+20% to beasts, -20% to undead)");
+                    Tooltip_AddLine_2("(+20% contra feras, -20% contra mortos-vivos)");
                 }//else if (item.ItemCode == IC_21_KNIFE && player.fullClassId == PFC_ASSASSIN) {//as if smb else wields knifes...
                  //   Tooltip_AddLine("(+PLACEHOLDER% to PLACEHOLDER, -PLACEHOLDER% to PLACEHOLDER)");
                 //}
@@ -522,7 +522,7 @@ void __fastcall Tooltip_ShowItemInfo_2(int slot)
 
     if (item.TypeID == ITEM_2_ARMOR) {
         if (item.damageFromEnemies) {
-            sprintf(InfoPanelBuffer, "%+i damage from enemies", item.damageFromEnemies);
+            sprintf(InfoPanelBuffer, "%+i de dano dos inimigos", item.damageFromEnemies);
             Tooltip_AddLine_2(InfoPanelBuffer);
         }
         if (item.ArmorClass) {
@@ -1265,13 +1265,13 @@ void __fastcall Tooltip_ShowItemInfo_3(int slot)
                 goto MUMZ_5;
             }
             if (BaseItems[item.baseItemIndex].AnimationDelay) {
-                damageName = "slow damage";
+                damageName = "dano lento";
             }
             else if (item.ItemCode == IC_1_SWORD && player.fullClassId != PFC_INQUISITOR && player.fullClassId != PFC_DRUID) {
-                damageName = "slashing damage";
+                damageName = "dano cortante";
             }
             else if (item.ItemCode == IC_4_MACE && player.fullClassId != PFC_INQUISITOR && player.fullClassId != PFC_DRUID) {
-                damageName = "crushing damage";
+                damageName = "dano contundente";
             }
             MUMZ_5:
             sprintf(InfoPanelBuffer, "%s: ", damageName);
@@ -1296,55 +1296,55 @@ void __fastcall Tooltip_ShowItemInfo_3(int slot)
             if (!(player.gameChanger & BIT(GC_10_HACKNSLASH)) && GameMode != GM_COLISEUM) {
                 if (item.ItemCode == IC_1_SWORD) {
                     if (player.fullClassId == PFC_THRAEX) {
-                        Tooltip_AddLine_3("(+50% to beasts)");
+                        Tooltip_AddLine_3("(+50% contra feras)");
                     }
                     else if (player.fullClassId == PFC_INQUISITOR || player.fullClassId == PFC_DRUID || HasTrait(CurrentPlayerIndex, TraitId::Mamluk)) {
-                        //Tooltip_AddLine("(+50% to beasts, -50% to undead)");
+                        //Tooltip_AddLine("(+50% contra feras, -50% contra mortos-vivos)");
                     }
                     else if (player.fullClassId == PFC_ROGUE || player.fullClassId == PFC_DIMACHAERUS) {
-                        Tooltip_AddLine_3("(+15% to beasts, -50% to undead)");
+                        Tooltip_AddLine_3("(+15% contra feras, -50% contra mortos-vivos)");
                     }
                     else if (player.fullClassId == PFC_SECUTOR && HasTrait(CurrentPlayerIndex, TraitId::Bestiarius)) {
-                        Tooltip_AddLine_3("(+80% to beasts, -50% to undead)");
+                        Tooltip_AddLine_3("(+80% contra feras, -50% contra mortos-vivos)");
                     }
                     else if (player.fullClassId == PFC_KENSEI) {
-                        Tooltip_AddLine_3("(+30% to beasts, -50% to undead)");
+                        Tooltip_AddLine_3("(+30% contra feras, -50% contra mortos-vivos)");
                     }
                     else if (player.fullClassId == PFC_GUARDIAN) {
-                        Tooltip_AddLine_3("(+40% to beasts, -50% to undead)");
+                        Tooltip_AddLine_3("(+40% contra feras, -50% contra mortos-vivos)");
                     }
                     else {
-                        Tooltip_AddLine_3("(+50% to beasts, -50% to undead)");
+                        Tooltip_AddLine_3("(+50% contra feras, -50% contra mortos-vivos)");
                     }
                 }
                 else if (item.ItemCode == IC_4_MACE) {
                     if (player.fullClassId == PFC_TEMPLAR) {
-                        Tooltip_AddLine_3("(+70% to undead, -50% to beasts)");
+                        Tooltip_AddLine_3("(+70% contra mortos-vivos, -50% contra feras)");
                     }
                     else if (player.fullClassId == PFC_INQUISITOR || player.fullClassId == PFC_DRUID) {
-                        //Tooltip_AddLine("(+70% to undead, -50% to beasts)");
+                        //Tooltip_AddLine("(+70% contra mortos-vivos, -50% contra feras)");
                     }
                     else if (player.fullClassId == PFC_ROGUE || player.fullClassId == PFC_DIMACHAERUS) {
-                        Tooltip_AddLine_3("(+15% to undead, -50% to beasts)");
+                        Tooltip_AddLine_3("(+15% contra mortos-vivos, -50% contra feras)");
                     }
                     else if (player.fullClassId == PFC_SECUTOR && HasTrait(CurrentPlayerIndex, TraitId::Bestiarius)) {
-                        Tooltip_AddLine_3("(+25% to undead, -50% to beasts)");
+                        Tooltip_AddLine_3("(+25% contra mortos-vivos, -50% contra feras)");
                     }
                     else if (player.fullClassId == PFC_KENSEI) {
-                        Tooltip_AddLine_3("(+30% to undead, -50% to beasts)");
+                        Tooltip_AddLine_3("(+30% contra mortos-vivos, -50% contra feras)");
                     }
                     else if (player.fullClassId == PFC_GUARDIAN) {
-                        Tooltip_AddLine_3("(+40% to undead, -50% to beasts)");
+                        Tooltip_AddLine_3("(+40% contra mortos-vivos, -50% contra feras)");
                     }
                     else {
-                        Tooltip_AddLine_3("(+50% to undead, -50% to beasts)");
+                        Tooltip_AddLine_3("(+50% contra mortos-vivos, -50% contra feras)");
                     }
                 }
                 else if (item.ItemCode == IC_10_STAFF && player.fullClassId == PFC_MONK) {
-                    Tooltip_AddLine_3("(+20% to demons, -20% to beasts)");
+                    Tooltip_AddLine_3("(+20% contra demonios, -20% contra feras)");
                 }
                 else if (item.ItemCode == IC_20_CLAW && player.fullClassId == PFC_ASSASSIN) {//as if smb else wields claws...
-                    Tooltip_AddLine_3("(+20% to beasts, -20% to undead)");
+                    Tooltip_AddLine_3("(+20% contra feras, -20% contra mortos-vivos)");
                 }//else if (item.ItemCode == IC_21_KNIFE && player.fullClassId == PFC_ASSASSIN) {//as if smb else wields knifes...
                  //   Tooltip_AddLine("(+PLACEHOLDER% to PLACEHOLDER, -PLACEHOLDER% to PLACEHOLDER)");
                 //}
@@ -1374,7 +1374,7 @@ void __fastcall Tooltip_ShowItemInfo_3(int slot)
 
     if (item.TypeID == ITEM_2_ARMOR) {
         if (item.damageFromEnemies) {
-            sprintf(InfoPanelBuffer, "%+i damage from enemies", item.damageFromEnemies);
+            sprintf(InfoPanelBuffer, "%+i de dano dos inimigos", item.damageFromEnemies);
             Tooltip_AddLine_3(InfoPanelBuffer);
         }
         if (item.ArmorClass) {
@@ -2230,13 +2230,13 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
                 goto MUMZ_6;
             }
             if (BaseItems[item.baseItemIndex].AnimationDelay) {
-                damageName = "slow damage";
+                damageName = "dano lento";
             }
             else if (item.ItemCode == IC_1_SWORD && player.fullClassId != PFC_INQUISITOR && player.fullClassId != PFC_DRUID) {
-                damageName = "slashing damage";
+                damageName = "dano cortante";
             }
             else if (item.ItemCode == IC_4_MACE && player.fullClassId != PFC_INQUISITOR && player.fullClassId != PFC_DRUID) {
-                damageName = "crushing damage";
+                damageName = "dano contundente";
             }
             MUMZ_6:
             sprintf(InfoPanelBuffer, "%s: ", damageName);
@@ -2261,55 +2261,55 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
             if (!(player.gameChanger & BIT(GC_10_HACKNSLASH)) && GameMode != GM_COLISEUM) {
                 if (item.ItemCode == IC_1_SWORD) {
                     if (player.fullClassId == PFC_THRAEX) {
-                        Tooltip_AddLine("(+50% to beasts)");
+                        Tooltip_AddLine("(+50% contra feras)");
                     }
                     else if (player.fullClassId == PFC_INQUISITOR || player.fullClassId == PFC_DRUID || HasTrait(CurrentPlayerIndex, TraitId::Mamluk)) {
-                        //Tooltip_AddLine("(+50% to beasts, -50% to undead)");
+                        //Tooltip_AddLine("(+50% contra feras, -50% contra mortos-vivos)");
                     }
                     else if (player.fullClassId == PFC_ROGUE || player.fullClassId == PFC_DIMACHAERUS) {
-                        Tooltip_AddLine("(+15% to beasts, -50% to undead)");
+                        Tooltip_AddLine("(+15% contra feras, -50% contra mortos-vivos)");
                     }
                     else if (player.fullClassId == PFC_SECUTOR && HasTrait(CurrentPlayerIndex, TraitId::Bestiarius)) {
-                        Tooltip_AddLine("(+80% to beasts, -50% to undead)");
+                        Tooltip_AddLine("(+80% contra feras, -50% contra mortos-vivos)");
                     }
                     else if (player.fullClassId == PFC_KENSEI) {
-                        Tooltip_AddLine("(+30% to beasts, -50% to undead)");
+                        Tooltip_AddLine("(+30% contra feras, -50% contra mortos-vivos)");
                     }
                     else if (player.fullClassId == PFC_GUARDIAN) {
-                        Tooltip_AddLine("(+40% to beasts, -50% to undead)");
+                        Tooltip_AddLine("(+40% contra feras, -50% contra mortos-vivos)");
                     }
                     else {
-                        Tooltip_AddLine("(+50% to beasts, -50% to undead)");
+                        Tooltip_AddLine("(+50% contra feras, -50% contra mortos-vivos)");
                     }
                 }
                 else if (item.ItemCode == IC_4_MACE) {
                     if (player.fullClassId == PFC_TEMPLAR) {
-                        Tooltip_AddLine("(+70% to undead, -50% to beasts)");
+                        Tooltip_AddLine("(+70% contra mortos-vivos, -50% contra feras)");
                     }
                     else if (player.fullClassId == PFC_INQUISITOR || player.fullClassId == PFC_DRUID) {
-                        //Tooltip_AddLine("(+70% to undead, -50% to beasts)");
+                        //Tooltip_AddLine("(+70% contra mortos-vivos, -50% contra feras)");
                     }
                     else if (player.fullClassId == PFC_ROGUE || player.fullClassId == PFC_DIMACHAERUS) {
-                        Tooltip_AddLine("(+15% to undead, -50% to beasts)");
+                        Tooltip_AddLine("(+15% contra mortos-vivos, -50% contra feras)");
                     }
                     else if (player.fullClassId == PFC_SECUTOR && HasTrait(CurrentPlayerIndex, TraitId::Bestiarius)) {
-                        Tooltip_AddLine("(+25% to undead, -50% to beasts)");
+                        Tooltip_AddLine("(+25% contra mortos-vivos, -50% contra feras)");
                     }
                     else if (player.fullClassId == PFC_KENSEI) {
-                        Tooltip_AddLine("(+30% to undead, -50% to beasts)");
+                        Tooltip_AddLine("(+30% contra mortos-vivos, -50% contra feras)");
                     }
                     else if (player.fullClassId == PFC_GUARDIAN) {
-                        Tooltip_AddLine("(+40% to undead, -50% to beasts)");
+                        Tooltip_AddLine("(+40% contra mortos-vivos, -50% contra feras)");
                     }
                     else {
-                        Tooltip_AddLine("(+50% to undead, -50% to beasts)");
+                        Tooltip_AddLine("(+50% contra mortos-vivos, -50% contra feras)");
                     }
                 }
                 else if (item.ItemCode == IC_10_STAFF && player.fullClassId == PFC_MONK) {
-                    Tooltip_AddLine("(+20% to demons, -20% to beasts)");
+                    Tooltip_AddLine("(+20% contra demonios, -20% contra feras)");
                 }
                 else if (item.ItemCode == IC_20_CLAW && player.fullClassId == PFC_ASSASSIN) {//as if smb else wields claws...
-                    Tooltip_AddLine("(+20% to beasts, -20% to undead)");
+                    Tooltip_AddLine("(+20% contra feras, -20% contra mortos-vivos)");
                 }//else if (item.ItemCode == IC_21_KNIFE && player.fullClassId == PFC_ASSASSIN) {//as if smb else wields knifes...
                  //   Tooltip_AddLine("(+PLACEHOLDER% to PLACEHOLDER, -PLACEHOLDER% to PLACEHOLDER)");
                 //}
@@ -2339,7 +2339,7 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
     
     if( item.TypeID == ITEM_2_ARMOR ){
         if( item.damageFromEnemies ){
-            sprintf(InfoPanelBuffer, "%+i damage from enemies", item.damageFromEnemies);
+            sprintf(InfoPanelBuffer, "%+i de dano dos inimigos", item.damageFromEnemies);
             Tooltip_AddLine(InfoPanelBuffer);
         }
         if( item.ArmorClass ){
@@ -2989,7 +2989,7 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
                 if (IsController() && !XinputNotInUse(true)) {
                     Tooltip_AddLine("Right Trigger + A to unequip", C_7_Grey);
                 }else{
-                    Tooltip_AddLine("Shift Click to unequip", C_7_Grey);
+                    Tooltip_AddLine("Shift + clique para desequipar", C_7_Grey);
                 }
             }else if( slot >= IS_Inventory
 			 && (is(BaseItems[item.baseItemIndex].ItemType, ITEM_1_WEAPON, ITEM_2_ARMOR) || is(item.ItemCode, IC_12_RING, IC_13_AMULET))
