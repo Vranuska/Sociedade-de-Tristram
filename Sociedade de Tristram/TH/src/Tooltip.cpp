@@ -1013,20 +1013,20 @@ void __fastcall Tooltip_ShowItemInfo_2(int slot)
     }
     else if (HasTrait(CurrentPlayerIndex, TraitId::Fechtmeister, TraitId::Ranger, TraitId::Mamluk)) {
         if (is(item.ItemCode, IC_5_SHIELD)) {
-            Tooltip_AddLine_2("[Can't use shields]", C_2_Red);
+            Tooltip_AddLine_2("[Nao pode usar escudos]", C_2_Red);
         }
     }
     else if (HasTrait(CurrentPlayerIndex, TraitId::Black_Witchery)) {
         if (is(item.ItemCode, IC_21_KNIFE)) {
-            Tooltip_AddLine_2("[Can't use throwing knives]", C_2_Red);
+            Tooltip_AddLine_2("[Nao pode usar facas de arremesso]", C_2_Red);
         }
     }
     else if (HasTrait(CurrentPlayerIndex, TraitId::Paladin) || player.fullClassId == PFC_DRUID) {
         if (is(item.ItemCode, IC_3_BOW)) {
-            Tooltip_AddLine_2("[Can't use crossbows]", C_2_Red);
+            Tooltip_AddLine_2("[Nao pode usar bestas]", C_2_Red);
         }
         else if (is(item.ItemCode, IC_22_MALLET)) {
-            Tooltip_AddLine_2("[Can't use throwing mallets]", C_2_Red);
+            Tooltip_AddLine_2("[Nao pode usar martelos de arremesso]", C_2_Red);
         }
     }
     else if (HasTrait(CurrentPlayerIndex, TraitId::TwoTowers)) {
@@ -1047,7 +1047,7 @@ void __fastcall Tooltip_ShowItemInfo_2(int slot)
             MC_7_POTION_OF_FULL_MANA,
             MC_18_POTION_OF_REJUVENATION,
             MC_19_POTION_OF_FULL_REJUVENATION)) {
-            Tooltip_AddLine_2("[Can't use potions]", C_2_Red);
+            Tooltip_AddLine_2("[Nao pode usar pocoes]", C_2_Red);
         }
     }
     //----------------------
@@ -1865,20 +1865,20 @@ void __fastcall Tooltip_ShowItemInfo_3(int slot)
     }
     else if (HasTrait(CurrentPlayerIndex, TraitId::Fechtmeister, TraitId::Ranger, TraitId::Mamluk)) {
         if (is(item.ItemCode, IC_5_SHIELD)) {
-            Tooltip_AddLine_3("[Can't use shields]", C_2_Red);
+            Tooltip_AddLine_3("[Nao pode usar escudos]", C_2_Red);
         }
     }
     else if (HasTrait(CurrentPlayerIndex, TraitId::Black_Witchery)) {
         if (is(item.ItemCode, IC_21_KNIFE)) {
-            Tooltip_AddLine_3("[Can't use throwing knives]", C_2_Red);
+            Tooltip_AddLine_3("[Nao pode usar facas de arremesso]", C_2_Red);
         }
     }
     else if (HasTrait(CurrentPlayerIndex, TraitId::Paladin) || player.fullClassId == PFC_DRUID) {
         if (is(item.ItemCode, IC_3_BOW)) {
-            Tooltip_AddLine_3("[Can't use crossbows]", C_2_Red);
+            Tooltip_AddLine_3("[Nao pode usar bestas]", C_2_Red);
         }
         else if (is(item.ItemCode, IC_22_MALLET)) {
-            Tooltip_AddLine_3("[Can't use throwing mallets]", C_2_Red);
+            Tooltip_AddLine_3("[Nao pode usar martelos de arremesso]", C_2_Red);
         }
     }
     else if (HasTrait(CurrentPlayerIndex, TraitId::TwoTowers)) {
@@ -1899,7 +1899,7 @@ void __fastcall Tooltip_ShowItemInfo_3(int slot)
             MC_7_POTION_OF_FULL_MANA,
             MC_18_POTION_OF_REJUVENATION,
             MC_19_POTION_OF_FULL_REJUVENATION)) {
-            Tooltip_AddLine_3("[Can't use potions]", C_2_Red);
+            Tooltip_AddLine_3("[Nao pode usar pocoes]", C_2_Red);
         }
     }
     //----------------------
@@ -2833,20 +2833,20 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
 	}
 	else if (HasTrait(CurrentPlayerIndex, TraitId::Fechtmeister, TraitId::Ranger, TraitId::Mamluk)) {
 		if (is(item.ItemCode, IC_5_SHIELD)) {
-			Tooltip_AddLine("[Can't use shields]", C_2_Red);
+			Tooltip_AddLine("[Nao pode usar escudos]", C_2_Red);
 		}
 	}
 	else if (HasTrait(CurrentPlayerIndex, TraitId::Black_Witchery)) {
 		if (is(item.ItemCode, IC_21_KNIFE)) {
-			Tooltip_AddLine("[Can't use throwing knives]", C_2_Red);
+			Tooltip_AddLine("[Nao pode usar facas de arremesso]", C_2_Red);
 		}
 	}
     else if (HasTrait(CurrentPlayerIndex, TraitId::Paladin) || player.fullClassId == PFC_DRUID) {
         if (is(item.ItemCode, IC_3_BOW)) {
-            Tooltip_AddLine("[Can't use crossbows]", C_2_Red);
+            Tooltip_AddLine("[Nao pode usar bestas]", C_2_Red);
         }
         else if (is(item.ItemCode, IC_22_MALLET)) {
-            Tooltip_AddLine("[Can't use throwing mallets]", C_2_Red);
+            Tooltip_AddLine("[Nao pode usar martelos de arremesso]", C_2_Red);
         }
     }
     else if (HasTrait(CurrentPlayerIndex, TraitId::TwoTowers)) {
@@ -2867,7 +2867,7 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
 			MC_7_POTION_OF_FULL_MANA,
 			MC_18_POTION_OF_REJUVENATION,
 			MC_19_POTION_OF_FULL_REJUVENATION)) {
-			Tooltip_AddLine("[Can't use potions]", C_2_Red);
+			Tooltip_AddLine("[Nao pode usar pocoes]", C_2_Red);
 		}
 	}
 	//----------------------
