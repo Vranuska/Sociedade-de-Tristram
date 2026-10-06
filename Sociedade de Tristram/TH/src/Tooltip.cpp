@@ -398,7 +398,7 @@ void __fastcall Tooltip_ShowItemInfo_2(int slot)
 
     if (item.BaseCharges) {
         char color = ((item.CurCharges > 0) ? C_0_White : C_2_Red) + 128;
-        sprintf(InfoPanelBuffer, "%s charges: %c%i%c of %i", getSpellName(item.SpellIndex), color, item.CurCharges, color, item.BaseCharges);
+        sprintf(InfoPanelBuffer, "%s cargas: %c%i%c de %i", getSpellName(item.SpellIndex), color, item.CurCharges, color, item.BaseCharges);
         Tooltip_AddLine_2(InfoPanelBuffer);
     }
 
@@ -408,7 +408,7 @@ void __fastcall Tooltip_ShowItemInfo_2(int slot)
         }
         else if (!is(player.fullClassId, PFC_MAGE, PFC_ELEMENTALIST, PFC_WARLOCK, PFC_NECROMANCER, PFC_DEMONOLOGIST)) {
         MUM_1:
-            const char* damageName = "damage";
+            const char* damageName = "dano";
             if (HasTrait(CurrentPlayerIndex, TraitId::Mamluk)) {
                 goto MUMZ_4;
             }
@@ -425,10 +425,10 @@ void __fastcall Tooltip_ShowItemInfo_2(int slot)
             sprintf(InfoPanelBuffer, "%s: ", damageName);
             if (item.overTime) {
                 if (item.MinDamage == item.MaxDamage) {
-                    sprintf(InfoPanelBuffer, "%s%i over %i sec", InfoPanelBuffer, item.MinDamage, item.overTime);
+                    sprintf(InfoPanelBuffer, "%s%i ao longo de %i s", InfoPanelBuffer, item.MinDamage, item.overTime);
                 }
                 else {
-                    sprintf(InfoPanelBuffer, "%s%i-%i over %i sec", InfoPanelBuffer, item.MinDamage, item.MaxDamage, item.overTime);
+                    sprintf(InfoPanelBuffer, "%s%i-%i ao longo de %i s", InfoPanelBuffer, item.MinDamage, item.MaxDamage, item.overTime);
                 }
             }
             else {
@@ -514,7 +514,7 @@ void __fastcall Tooltip_ShowItemInfo_2(int slot)
                     ac = -ac;
                     modificationSrt = "reduced";
                 }
-                sprintf(InfoPanelBuffer, "armor class %s by: %i", modificationSrt, ac);
+                sprintf(InfoPanelBuffer, "armadura %s em: %i", modificationSrt, ac);
                 Tooltip_AddLine_2(InfoPanelBuffer);
             }
         }
@@ -526,11 +526,11 @@ void __fastcall Tooltip_ShowItemInfo_2(int slot)
             Tooltip_AddLine_2(InfoPanelBuffer);
         }
         if (item.ArmorClass) {
-            sprintf(InfoPanelBuffer, "armor class: %i", item.ArmorClass);
+            sprintf(InfoPanelBuffer, "armadura: %i", item.ArmorClass);
             Tooltip_AddLine_2(InfoPanelBuffer);
         }
         if (item.minMeleeAbsorbPercent || item.maxMeleeAbsorbPercent) {
-            sprintf(InfoPanelBuffer, "resist melee damage: ");
+            sprintf(InfoPanelBuffer, "resistencia a dano corpo a corpo: ");
             if (item.minMeleeAbsorbPercent == item.maxMeleeAbsorbPercent) {
                 sprintf(InfoPanelBuffer, "%s%i", InfoPanelBuffer, item.maxMeleeAbsorbPercent);
             }
@@ -540,7 +540,7 @@ void __fastcall Tooltip_ShowItemInfo_2(int slot)
             Tooltip_AddLine_2(InfoPanelBuffer);
         }
         if (item.minArrowAbsorbPercent || item.maxArrowAbsorbPercent) {
-            sprintf(InfoPanelBuffer, "resist arrow damage: ");
+            sprintf(InfoPanelBuffer, "resistencia a dano de projeteis: ");
             if (item.minArrowAbsorbPercent == item.maxArrowAbsorbPercent) {
                 sprintf(InfoPanelBuffer, "%s%i", InfoPanelBuffer, item.maxArrowAbsorbPercent);
             }
@@ -550,7 +550,7 @@ void __fastcall Tooltip_ShowItemInfo_2(int slot)
             Tooltip_AddLine_2(InfoPanelBuffer);
         }
         if (item.minThorns || item.maxThorns) {
-            sprintf(InfoPanelBuffer, "thorns damage: ");
+            sprintf(InfoPanelBuffer, "dano de espinhos: ");
             if (item.minThorns == item.maxThorns) {
                 sprintf(InfoPanelBuffer, "%s%i", InfoPanelBuffer, item.minThorns);
             }
@@ -572,10 +572,10 @@ void __fastcall Tooltip_ShowItemInfo_2(int slot)
                 modificationSrt = "reduced";
             }
             if (item.MinDamage == item.MaxDamage) {
-                sprintf(InfoPanelBuffer, "damage %s by: %i", modificationSrt, minDmg);
+                sprintf(InfoPanelBuffer, "dano %s em: %i", modificationSrt, minDmg);
             }
             else {
-                sprintf(InfoPanelBuffer, "damage %s by: %i-%i", modificationSrt, minDmg, maxDmg);
+                sprintf(InfoPanelBuffer, "dano %s em: %i-%i", modificationSrt, minDmg, maxDmg);
             }
             Tooltip_AddLine_2(InfoPanelBuffer);
         }
@@ -674,7 +674,7 @@ void __fastcall Tooltip_ShowItemInfo_2(int slot)
         case MC_2_POTION_OF_FULL_HEALING:
         {
             if (HasTrait(CurrentPlayerIndex, TraitId::Giant)) {
-                Tooltip_AddLine_2("recover 50% of your life");
+                Tooltip_AddLine_2("recupera 50% da sua vida");
             }
             else {
                 Tooltip_AddLine_2("recupera toda a vida");
@@ -690,7 +690,7 @@ void __fastcall Tooltip_ShowItemInfo_2(int slot)
         case MC_7_POTION_OF_FULL_MANA:
         {
             if (HasTrait(CurrentPlayerIndex, TraitId::Giant)) {
-                Tooltip_AddLine_2("recover 50% of your mana");
+                Tooltip_AddLine_2("recupera 50% da sua mana");
             }
             else {
                 Tooltip_AddLine_2("recupera toda a mana");
@@ -698,27 +698,27 @@ void __fastcall Tooltip_ShowItemInfo_2(int slot)
         }
             break;
         case MC_10_ELIXIR_OF_STRENGTH:
-            Tooltip_AddLine_2("increases strength");
+            Tooltip_AddLine_2("aumenta a forca");
             break;
         case MC_11_ELIXIR_OF_MAGIC:
-            Tooltip_AddLine_2("increases magic");
+            Tooltip_AddLine_2("aumenta a magia");
             break;
         case MC_12_ELIXIR_OF_DEXTERITY:
-            Tooltip_AddLine_2("increases dexterity");
+            Tooltip_AddLine_2("aumenta a destreza");
             break;
         case MC_13_ELIXIR_OF_VITALITY:
-            Tooltip_AddLine_2("increases vitality");
+            Tooltip_AddLine_2("aumenta a vitalidade");
             break;
         case MC_44_SPECTRAL_ELIXIR:
             Tooltip_AddLine_2("increases all stats");
             break;
         case MC_18_POTION_OF_REJUVENATION:
-            Tooltip_AddLine_2("recover life and mana");
+            Tooltip_AddLine_2("recupera vida e mana");
             break;
         case MC_19_POTION_OF_FULL_REJUVENATION:
         {
             if (HasTrait(CurrentPlayerIndex, TraitId::Giant)) {
-                Tooltip_AddLine_2("recover 50% of life and mana");
+                Tooltip_AddLine_2("recupera 50% da vida and mana");
             }
             else {
                 Tooltip_AddLine_2("recupera toda vida e mana");
@@ -727,11 +727,11 @@ void __fastcall Tooltip_ShowItemInfo_2(int slot)
             break;
         case MC_47_RUNE_OF_FIRE:
         case MC_50_RUNE_OF_BLAZE:
-            Tooltip_AddLine_2("Explodes with Fire Nova");
+            Tooltip_AddLine_2("Explode com Nova de Fogo");
             break;
         case MC_48_RUNE_OF_LIGHTNING:
         case MC_49_RUNE_OF_SHOCK:
-            Tooltip_AddLine_2("Explodes with Lightning Nova");
+            Tooltip_AddLine_2("Explode com Nova de Raios");
             break;
         case MC_51_RUNE_OF_STONE:
             Tooltip_AddLine_2("sets petrification trap");
@@ -765,16 +765,16 @@ void __fastcall Tooltip_ShowItemInfo_2(int slot)
                     }
                 }
                 else {
-                    Tooltip_AddLine_2("can be inserted into socketed items");
+                    Tooltip_AddLine_2("pode ser inserida em itens com encaixe");
 
                     PrintGemEffectToStringBuffer(gemInfoOpt->weaponEffect);
-                    sprintf(buffer, "weapons: %s", InfoPanelBuffer);
+                    sprintf(buffer, "armas: %s", InfoPanelBuffer);
                     if (gemInfoOpt->weaponEffect.type == GemEffectType::Damage) {
                         if (HasTrait(CurrentPlayerIndex, TraitId::Pistoleer)) {
                             sprintf(buffer, "%s", buffer);
                         }
                         else {
-                            sprintf(buffer, "%s (2X FOR 2H WEAPONS)", buffer);
+                            sprintf(buffer, "%s (2X PARA ARMAS DE 2 MAOS)", buffer);
                         }
                     }
                     Tooltip_AddLine_2(buffer, C_4_Orange);
@@ -786,10 +786,10 @@ void __fastcall Tooltip_ShowItemInfo_2(int slot)
 
                     PrintGemEffectToStringBuffer(gemInfoOpt->armorEffect);
                     if (gemInfoOpt->type == GEM::Chrysolite) {
-                        sprintf(buffer, "body armors: %s", InfoPanelBuffer);
+                        sprintf(buffer, "armaduras corporais: %s", InfoPanelBuffer);
                     }
                     else {
-                        sprintf(buffer, "armors: %s", InfoPanelBuffer);
+                        sprintf(buffer, "armaduras: %s", InfoPanelBuffer);
                     }
                     Tooltip_AddLine_2(buffer, C_1_Blue);
 
@@ -799,13 +799,13 @@ void __fastcall Tooltip_ShowItemInfo_2(int slot)
                                 // Insertion is now free
                             }
                             else {
-                                Tooltip_AddLine_2("Not suitable for current item", C_2_Red);
+                                Tooltip_AddLine_2("Nao serve para o item atual", C_2_Red);
                             }
                         }
                     }
                 }
                 if (IsCraftPanelVisible && CurrentCraftPage == CraftPage::CP_Gems && !isCraftSlot) {
-                    Tooltip_AddLine_2("Shift click to move to crafting slot");
+                    Tooltip_AddLine_2("Shift + clique para mover ao espaco de criacao");
                 }
             }
             break;
@@ -821,15 +821,15 @@ void __fastcall Tooltip_ShowItemInfo_2(int slot)
             }
             Tooltip_AddLine_2(InfoPanelBuffer);
 
-            Tooltip_AddLine_2("of current durability");
+            Tooltip_AddLine_2("da durabilidade atual");
         }
 
         if (addDurMin || addDurMax) {
             if (addDurMin == addDurMax) {
-                sprintf(InfoPanelBuffer, "+%i to maxdurability", addDurMin);
+                sprintf(InfoPanelBuffer, "+%i de durabilidade maxima", addDurMin);
             }
             else {
-                sprintf(InfoPanelBuffer, "+[%i-%i] to max durability", addDurMin, addDurMax);
+                sprintf(InfoPanelBuffer, "+[%i-%i] de durabilidade maxima", addDurMin, addDurMax);
             }
             if (addDurLimit) {
                 sprintf(InfoPanelBuffer, "%s,", InfoPanelBuffer);
@@ -840,7 +840,7 @@ void __fastcall Tooltip_ShowItemInfo_2(int slot)
                 sprintf(InfoPanelBuffer, "up to %i points", addDurLimit);
                 Tooltip_AddLine_2(InfoPanelBuffer);
                 int elTorso = addDurLimit * 2;
-                sprintf(InfoPanelBuffer, "(%i for body armor)", elTorso);
+                sprintf(InfoPanelBuffer, "(%i para armadura corporal)", elTorso);
                 Tooltip_AddLine_2(InfoPanelBuffer);
             }
         }
@@ -852,7 +852,7 @@ void __fastcall Tooltip_ShowItemInfo_2(int slot)
     }
 
     if( item.socketsAmount > 0 && (not(GameMode, GM_IRONMAN, GM_NIGHTMARE, GM_SPEEDRUN) || item.MagicLevel < ML_2_UNIQUE) ){
-        sprintf(InfoPanelBuffer, "Socketed [%i]", item.socketsAmount);
+        sprintf(InfoPanelBuffer, "Encaixes [%i]", item.socketsAmount);
         Tooltip_AddLine_2(InfoPanelBuffer, C_1_Blue);
 	}
 	for( int i = 0; i < countof(item.effect); ++i ){
@@ -901,14 +901,14 @@ void __fastcall Tooltip_ShowItemInfo_2(int slot)
             Tooltip_AddLine_2("clique direito para ler");
             break;
         case MC_22_RELIC_NEED_TARGET:
-            Tooltip_AddLine_2("Right-click to read, then");
-            Tooltip_AddLine_2("left-click to target");
+            Tooltip_AddLine_2("Clique direito para ler, depois");
+            Tooltip_AddLine_2("clique esquerdo para selecionar o alvo");
             break;
         case MC_42_MAP_OF_THE_STARS:
-            Tooltip_AddLine_2("Right click to view");
+            Tooltip_AddLine_2("Clique direito para visualizar");
             break;
         case MC_43_EAR_HEART:
-            sprintf(InfoPanelBuffer, "Level : %i", item.quality);
+            sprintf(InfoPanelBuffer, "Nivel: %i", item.quality);
             Tooltip_AddLine_2(InfoPanelBuffer);
             break;
         case MC_53_AURIC_AMULET:
@@ -917,13 +917,13 @@ void __fastcall Tooltip_ShowItemInfo_2(int slot)
         }
 
         if (item.baseItemIndex == BI_33_STAFF_OF_LAZARUS && HasTrait(CurrentPlayerIndex, TraitId::Leper)) {
-            Tooltip_AddLine_2("Right click to use");
+            Tooltip_AddLine_2("Clique direito para usar");
         }
         else if (isTownPortalForbidden()) {
             switch (item.baseItemIndex) {
-            case BI_19_FUNGAL_TOME:		 Tooltip_AddLine_2("Right click to transmute into spectral elixir"); break;
-            case BI_2512_FULL_CONTAINERS:Tooltip_AddLine_2("Right click to transmute into random elixir"); break;
-            case BI_33_STAFF_OF_LAZARUS: Tooltip_AddLine_2("Right click to use"); break;
+            case BI_19_FUNGAL_TOME:		 Tooltip_AddLine_2("Clique direito para transmutar em elixir espectral"); break;
+            case BI_2512_FULL_CONTAINERS:Tooltip_AddLine_2("Clique direito para transmutar em elixir aleatorio"); break;
+            case BI_33_STAFF_OF_LAZARUS: Tooltip_AddLine_2("Clique direito para usar"); break;
             case BI_16_ANVIL_OF_FURY:
             case BI_9_MAGIC_ROCK:
             case BI_327_TAVERN_SIGN:
@@ -932,7 +932,7 @@ void __fastcall Tooltip_ShowItemInfo_2(int slot)
             case BI_2460_THE_RIGHT_GOODS: 
             case BI_2510_DUSTY_CRATE:
             case BI_2461_MUNDANE_INVENTORY:
-            case BI_334_THEODORE:		 Tooltip_AddLine_2("Right click to transmute into quest reward"); break;
+            case BI_334_THEODORE:		 Tooltip_AddLine_2("Clique direito para transmutar em recompensa de missao"); break;
             }
         }
 		if( item.baseItemIndex == BI_301_AQUAMARINE ){
@@ -942,19 +942,19 @@ void __fastcall Tooltip_ShowItemInfo_2(int slot)
 		}
 		if (isTownPortalForbidden()) {
 	            if (item.baseItemIndex >= BI_296_QUARTZ && item.baseItemIndex < BI_301_AQUAMARINE) {
-                Tooltip_AddLine_2("Right click to transmute into gold");
+                Tooltip_AddLine_2("Clique direito para transmutar em ouro");
             }
         }
         if (item.baseItemIndex == BI_2472_THE_LOCKED_CHEST) {
-            Tooltip_AddLine_2("Right click to open (requires key)"); 
+            Tooltip_AddLine_2("Clique direito para abrir (requer chave)"); 
         }
         if (item.baseItemIndex == BI_2476_THE_STRANGE_BOOK) {
-            Tooltip_AddLine_2("Right click to read (requires crystal eyepiece)");
+            Tooltip_AddLine_2("Clique direito para ler (requer ocular de cristal)");
         }
 
         if (IsItemAllowedForBelt(item)) {
             if (slot >= IS_50_47_Belt_Start && slot < IS_50_47_Belt_End) {
-                Tooltip_AddLine_2("Shift Click to move left");
+                Tooltip_AddLine_2("Shift + clique para mover para a esquerda");
 			}else if( ! IsTransmutePanelVisible ){
                 Tooltip_AddLine_2("Shift + clique: mover ao cinto");
             }
@@ -963,7 +963,7 @@ void __fastcall Tooltip_ShowItemInfo_2(int slot)
 
     // Requirements
     if (item.MagicCode == MC_24_BOOKS && item.RequiredLevel == 255u) {
-        Tooltip_AddLine_2("Spell is maxed", C_3_Gold);
+        Tooltip_AddLine_2("Magia no nivel maximo", C_3_Gold);
     }
     else if (item.RequiredMagic || item.RequiredStrength || item.RequiredDexterity || item.RequiredVitality || item.RequiredLevel) {
         strcpy(InfoPanelBuffer, "necessario:");
@@ -1004,11 +1004,11 @@ void __fastcall Tooltip_ShowItemInfo_2(int slot)
     }
 
     if ((playerFullClassMask & IPCM_ANY_EXILE) != 0 && baseItem.ForbiddenForExiles) {
-        Tooltip_AddLine_2("[Can't wear item]", C_2_Red);
+        Tooltip_AddLine_2("[Nao pode equipar o item]", C_2_Red);
     }
     else if (HasTrait(CurrentPlayerIndex, TraitId::OldFashioned)) {
         if (is(item.ItemCode, IC_6_LIGHT_ARMOR, IC_8_MID_ARMOR, IC_9_HEAVY_ARMOR)) {
-            Tooltip_AddLine_2("[Can't wear body armor]", C_2_Red);
+            Tooltip_AddLine_2("[Nao pode equipar armadura corporal]", C_2_Red);
         }
     }
     else if (HasTrait(CurrentPlayerIndex, TraitId::Fechtmeister, TraitId::Ranger, TraitId::Mamluk)) {
@@ -1031,12 +1031,12 @@ void __fastcall Tooltip_ShowItemInfo_2(int slot)
     }
     else if (HasTrait(CurrentPlayerIndex, TraitId::TwoTowers)) {
         if (is(item.ItemCode, IC_1_SWORD, IC_4_MACE)) {
-            Tooltip_AddLine_2("[Can't use melee weapons]", C_2_Red);
+            Tooltip_AddLine_2("[Nao pode usar armas corpo a corpo]", C_2_Red);
         }
     }
     else if (HasTrait(CurrentPlayerIndex, TraitId::Axepertise)) {
         if (is(item.ItemCode, IC_1_SWORD, IC_4_MACE)) {
-            Tooltip_AddLine_2("[Can't use item]", C_2_Red);
+            Tooltip_AddLine_2("[Nao pode usar o item]", C_2_Red);
         }
     }
     if (HasTrait(CurrentPlayerIndex, TraitId::WildSorcery) || HasTrait(CurrentPlayerIndex, TraitId::Rabid)) {
@@ -1057,7 +1057,7 @@ void __fastcall Tooltip_ShowItemInfo_2(int slot)
             int price = VisualTrade_GetBuyPrice(&item);
             sprintf(InfoPanelBuffer, "Buy price: %i", price);
             Tooltip_AddLine_2(InfoPanelBuffer, player.TotalGold >= price ? C_0_White : C_2_Red);
-            Tooltip_AddLine_2("Shift click to buy fast");
+            Tooltip_AddLine_2("Shift + clique para comprar rapidamente");
         }
         else {
             if (Cur.GraphicsID == CM_1_NORMAL_HAND) {
@@ -1066,10 +1066,10 @@ void __fastcall Tooltip_ShowItemInfo_2(int slot)
                     if (price) {
                         sprintf(InfoPanelBuffer, "Sell price: %i", price);
                         Tooltip_AddLine_2(InfoPanelBuffer);
-                        Tooltip_AddLine_2("Shift click to sell fast");
+                        Tooltip_AddLine_2("Shift + clique para vender rapidamente");
                     }
                     else {
-                        Tooltip_AddLine_2("Item cannot be sold", C_2_Red);
+                        Tooltip_AddLine_2("O item nao pode ser vendido", C_2_Red);
                     }
                 }
             }
@@ -1106,7 +1106,7 @@ void __fastcall Tooltip_ShowItemInfo_2(int slot)
             }
             else {
                 if (isVisualStashSlot) {
-                    Tooltip_AddLine_2("Shift Click to move to inventory");
+                    Tooltip_AddLine_2("Shift + clique para mover ao inventario");
                 }
                 else {
                     Tooltip_AddLine_2("Shift + clique: mover ao bau");
@@ -1116,9 +1116,9 @@ void __fastcall Tooltip_ShowItemInfo_2(int slot)
     }
 	if( IsTransmutePanelVisible && Transmute_Allowed(item) ) {
 		if( slot >= Stash_SlotIDStart ){
-			Tooltip_AddLine_2("Shift Click to move to inventory", C_7_Grey);
+			Tooltip_AddLine_2("Shift + clique para mover ao inventario", C_7_Grey);
 		}else if (slot >= IS_Inventory) {
-			Tooltip_AddLine_2("Shift Click to transmute panel", C_7_Grey);
+			Tooltip_AddLine_2("Shift + clique para o painel de transmutacao", C_7_Grey);
 		}
 	}
 
@@ -1250,7 +1250,7 @@ void __fastcall Tooltip_ShowItemInfo_3(int slot)
 
     if (item.BaseCharges) {
         char color = ((item.CurCharges > 0) ? C_0_White : C_2_Red) + 128;
-        sprintf(InfoPanelBuffer, "%s charges: %c%i%c of %i", getSpellName(item.SpellIndex), color, item.CurCharges, color, item.BaseCharges);
+        sprintf(InfoPanelBuffer, "%s cargas: %c%i%c de %i", getSpellName(item.SpellIndex), color, item.CurCharges, color, item.BaseCharges);
         Tooltip_AddLine_3(InfoPanelBuffer);
     }
 
@@ -1260,7 +1260,7 @@ void __fastcall Tooltip_ShowItemInfo_3(int slot)
         }
         else if (!is(player.fullClassId, PFC_MAGE, PFC_ELEMENTALIST, PFC_WARLOCK, PFC_NECROMANCER, PFC_DEMONOLOGIST)) {
         MUM_2:
-            const char* damageName = "damage";
+            const char* damageName = "dano";
             if (HasTrait(CurrentPlayerIndex, TraitId::Mamluk)) {
                 goto MUMZ_5;
             }
@@ -1277,10 +1277,10 @@ void __fastcall Tooltip_ShowItemInfo_3(int slot)
             sprintf(InfoPanelBuffer, "%s: ", damageName);
             if (item.overTime) {
                 if (item.MinDamage == item.MaxDamage) {
-                    sprintf(InfoPanelBuffer, "%s%i over %i sec", InfoPanelBuffer, item.MinDamage, item.overTime);
+                    sprintf(InfoPanelBuffer, "%s%i ao longo de %i s", InfoPanelBuffer, item.MinDamage, item.overTime);
                 }
                 else {
-                    sprintf(InfoPanelBuffer, "%s%i-%i over %i sec", InfoPanelBuffer, item.MinDamage, item.MaxDamage, item.overTime);
+                    sprintf(InfoPanelBuffer, "%s%i-%i ao longo de %i s", InfoPanelBuffer, item.MinDamage, item.MaxDamage, item.overTime);
                 }
             }
             else {
@@ -1366,7 +1366,7 @@ void __fastcall Tooltip_ShowItemInfo_3(int slot)
                     ac = -ac;
                     modificationSrt = "reduced";
                 }
-                sprintf(InfoPanelBuffer, "armor class %s by: %i", modificationSrt, ac);
+                sprintf(InfoPanelBuffer, "armadura %s em: %i", modificationSrt, ac);
                 Tooltip_AddLine_3(InfoPanelBuffer);
             }
         }
@@ -1378,11 +1378,11 @@ void __fastcall Tooltip_ShowItemInfo_3(int slot)
             Tooltip_AddLine_3(InfoPanelBuffer);
         }
         if (item.ArmorClass) {
-            sprintf(InfoPanelBuffer, "armor class: %i", item.ArmorClass);
+            sprintf(InfoPanelBuffer, "armadura: %i", item.ArmorClass);
             Tooltip_AddLine_3(InfoPanelBuffer);
         }
         if (item.minMeleeAbsorbPercent || item.maxMeleeAbsorbPercent) {
-            sprintf(InfoPanelBuffer, "resist melee damage: ");
+            sprintf(InfoPanelBuffer, "resistencia a dano corpo a corpo: ");
             if (item.minMeleeAbsorbPercent == item.maxMeleeAbsorbPercent) {
                 sprintf(InfoPanelBuffer, "%s%i", InfoPanelBuffer, item.maxMeleeAbsorbPercent);
             }
@@ -1392,7 +1392,7 @@ void __fastcall Tooltip_ShowItemInfo_3(int slot)
             Tooltip_AddLine_3(InfoPanelBuffer);
         }
         if (item.minArrowAbsorbPercent || item.maxArrowAbsorbPercent) {
-            sprintf(InfoPanelBuffer, "resist arrow damage: ");
+            sprintf(InfoPanelBuffer, "resistencia a dano de projeteis: ");
             if (item.minArrowAbsorbPercent == item.maxArrowAbsorbPercent) {
                 sprintf(InfoPanelBuffer, "%s%i", InfoPanelBuffer, item.maxArrowAbsorbPercent);
             }
@@ -1402,7 +1402,7 @@ void __fastcall Tooltip_ShowItemInfo_3(int slot)
             Tooltip_AddLine_3(InfoPanelBuffer);
         }
         if (item.minThorns || item.maxThorns) {
-            sprintf(InfoPanelBuffer, "thorns damage: ");
+            sprintf(InfoPanelBuffer, "dano de espinhos: ");
             if (item.minThorns == item.maxThorns) {
                 sprintf(InfoPanelBuffer, "%s%i", InfoPanelBuffer, item.minThorns);
             }
@@ -1424,10 +1424,10 @@ void __fastcall Tooltip_ShowItemInfo_3(int slot)
                 modificationSrt = "reduced";
             }
             if (item.MinDamage == item.MaxDamage) {
-                sprintf(InfoPanelBuffer, "damage %s by: %i", modificationSrt, minDmg);
+                sprintf(InfoPanelBuffer, "dano %s em: %i", modificationSrt, minDmg);
             }
             else {
-                sprintf(InfoPanelBuffer, "damage %s by: %i-%i", modificationSrt, minDmg, maxDmg);
+                sprintf(InfoPanelBuffer, "dano %s em: %i-%i", modificationSrt, minDmg, maxDmg);
             }
             Tooltip_AddLine_3(InfoPanelBuffer);
         }
@@ -1526,7 +1526,7 @@ void __fastcall Tooltip_ShowItemInfo_3(int slot)
         case MC_2_POTION_OF_FULL_HEALING:
         {
             if (HasTrait(CurrentPlayerIndex, TraitId::Giant)) {
-                Tooltip_AddLine_3("recover 50% of life");
+                Tooltip_AddLine_3("recupera 50% da vida");
             }
             else {
                 Tooltip_AddLine_3("recupera toda a vida");
@@ -1542,7 +1542,7 @@ void __fastcall Tooltip_ShowItemInfo_3(int slot)
         case MC_7_POTION_OF_FULL_MANA:
         {
             if (HasTrait(CurrentPlayerIndex, TraitId::Giant)) {
-                Tooltip_AddLine_3("recover 50% of mana");
+                Tooltip_AddLine_3("recupera 50% da mana");
             }
             else {
                 Tooltip_AddLine_3("recupera toda a mana");
@@ -1550,27 +1550,27 @@ void __fastcall Tooltip_ShowItemInfo_3(int slot)
         }
             break;
         case MC_10_ELIXIR_OF_STRENGTH:
-            Tooltip_AddLine_3("increases strength");
+            Tooltip_AddLine_3("aumenta a forca");
             break;
         case MC_11_ELIXIR_OF_MAGIC:
-            Tooltip_AddLine_3("increases magic");
+            Tooltip_AddLine_3("aumenta a magia");
             break;
         case MC_12_ELIXIR_OF_DEXTERITY:
-            Tooltip_AddLine_3("increases dexterity");
+            Tooltip_AddLine_3("aumenta a destreza");
             break;
         case MC_13_ELIXIR_OF_VITALITY:
-            Tooltip_AddLine_3("increases vitality");
+            Tooltip_AddLine_3("aumenta a vitalidade");
             break;
         case MC_44_SPECTRAL_ELIXIR:
             Tooltip_AddLine_3("increases all stats");
             break;
         case MC_18_POTION_OF_REJUVENATION:
-            Tooltip_AddLine_3("recover life and mana");
+            Tooltip_AddLine_3("recupera vida e mana");
             break;
         case MC_19_POTION_OF_FULL_REJUVENATION:
         {
             if (HasTrait(CurrentPlayerIndex, TraitId::Giant)) {
-                Tooltip_AddLine_3("recover 50% of life and mana");
+                Tooltip_AddLine_3("recupera 50% da vida and mana");
             }
             else {
                 Tooltip_AddLine_3("recupera toda vida e mana");
@@ -1579,11 +1579,11 @@ void __fastcall Tooltip_ShowItemInfo_3(int slot)
             break;
         case MC_47_RUNE_OF_FIRE:
         case MC_50_RUNE_OF_BLAZE:
-            Tooltip_AddLine_3("Explodes with Fire Nova");
+            Tooltip_AddLine_3("Explode com Nova de Fogo");
             break;
         case MC_48_RUNE_OF_LIGHTNING:
         case MC_49_RUNE_OF_SHOCK:
-            Tooltip_AddLine_3("Explodes with Lightning Nova");
+            Tooltip_AddLine_3("Explode com Nova de Raios");
             break;
         case MC_51_RUNE_OF_STONE:
             Tooltip_AddLine_3("sets petrification trap");
@@ -1617,16 +1617,16 @@ void __fastcall Tooltip_ShowItemInfo_3(int slot)
                     }
                 }
                 else {
-                    Tooltip_AddLine_3("can be inserted into socketed items");
+                    Tooltip_AddLine_3("pode ser inserida em itens com encaixe");
 
                     PrintGemEffectToStringBuffer(gemInfoOpt->weaponEffect);
-                    sprintf(buffer, "weapons: %s", InfoPanelBuffer);
+                    sprintf(buffer, "armas: %s", InfoPanelBuffer);
                     if (gemInfoOpt->weaponEffect.type == GemEffectType::Damage) {
                         if (HasTrait(CurrentPlayerIndex, TraitId::Pistoleer)) {
                             sprintf(buffer, "%s", buffer);
                         }
                         else {
-                            sprintf(buffer, "%s (2X FOR 2H WEAPONS)", buffer);
+                            sprintf(buffer, "%s (2X PARA ARMAS DE 2 MAOS)", buffer);
                         }
                     }
                     Tooltip_AddLine_3(buffer, C_4_Orange);
@@ -1638,10 +1638,10 @@ void __fastcall Tooltip_ShowItemInfo_3(int slot)
 
                     PrintGemEffectToStringBuffer(gemInfoOpt->armorEffect);
                     if (gemInfoOpt->type == GEM::Chrysolite) {
-                        sprintf(buffer, "body armors: %s", InfoPanelBuffer);
+                        sprintf(buffer, "armaduras corporais: %s", InfoPanelBuffer);
                     }
                     else {
-                        sprintf(buffer, "armors: %s", InfoPanelBuffer);
+                        sprintf(buffer, "armaduras: %s", InfoPanelBuffer);
                     }
                     Tooltip_AddLine_3(buffer, C_1_Blue);
 
@@ -1651,13 +1651,13 @@ void __fastcall Tooltip_ShowItemInfo_3(int slot)
                                 // Insertion is now free
                             }
                             else {
-                                Tooltip_AddLine_3("Not suitable for current item", C_2_Red);
+                                Tooltip_AddLine_3("Nao serve para o item atual", C_2_Red);
                             }
                         }
                     }
                 }
                 if (IsCraftPanelVisible && CurrentCraftPage == CraftPage::CP_Gems && !isCraftSlot) {
-                    Tooltip_AddLine_3("Shift click to move to crafting slot");
+                    Tooltip_AddLine_3("Shift + clique para mover ao espaco de criacao");
                 }
             }
             break;
@@ -1673,15 +1673,15 @@ void __fastcall Tooltip_ShowItemInfo_3(int slot)
             }
             Tooltip_AddLine_3(InfoPanelBuffer);
 
-            Tooltip_AddLine_3("of current durability");
+            Tooltip_AddLine_3("da durabilidade atual");
         }
 
         if (addDurMin || addDurMax) {
             if (addDurMin == addDurMax) {
-                sprintf(InfoPanelBuffer, "+%i to max durability", addDurMin);
+                sprintf(InfoPanelBuffer, "+%i de durabilidade maxima", addDurMin);
             }
             else {
-                sprintf(InfoPanelBuffer, "+[%i-%i] to max durability", addDurMin, addDurMax);
+                sprintf(InfoPanelBuffer, "+[%i-%i] de durabilidade maxima", addDurMin, addDurMax);
             }
             if (addDurLimit) {
                 sprintf(InfoPanelBuffer, "%s,", InfoPanelBuffer);
@@ -1692,7 +1692,7 @@ void __fastcall Tooltip_ShowItemInfo_3(int slot)
                 sprintf(InfoPanelBuffer, "up to %i points", addDurLimit);
                 Tooltip_AddLine_3(InfoPanelBuffer);
                 int elTorso = addDurLimit * 2;
-                sprintf(InfoPanelBuffer, "(%i for body armor)", elTorso);
+                sprintf(InfoPanelBuffer, "(%i para armadura corporal)", elTorso);
                 Tooltip_AddLine_3(InfoPanelBuffer);
             }
         }
@@ -1704,7 +1704,7 @@ void __fastcall Tooltip_ShowItemInfo_3(int slot)
     }
 
 	if( item.socketsAmount > 0 && (not(GameMode, GM_IRONMAN, GM_NIGHTMARE, GM_SPEEDRUN) || item.MagicLevel < ML_2_UNIQUE) ){
-		sprintf(InfoPanelBuffer, "Socketed [%i]", item.socketsAmount);
+		sprintf(InfoPanelBuffer, "Encaixes [%i]", item.socketsAmount);
         Tooltip_AddLine_3(InfoPanelBuffer, C_1_Blue);
 	}
 	for( int i = 0; i < countof(item.effect); ++i ){
@@ -1753,14 +1753,14 @@ void __fastcall Tooltip_ShowItemInfo_3(int slot)
             Tooltip_AddLine_3("clique direito para ler");
             break;
         case MC_22_RELIC_NEED_TARGET:
-            Tooltip_AddLine_3("Right-click to read, then");
-            Tooltip_AddLine_3("left-click to target");
+            Tooltip_AddLine_3("Clique direito para ler, depois");
+            Tooltip_AddLine_3("clique esquerdo para selecionar o alvo");
             break;
         case MC_42_MAP_OF_THE_STARS:
-            Tooltip_AddLine_3("Right click to view");
+            Tooltip_AddLine_3("Clique direito para visualizar");
             break;
         case MC_43_EAR_HEART:
-            sprintf(InfoPanelBuffer, "Level : %i", item.quality);
+            sprintf(InfoPanelBuffer, "Nivel: %i", item.quality);
             Tooltip_AddLine_3(InfoPanelBuffer);
             break;
         case MC_53_AURIC_AMULET:
@@ -1769,13 +1769,13 @@ void __fastcall Tooltip_ShowItemInfo_3(int slot)
         }
 
         if (item.baseItemIndex == BI_33_STAFF_OF_LAZARUS && HasTrait(CurrentPlayerIndex, TraitId::Leper)) {
-            Tooltip_AddLine_3("Right click to use");
+            Tooltip_AddLine_3("Clique direito para usar");
         }
         else if (isTownPortalForbidden()) {
             switch (item.baseItemIndex) {
-            case BI_19_FUNGAL_TOME:		 Tooltip_AddLine_3("Right click to transmute into spectral elixir"); break;
-            case BI_2512_FULL_CONTAINERS:Tooltip_AddLine_3("Right click to transmute into random elixir"); break;
-            case BI_33_STAFF_OF_LAZARUS: Tooltip_AddLine_3("Right click to use"); break;
+            case BI_19_FUNGAL_TOME:		 Tooltip_AddLine_3("Clique direito para transmutar em elixir espectral"); break;
+            case BI_2512_FULL_CONTAINERS:Tooltip_AddLine_3("Clique direito para transmutar em elixir aleatorio"); break;
+            case BI_33_STAFF_OF_LAZARUS: Tooltip_AddLine_3("Clique direito para usar"); break;
             case BI_16_ANVIL_OF_FURY:
             case BI_9_MAGIC_ROCK:
             case BI_327_TAVERN_SIGN:
@@ -1784,7 +1784,7 @@ void __fastcall Tooltip_ShowItemInfo_3(int slot)
             case BI_2460_THE_RIGHT_GOODS:
             case BI_2510_DUSTY_CRATE:
             case BI_2461_MUNDANE_INVENTORY:
-            case BI_334_THEODORE:		 Tooltip_AddLine_3("Right click to transmute into quest reward"); break;
+            case BI_334_THEODORE:		 Tooltip_AddLine_3("Clique direito para transmutar em recompensa de missao"); break;
             }
         }
 		if( item.baseItemIndex == BI_301_AQUAMARINE ){
@@ -1794,19 +1794,19 @@ void __fastcall Tooltip_ShowItemInfo_3(int slot)
 		}
 		if (isTownPortalForbidden()) {
 	            if (item.baseItemIndex >= BI_296_QUARTZ && item.baseItemIndex < BI_301_AQUAMARINE) {
-                Tooltip_AddLine_3("Right click to transmute into gold");
+                Tooltip_AddLine_3("Clique direito para transmutar em ouro");
             }
         }
         if (item.baseItemIndex == BI_2472_THE_LOCKED_CHEST) { 
-            Tooltip_AddLine_3("Right click to open (requires key)");
+            Tooltip_AddLine_3("Clique direito para abrir (requer chave)");
         }
         if (item.baseItemIndex == BI_2476_THE_STRANGE_BOOK) {
-            Tooltip_AddLine_3("Right click to read (requires crystal eyepiece)");
+            Tooltip_AddLine_3("Clique direito para ler (requer ocular de cristal)");
         }
 
         if (IsItemAllowedForBelt(item)) {
             if (slot >= IS_50_47_Belt_Start && slot < IS_50_47_Belt_End) {
-                Tooltip_AddLine_3("Shift Click to move left");
+                Tooltip_AddLine_3("Shift + clique para mover para a esquerda");
             }else if( ! IsTransmutePanelVisible ){
                 Tooltip_AddLine_3("Shift + clique: mover ao cinto");
             }
@@ -1815,7 +1815,7 @@ void __fastcall Tooltip_ShowItemInfo_3(int slot)
 
     // Requirements
     if (item.MagicCode == MC_24_BOOKS && item.RequiredLevel == 255u) {
-        Tooltip_AddLine_3("Spell is maxed", C_3_Gold);
+        Tooltip_AddLine_3("Magia no nivel maximo", C_3_Gold);
     }
     else if (item.RequiredMagic || item.RequiredStrength || item.RequiredDexterity || item.RequiredVitality || item.RequiredLevel) {
         strcpy(InfoPanelBuffer, "necessario:");
@@ -1856,11 +1856,11 @@ void __fastcall Tooltip_ShowItemInfo_3(int slot)
     }
 
     if ((playerFullClassMask & IPCM_ANY_EXILE) != 0 && baseItem.ForbiddenForExiles) {
-        Tooltip_AddLine_3("[Can't wear item]", C_2_Red);
+        Tooltip_AddLine_3("[Nao pode equipar o item]", C_2_Red);
     }
     else if (HasTrait(CurrentPlayerIndex, TraitId::OldFashioned)) {
         if (is(item.ItemCode, IC_6_LIGHT_ARMOR, IC_8_MID_ARMOR, IC_9_HEAVY_ARMOR)) {
-            Tooltip_AddLine_3("[Can't wear body armor]", C_2_Red);
+            Tooltip_AddLine_3("[Nao pode equipar armadura corporal]", C_2_Red);
         }
     }
     else if (HasTrait(CurrentPlayerIndex, TraitId::Fechtmeister, TraitId::Ranger, TraitId::Mamluk)) {
@@ -1883,12 +1883,12 @@ void __fastcall Tooltip_ShowItemInfo_3(int slot)
     }
     else if (HasTrait(CurrentPlayerIndex, TraitId::TwoTowers)) {
         if (is(item.ItemCode, IC_1_SWORD, IC_4_MACE)) {
-            Tooltip_AddLine_3("[Can't use melee weapons]", C_2_Red);
+            Tooltip_AddLine_3("[Nao pode usar armas corpo a corpo]", C_2_Red);
         }
     }
     else if (HasTrait(CurrentPlayerIndex, TraitId::Axepertise)) {
         if (is(item.ItemCode, IC_1_SWORD, IC_4_MACE)) {
-            Tooltip_AddLine_3("[Can't use item]", C_2_Red);
+            Tooltip_AddLine_3("[Nao pode usar o item]", C_2_Red);
         }
     }
     if (HasTrait(CurrentPlayerIndex, TraitId::WildSorcery) || HasTrait(CurrentPlayerIndex, TraitId::Rabid)) {
@@ -1909,7 +1909,7 @@ void __fastcall Tooltip_ShowItemInfo_3(int slot)
             int price = VisualTrade_GetBuyPrice(&item);
             sprintf(InfoPanelBuffer, "Buy price: %i", price);
             Tooltip_AddLine_3(InfoPanelBuffer, player.TotalGold >= price ? C_0_White : C_2_Red);
-            Tooltip_AddLine_3("Shift click to buy fast");
+            Tooltip_AddLine_3("Shift + clique para comprar rapidamente");
         }
         else {
             if (Cur.GraphicsID == CM_1_NORMAL_HAND) {
@@ -1918,10 +1918,10 @@ void __fastcall Tooltip_ShowItemInfo_3(int slot)
                     if (price) {
                         sprintf(InfoPanelBuffer, "Sell price: %i", price);
                         Tooltip_AddLine_3(InfoPanelBuffer);
-                        Tooltip_AddLine_3("Shift click to sell fast");
+                        Tooltip_AddLine_3("Shift + clique para vender rapidamente");
                     }
                     else {
-                        Tooltip_AddLine_3("Item cannot be sold", C_2_Red);
+                        Tooltip_AddLine_3("O item nao pode ser vendido", C_2_Red);
                     }
                 }
             }
@@ -1958,7 +1958,7 @@ void __fastcall Tooltip_ShowItemInfo_3(int slot)
             }
             else {
                 if (isVisualStashSlot) {
-                    Tooltip_AddLine_3("Shift Click to move to inventory");
+                    Tooltip_AddLine_3("Shift + clique para mover ao inventario");
                 }
                 else {
                     Tooltip_AddLine_3("Shift + clique: mover ao bau");
@@ -1968,9 +1968,9 @@ void __fastcall Tooltip_ShowItemInfo_3(int slot)
     }
 	if( IsTransmutePanelVisible && Transmute_Allowed(item) ){
 		if( slot >= Stash_SlotIDStart ){
-			Tooltip_AddLine_3("Shift Click to move to inventory", C_7_Grey);
+			Tooltip_AddLine_3("Shift + clique para mover ao inventario", C_7_Grey);
 		}else if (slot >= IS_Inventory) {
-			Tooltip_AddLine_3("Shift Click to transmute panel", C_7_Grey);
+			Tooltip_AddLine_3("Shift + clique para o painel de transmutacao", C_7_Grey);
 		}
 	}
 
@@ -2215,7 +2215,7 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
     
     if( item.BaseCharges ){
         char color = ((item.CurCharges > 0) ? C_0_White : C_2_Red) + 128;
-        sprintf(InfoPanelBuffer, "%s charges: %c%i%c of %i", getSpellName( item.SpellIndex ), color, item.CurCharges, color, item.BaseCharges);
+        sprintf(InfoPanelBuffer, "%s cargas: %c%i%c de %i", getSpellName( item.SpellIndex ), color, item.CurCharges, color, item.BaseCharges);
         Tooltip_AddLine(InfoPanelBuffer);
     }
     
@@ -2225,7 +2225,7 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
         }
         else if (!is(player.fullClassId, PFC_MAGE, PFC_ELEMENTALIST, PFC_WARLOCK, PFC_NECROMANCER, PFC_DEMONOLOGIST)) {
         MUM_3:
-            const char* damageName = "damage";
+            const char* damageName = "dano";
             if (HasTrait(CurrentPlayerIndex, TraitId::Mamluk)) {
                 goto MUMZ_6;
             }
@@ -2242,10 +2242,10 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
             sprintf(InfoPanelBuffer, "%s: ", damageName);
             if (item.overTime) {
                 if (item.MinDamage == item.MaxDamage) {
-                    sprintf(InfoPanelBuffer, "%s%i over %i sec", InfoPanelBuffer, item.MinDamage, item.overTime);
+                    sprintf(InfoPanelBuffer, "%s%i ao longo de %i s", InfoPanelBuffer, item.MinDamage, item.overTime);
                 }
                 else {
-                    sprintf(InfoPanelBuffer, "%s%i-%i over %i sec", InfoPanelBuffer, item.MinDamage, item.MaxDamage, item.overTime);
+                    sprintf(InfoPanelBuffer, "%s%i-%i ao longo de %i s", InfoPanelBuffer, item.MinDamage, item.MaxDamage, item.overTime);
                 }
             }
             else {
@@ -2331,7 +2331,7 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
                     ac = -ac;
                     modificationSrt = "reduced";
                 }
-                sprintf(InfoPanelBuffer, "armor class %s by: %i", modificationSrt, ac);
+                sprintf(InfoPanelBuffer, "armadura %s em: %i", modificationSrt, ac);
                 Tooltip_AddLine(InfoPanelBuffer);
             }
         }
@@ -2343,11 +2343,11 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
             Tooltip_AddLine(InfoPanelBuffer);
         }
         if( item.ArmorClass ){
-            sprintf(InfoPanelBuffer, "armor class: %i", item.ArmorClass);
+            sprintf(InfoPanelBuffer, "armadura: %i", item.ArmorClass);
             Tooltip_AddLine(InfoPanelBuffer);
         }
         if( item.minMeleeAbsorbPercent || item.maxMeleeAbsorbPercent ){
-            sprintf(InfoPanelBuffer, "resist melee damage: ");
+            sprintf(InfoPanelBuffer, "resistencia a dano corpo a corpo: ");
             if( item.minMeleeAbsorbPercent == item.maxMeleeAbsorbPercent ){
                 sprintf(InfoPanelBuffer, "%s%i", InfoPanelBuffer, item.maxMeleeAbsorbPercent);
             }else{
@@ -2356,7 +2356,7 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
             Tooltip_AddLine(InfoPanelBuffer);
         }
         if( item.minArrowAbsorbPercent || item.maxArrowAbsorbPercent ){
-            sprintf(InfoPanelBuffer, "resist arrow damage: ");
+            sprintf(InfoPanelBuffer, "resistencia a dano de projeteis: ");
             if( item.minArrowAbsorbPercent == item.maxArrowAbsorbPercent ){
                 sprintf(InfoPanelBuffer, "%s%i", InfoPanelBuffer, item.maxArrowAbsorbPercent);
             }else{
@@ -2365,7 +2365,7 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
             Tooltip_AddLine(InfoPanelBuffer);
         }
         if( item.minThorns || item.maxThorns ){
-            sprintf(InfoPanelBuffer, "thorns damage: ");
+            sprintf(InfoPanelBuffer, "dano de espinhos: ");
             if( item.minThorns == item.maxThorns ){
                 sprintf(InfoPanelBuffer, "%s%i", InfoPanelBuffer, item.minThorns);
             }else{
@@ -2385,9 +2385,9 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
                 modificationSrt = "reduced";
             }
 			if( item.MinDamage == item.MaxDamage ){
-				sprintf(InfoPanelBuffer, "damage %s by: %i", modificationSrt, minDmg);
+				sprintf(InfoPanelBuffer, "dano %s em: %i", modificationSrt, minDmg);
 			}else{
-				sprintf(InfoPanelBuffer, "damage %s by: %i-%i", modificationSrt, minDmg, maxDmg);
+				sprintf(InfoPanelBuffer, "dano %s em: %i-%i", modificationSrt, minDmg, maxDmg);
 			}
             Tooltip_AddLine(InfoPanelBuffer);
         }
@@ -2486,7 +2486,7 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
         case MC_2_POTION_OF_FULL_HEALING:
         {
             if (HasTrait(CurrentPlayerIndex, TraitId::Giant)) {
-                Tooltip_AddLine("recover 50% of life");
+                Tooltip_AddLine("recupera 50% da vida");
             }
             else {
                 Tooltip_AddLine("recupera toda a vida");
@@ -2502,7 +2502,7 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
         case MC_7_POTION_OF_FULL_MANA:
         {
             if (HasTrait(CurrentPlayerIndex, TraitId::Giant)) {
-                Tooltip_AddLine("recover 50% of mana");
+                Tooltip_AddLine("recupera 50% da mana");
             }
             else {
                 Tooltip_AddLine("recupera toda a mana");
@@ -2510,27 +2510,27 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
         }
             break;
         case MC_10_ELIXIR_OF_STRENGTH:
-            Tooltip_AddLine( "increases strength");
+            Tooltip_AddLine( "aumenta a forca");
             break;
         case MC_11_ELIXIR_OF_MAGIC:
-            Tooltip_AddLine( "increases magic");
+            Tooltip_AddLine( "aumenta a magia");
             break;
         case MC_12_ELIXIR_OF_DEXTERITY:
-            Tooltip_AddLine( "increases dexterity");
+            Tooltip_AddLine( "aumenta a destreza");
             break;
         case MC_13_ELIXIR_OF_VITALITY:
-            Tooltip_AddLine( "increases vitality");
+            Tooltip_AddLine( "aumenta a vitalidade");
             break;
         case MC_44_SPECTRAL_ELIXIR:
             Tooltip_AddLine( "increases all stats");
             break;
         case MC_18_POTION_OF_REJUVENATION:
-            Tooltip_AddLine( "recover life and mana");
+            Tooltip_AddLine( "recupera vida e mana");
             break;
         case MC_19_POTION_OF_FULL_REJUVENATION:
         {
             if (HasTrait(CurrentPlayerIndex, TraitId::Giant)) {
-                Tooltip_AddLine("recover 50% of life and mana");
+                Tooltip_AddLine("recupera 50% da vida and mana");
             }
             else {
                 Tooltip_AddLine("recupera toda vida e mana");
@@ -2539,11 +2539,11 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
             break;
         case MC_47_RUNE_OF_FIRE:
         case MC_50_RUNE_OF_BLAZE:
-            Tooltip_AddLine( "Explodes with Fire Nova");
+            Tooltip_AddLine( "Explode com Nova de Fogo");
             break;
         case MC_48_RUNE_OF_LIGHTNING:
         case MC_49_RUNE_OF_SHOCK:
-            Tooltip_AddLine( "Explodes with Lightning Nova");
+            Tooltip_AddLine( "Explode com Nova de Raios");
             break;
         case MC_51_RUNE_OF_STONE:
             Tooltip_AddLine( "sets petrification trap");
@@ -2576,16 +2576,16 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
                         Tooltip_AddLine(InfoPanelBuffer, player.TotalGold >= price ? C_0_White : C_2_Red);
                     }
                 }else{
-                    Tooltip_AddLine( "can be inserted into socketed items");
+                    Tooltip_AddLine( "pode ser inserida em itens com encaixe");
                     
                     PrintGemEffectToStringBuffer( gemInfoOpt->weaponEffect );
-                    sprintf(buffer, "weapons: %s", InfoPanelBuffer);
+                    sprintf(buffer, "armas: %s", InfoPanelBuffer);
                     if( gemInfoOpt->weaponEffect.type == GemEffectType::Damage ){
                         if (HasTrait(CurrentPlayerIndex, TraitId::Pistoleer)) {
                             sprintf(buffer, "%s", buffer);
                         }
                         else {
-                            sprintf(buffer, "%s (2X FOR 2H WEAPONS)", buffer);
+                            sprintf(buffer, "%s (2X PARA ARMAS DE 2 MAOS)", buffer);
                         }
                     }
                     Tooltip_AddLine(buffer, C_4_Orange);
@@ -2597,9 +2597,9 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
                     
                     PrintGemEffectToStringBuffer( gemInfoOpt->armorEffect );
                     if( gemInfoOpt->type == GEM::Chrysolite ){
-                        sprintf(buffer, "body armors: %s", InfoPanelBuffer);
+                        sprintf(buffer, "armaduras corporais: %s", InfoPanelBuffer);
                     }else{
-                        sprintf(buffer, "armors: %s", InfoPanelBuffer);
+                        sprintf(buffer, "armaduras: %s", InfoPanelBuffer);
                     }
                     Tooltip_AddLine(buffer, C_1_Blue);
                     
@@ -2608,7 +2608,7 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
                             if( Craft_Socketing_IsGemSuitableForCurrentItem( *gemInfoOpt ) ){
                                 // Insertion is now free
                             }else{
-                                Tooltip_AddLine("Not suitable for current item", C_2_Red);
+                                Tooltip_AddLine("Nao serve para o item atual", C_2_Red);
                             }
                         }
                     }
@@ -2618,7 +2618,7 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
                         Tooltip_AddLine("Right Trigger + A to move to crafting slot");
                     }
                     else {
-                        Tooltip_AddLine("Shift click to move to crafting slot");
+                        Tooltip_AddLine("Shift + clique para mover ao espaco de criacao");
                     }
                 }
             }
@@ -2634,15 +2634,15 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
             }
             Tooltip_AddLine( InfoPanelBuffer );
             
-            Tooltip_AddLine( "of current durability" );
+            Tooltip_AddLine( "da durabilidade atual" );
         }
         
         if( addDurMin || addDurMax ){
             if( addDurMin == addDurMax ){
-                sprintf(InfoPanelBuffer, "+%i to max durability", addDurMin);
+                sprintf(InfoPanelBuffer, "+%i de durabilidade maxima", addDurMin);
             }
             else{
-                sprintf(InfoPanelBuffer, "+[%i-%i] to max durability", addDurMin, addDurMax);
+                sprintf(InfoPanelBuffer, "+[%i-%i] de durabilidade maxima", addDurMin, addDurMax);
             }
             if( addDurLimit ){
                 sprintf(InfoPanelBuffer, "%s,", InfoPanelBuffer);
@@ -2653,7 +2653,7 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
                 sprintf(InfoPanelBuffer, "up to %i points", addDurLimit);
                 Tooltip_AddLine( InfoPanelBuffer ); 
                 int elTorso = addDurLimit * 2;
-                sprintf(InfoPanelBuffer, "(%i for body armor)", elTorso);
+                sprintf(InfoPanelBuffer, "(%i para armadura corporal)", elTorso);
                 Tooltip_AddLine(InfoPanelBuffer);
             }
         }
@@ -2665,7 +2665,7 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
     }
     
 	if( item.socketsAmount > 0 && (not(GameMode, GM_IRONMAN, GM_NIGHTMARE, GM_SPEEDRUN) || item.MagicLevel < ML_2_UNIQUE) ){
-		sprintf(InfoPanelBuffer, "Socketed [%i]", item.socketsAmount );
+		sprintf(InfoPanelBuffer, "Encaixes [%i]", item.socketsAmount );
         Tooltip_AddLine( InfoPanelBuffer, C_1_Blue );
 	}
 	for( int i = 0; i < countof(item.effect); ++i ){
@@ -2714,14 +2714,14 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
             Tooltip_AddLine("clique direito para ler");
             break;
         case MC_22_RELIC_NEED_TARGET:
-            Tooltip_AddLine("Right-click to read, then");
-            Tooltip_AddLine("left-click to target");
+            Tooltip_AddLine("Clique direito para ler, depois");
+            Tooltip_AddLine("clique esquerdo para selecionar o alvo");
             break;
         case MC_42_MAP_OF_THE_STARS:
-            Tooltip_AddLine("Right click to view");
+            Tooltip_AddLine("Clique direito para visualizar");
             break;
         case MC_43_EAR_HEART:
-            sprintf(InfoPanelBuffer, "Level : %i", item.quality);
+            sprintf(InfoPanelBuffer, "Nivel: %i", item.quality);
             Tooltip_AddLine(InfoPanelBuffer);
             break;
         case MC_53_AURIC_AMULET:
@@ -2730,13 +2730,13 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
         }
     
 		if (item.baseItemIndex == BI_33_STAFF_OF_LAZARUS && HasTrait(CurrentPlayerIndex, TraitId::Leper)) {
-			Tooltip_AddLine("Right click to use");
+			Tooltip_AddLine("Clique direito para usar");
 		}
         else if( isTownPortalForbidden()  ){
 			switch (item.baseItemIndex) {
-				case BI_19_FUNGAL_TOME:		 Tooltip_AddLine("Right click to transmute into spectral elixir"); break;
-                case BI_2512_FULL_CONTAINERS:Tooltip_AddLine("Right click to transmute into random elixir"); break;
-                case BI_33_STAFF_OF_LAZARUS: Tooltip_AddLine("Right click to use"); break;
+				case BI_19_FUNGAL_TOME:		 Tooltip_AddLine("Clique direito para transmutar em elixir espectral"); break;
+                case BI_2512_FULL_CONTAINERS:Tooltip_AddLine("Clique direito para transmutar em elixir aleatorio"); break;
+                case BI_33_STAFF_OF_LAZARUS: Tooltip_AddLine("Clique direito para usar"); break;
 				case BI_16_ANVIL_OF_FURY: 
 				case BI_9_MAGIC_ROCK:
 				case BI_327_TAVERN_SIGN:
@@ -2745,7 +2745,7 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
                 case BI_2460_THE_RIGHT_GOODS:
                 case BI_2510_DUSTY_CRATE:
                 case BI_2461_MUNDANE_INVENTORY:
-                case BI_334_THEODORE:		 Tooltip_AddLine("Right click to transmute into quest reward"); break;
+                case BI_334_THEODORE:		 Tooltip_AddLine("Clique direito para transmutar em recompensa de missao"); break;
 			}
         }
 		if( item.baseItemIndex == BI_301_AQUAMARINE ){
@@ -2755,14 +2755,14 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
 		}
 		if (isTownPortalForbidden()) {
 				if (item.baseItemIndex >= BI_296_QUARTZ && item.baseItemIndex < BI_301_AQUAMARINE) {
-				Tooltip_AddLine("Right click to transmute into gold");
+				Tooltip_AddLine("Clique direito para transmutar em ouro");
 			}
 		}
         if (item.baseItemIndex == BI_2472_THE_LOCKED_CHEST) { 
-            Tooltip_AddLine("Right click to open (requires key)");
+            Tooltip_AddLine("Clique direito para abrir (requer chave)");
         }
         if (item.baseItemIndex == BI_2476_THE_STRANGE_BOOK) {
-            Tooltip_AddLine("Right click to read (requires crystal eyepiece)");
+            Tooltip_AddLine("Clique direito para ler (requer ocular de cristal)");
         }
 
         if( IsItemAllowedForBelt(item) ){
@@ -2776,7 +2776,7 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
                 }
                 else {
                     if (slot >= IS_50_47_Belt_Start && slot < IS_50_47_Belt_End) {
-                        Tooltip_AddLine("Shift Click to move left");
+                        Tooltip_AddLine("Shift + clique para mover para a esquerda");
 					}else if( ! IsTransmutePanelVisible ){
 						Tooltip_AddLine("Shift + clique: mover ao cinto");
                     }
@@ -2786,7 +2786,7 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
  
 	// Requirements
 	if( item.MagicCode == MC_24_BOOKS && item.RequiredLevel == 255u ){
-		Tooltip_AddLine( "Spell is maxed", C_3_Gold );
+		Tooltip_AddLine( "Magia no nivel maximo", C_3_Gold );
 	}else if( item.RequiredMagic || item.RequiredStrength || item.RequiredDexterity || item.RequiredVitality || item.RequiredLevel ){
 		strcpy(InfoPanelBuffer, "necessario:");
 		
@@ -2824,11 +2824,11 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
 	}
  
 	if( (playerFullClassMask & IPCM_ANY_EXILE) != 0 && baseItem.ForbiddenForExiles ){
-		Tooltip_AddLine( "[Can't wear item]", C_2_Red );
+		Tooltip_AddLine( "[Nao pode equipar o item]", C_2_Red );
 	}
 	else if (HasTrait(CurrentPlayerIndex, TraitId::OldFashioned)) {
 		if (is(item.ItemCode, IC_6_LIGHT_ARMOR, IC_8_MID_ARMOR, IC_9_HEAVY_ARMOR)) {
-			Tooltip_AddLine("[Can't wear body armor]", C_2_Red);
+			Tooltip_AddLine("[Nao pode equipar armadura corporal]", C_2_Red);
 		}
 	}
 	else if (HasTrait(CurrentPlayerIndex, TraitId::Fechtmeister, TraitId::Ranger, TraitId::Mamluk)) {
@@ -2851,12 +2851,12 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
     }
     else if (HasTrait(CurrentPlayerIndex, TraitId::TwoTowers)) {
 		if (is(item.ItemCode, IC_1_SWORD, IC_4_MACE)) {
-			Tooltip_AddLine("[Can't use melee weapons]", C_2_Red);
+			Tooltip_AddLine("[Nao pode usar armas corpo a corpo]", C_2_Red);
 		}
 	}
 	else if (HasTrait(CurrentPlayerIndex, TraitId::Axepertise)) {
 		if (is(item.ItemCode, IC_1_SWORD, IC_4_MACE)) {
-			Tooltip_AddLine("[Can't use item]", C_2_Red);
+			Tooltip_AddLine("[Nao pode usar o item]", C_2_Red);
 		}
 	}
 	if (HasTrait(CurrentPlayerIndex, TraitId::WildSorcery) || HasTrait(CurrentPlayerIndex, TraitId::Rabid)) {
@@ -2881,7 +2881,7 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
                     Tooltip_AddLine("Right Trigger + A to buy fast");
                 }
                 else {
-                    Tooltip_AddLine("Shift click to buy fast");
+                    Tooltip_AddLine("Shift + clique para comprar rapidamente");
                 }
         }else{
             if( Cur.GraphicsID == CM_1_NORMAL_HAND ){
@@ -2894,10 +2894,10 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
                             Tooltip_AddLine("Right Trigger + A to sell fast");
                         }
                         else {
-                            Tooltip_AddLine("Shift click to sell fast");
+                            Tooltip_AddLine("Shift + clique para vender rapidamente");
                         }
                     }else{
-                        Tooltip_AddLine("Item cannot be sold", C_2_Red);
+                        Tooltip_AddLine("O item nao pode ser vendido", C_2_Red);
                     }
                 }
             }else if( Cur.IsTradeService ){
@@ -2939,7 +2939,7 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
                 }
                 else {
                     if (isVisualStashSlot) {
-                        Tooltip_AddLine("Shift Click to move to inventory");
+                        Tooltip_AddLine("Shift + clique para mover ao inventario");
                     }
                     else {
                         Tooltip_AddLine("Shift + clique: mover ao bau");
@@ -2950,9 +2950,9 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
     }
 	if( IsTransmutePanelVisible && Transmute_Allowed(item) ){
 		if( slot >= Stash_SlotIDStart ){
-			Tooltip_AddLine("Shift Click to move to inventory", C_7_Grey);
+			Tooltip_AddLine("Shift + clique para mover ao inventario", C_7_Grey);
 		}else if (slot >= IS_Inventory) {
-			Tooltip_AddLine("Shift Click to transmute panel", C_7_Grey);
+			Tooltip_AddLine("Shift + clique para o painel de transmutacao", C_7_Grey);
 		}
 	}
 
@@ -2987,7 +2987,7 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
         if (!IsVisualTradePanelVisible && !IsStashPanelVisible) {
             if (slot <= IS_Feet) {
                 if (IsController() && !XinputNotInUse(true)) {
-                    Tooltip_AddLine("Right Trigger + A to unequip", C_7_Grey);
+                    Tooltip_AddLine("Gatilho direito + A para desequipar", C_7_Grey);
                 }else{
                     Tooltip_AddLine("Shift + clique para desequipar", C_7_Grey);
                 }
@@ -2995,15 +2995,15 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
 			 && (is(BaseItems[item.baseItemIndex].ItemType, ITEM_1_WEAPON, ITEM_2_ARMOR) || is(item.ItemCode, IC_12_RING, IC_13_AMULET))
 			 && !IsTransmutePanelVisible ){
                 if (IsController() && !XinputNotInUse(true)) {
-                    Tooltip_AddLine("Right Trigger + A to equip", C_7_Grey);
+                    Tooltip_AddLine("Gatilho direito + A para equipar", C_7_Grey);
                 }else{
                     if( RightSwapAllowed(CurrentPlayerIndex, item) ){
-                        Tooltip_AddLine("Shift Click to equip to left slot", C_7_Grey);
+                        Tooltip_AddLine("Shift + clique para equipar no espaco esquerdo", C_7_Grey);
                         if (FastSwapRightOnAlt) {
-                            Tooltip_AddLine("Alt Click to equip to right slot", C_7_Grey);
+                            Tooltip_AddLine("Alt + clique para equipar no espaco direito", C_7_Grey);
                         }
                     }else{
-                        Tooltip_AddLine("Shift Click to equip", C_7_Grey);
+                        Tooltip_AddLine("Shift + clique para equipar", C_7_Grey);
                     }
                 }
             }
