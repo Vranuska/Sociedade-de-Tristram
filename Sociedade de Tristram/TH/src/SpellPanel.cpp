@@ -506,7 +506,7 @@ void DrawSpellBook()
 	}
 	
 	if( player.CurrentSpellIndex == PS_M1_NONE ){
-	    drawLine( "No selected spells" );
+	    drawLine( "Nenhuma magia selecionada" );
 	}
 	else {
 		const auto spellIndex = player.CurrentSpellIndex;
@@ -517,35 +517,35 @@ void DrawSpellBook()
 
 		// 2. Spell origin
 		if (spellType == SO_0_SKILL) {
-			drawLine("Skill");
+			drawLine("Habilidade");
 		}
 		else if (spellType == SO_1_SPELL) {
 			int spellLevel = PlayerSpellLevel(CurrentPlayerIndex, spellIndex);
 			if( spellLevel == 0 ){
-				drawLine("Spell Level 0 - Unusable", C_2_Red);
+				drawLine("Nivel de magia 0 - Indisponivel", C_2_Red);
 			}else{
-				sprintf(InfoPanelBuffer, "Spell Level %i", spellLevel);
+				sprintf(InfoPanelBuffer, "Nivel de magia %i", spellLevel);
 				drawLine(InfoPanelBuffer);
 			}
 		}
 		else if (spellType == SO_2_RELIC) {
 			const int numberOfRelicWithCurrentSpell = GetNumberOfRelicWithCurrentSpell(spellIndex);
 			if (numberOfRelicWithCurrentSpell == 1) {
-				drawLine("1 Relict");
+				drawLine("1 Reliquia");
 			}
 			else {
-				sprintf(InfoPanelBuffer, "%i Relicts", numberOfRelicWithCurrentSpell);
+				sprintf(InfoPanelBuffer, "%i Reliquias", numberOfRelicWithCurrentSpell);
 				drawLine(InfoPanelBuffer);
 			}
 		}
 		else if (spellType == SO_3_EQUIPED_ITEM) {
 			int sumCharges = SumBodySlotSpellCharges( CurrentPlayerIndex, spellIndex );
 			if( sumCharges > 0 ){
-				sprintf(InfoPanelBuffer, "%s charges: %i", getSpellName(spellIndex), sumCharges);
+				sprintf(InfoPanelBuffer, "%s cargas: %i", getSpellName(spellIndex), sumCharges);
 				drawLine(InfoPanelBuffer);
 			}
 			else {
-				drawLine("Equipped item");
+				drawLine("Item equipado");
 			}
 		}
 
@@ -1124,9 +1124,9 @@ void DrawSpellBook()
 			drawLine("durability by 1 point");
 		}
 		else if (spellIndex == PS_27_STAFF_RECHARGE) {
-			drawLine("restores spell charges");
-			drawLine("at the cost of item's");			
-			drawLine("current durability");
+			drawLine("restaura cargas de magia");
+			drawLine("reduzindo a durabilidade");			
+			drawLine("atual do item");
 		}
 		else if (spellIndex == PS_28_TRAP_DISARM) {
 			drawLine("disarms trapped objects");			
@@ -1297,17 +1297,17 @@ void DrawSpellBook()
         // 7. Mana cost
         if( spellType == SO_1_SPELL ){
             int manaCost = CalculateManaRequiredToCastSpell(CurrentPlayerIndex, spellIndex) / 64;
-            sprintf( InfoPanelBuffer, "Mana cost: %i", manaCost ); // TODO: red or blue depending on bonuses and penalties
+            sprintf( InfoPanelBuffer, "Custo de mana: %i", manaCost ); // TODO: red or blue depending on bonuses and penalties
             drawLine( InfoPanelBuffer );
         }
 
 		const auto [cdType, cooldown] = GetSpellCooldownValue(CurrentPlayerIndex, spellIndex);
 		if (cooldown > 0) {
 			if (cooldown == 1) {				
-				sprintf(InfoPanelBuffer, "Cooldown: 1 second");
+				sprintf(InfoPanelBuffer, "Recarga: 1 segundo");
 			}
 			else {				
-				sprintf(InfoPanelBuffer, "Cooldown: %i seconds", cooldown);
+				sprintf(InfoPanelBuffer, "Recarga: %i segundos", cooldown);
 			}
 			drawLine("");
 			drawLine(InfoPanelBuffer);
