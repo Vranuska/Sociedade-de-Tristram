@@ -404,10 +404,10 @@ void printItemClassReqInfoInBuffer( const Item* aItem )
 	const BaseItem& baseItem = BaseItems[aItem->baseItemIndex];
     uint requiredClassMask = GetRequiredClassMask( aItem );
     if( requiredClassMask == IPCM_ALL_CLASSES ){
-        strcpy(InfoPanelBuffer, "[No class req]");
+        strcpy(InfoPanelBuffer, "[sem requisito de classe]");
     }
 	else if( requiredClassMask == 0 ){
-		strcpy(InfoPanelBuffer, "[No one can wear it]");
+		strcpy(InfoPanelBuffer, "[nenhuma classe pode equipar]");
 	}
 	else{
 		bitset<32> classReqBitset( requiredClassMask );
@@ -455,7 +455,7 @@ void printItemClassReqInfoInBuffer( const Item* aItem )
 				bool isOk = findClassGroupsByMask( requiredClassMask, classGroups, 2, &classGroupsFound );
 
 				if( !isOk || classGroupsFound == 0u ){
-				   strcpy(InfoPanelBuffer, "[Available to multiple classes]");
+				   strcpy(InfoPanelBuffer, "[disponivel para varias classes]");
 				}
 				else{
 					if (HasTrait(CurrentPlayerIndex, TraitId::Barbarian) && baseItem.ItemCode == IC_7_HELM) {
@@ -481,9 +481,9 @@ void printItemClassReqInfoInBuffer( const Item* aItem )
                 findFullClassIdByMask( requiredClassMask, classes, 2, nullptr );
 
                 if( disAllowedClassesCount == 1u ){
-                    sprintf(InfoPanelBuffer, "[for all but %s]", FullPlayerClasses[classes[0]].name);
+                    sprintf(InfoPanelBuffer, "[para todos, exceto %s]", LocalizeDisplayName(FullPlayerClasses[classes[0]].name));
 				}else{
-					sprintf(InfoPanelBuffer, "[for all but %s and %s]", FullPlayerClasses[classes[0]].name, FullPlayerClasses[classes[1]].name);
+					sprintf(InfoPanelBuffer, "[para todos, exceto %s e %s]", LocalizeDisplayName(FullPlayerClasses[classes[0]].name), LocalizeDisplayName(FullPlayerClasses[classes[1]].name));
                 }
             }else{
 				size_t classGroupsFound = 0;
@@ -491,12 +491,12 @@ void printItemClassReqInfoInBuffer( const Item* aItem )
 				bool isOk = findClassGroupsByMask( requiredClassMask, classGroups, 2, &classGroupsFound );
 
 				if( !isOk || classGroupsFound == 0u ){
-					strcpy(InfoPanelBuffer, "[Available to multiple classes]");
+					strcpy(InfoPanelBuffer, "[disponivel para varias classes]");
 				}else{
 					if( classGroupsFound == 1u ){
-						sprintf(InfoPanelBuffer, "[for all but %s]", ClassGroupsNames[ classGroups[0] ]);
+						sprintf(InfoPanelBuffer, "[para todos, exceto %s]", LocalizeDisplayName(ClassGroupsNames[classGroups[0]]));
 					}else{
-						sprintf(InfoPanelBuffer, "[for all but %s and %s]", ClassGroupsNames[ classGroups[0] ], ClassGroupsNames[ classGroups[1] ]);
+						sprintf(InfoPanelBuffer, "[para todos, exceto %s e %s]", LocalizeDisplayName(ClassGroupsNames[classGroups[0]]), LocalizeDisplayName(ClassGroupsNames[classGroups[1]]));
 					}
 				}
             }
