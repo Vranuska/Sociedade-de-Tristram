@@ -447,15 +447,15 @@ void WriteSummonSpellBookInfo(PLAYER_SPELL minionTypeSpell, int LINE_HEIGHT, int
 
 
 	if (minAccuracyFirst == maxAccuracyFirst)
-		sprintf(InfoPanelBuffer, "To Hit: %i", minAccuracyFirst);
+		sprintf(InfoPanelBuffer, "Precisao: %i", minAccuracyFirst);
 	else 
-		sprintf(InfoPanelBuffer, "To Hit: %i - %i", minAccuracyFirst, maxAccuracyFirst);
+		sprintf(InfoPanelBuffer, "Precisao: %i - %i", minAccuracyFirst, maxAccuracyFirst);
 	drawLine(InfoPanelBuffer);
-	sprintf(InfoPanelBuffer, "Damage: %i - %i", minMinDamageFirst, maxMaxDamageFirst);
+	sprintf(InfoPanelBuffer, "Dano: %i - %i", minMinDamageFirst, maxMaxDamageFirst);
 	drawLine(InfoPanelBuffer);
-	sprintf(InfoPanelBuffer, "Armor Class: %i - %i", minArmor, maxArmor);
+	sprintf(InfoPanelBuffer, "Classe de armadura: %i - %i", minArmor, maxArmor);
 	drawLine(InfoPanelBuffer);
-	sprintf(InfoPanelBuffer, "Hit Points: %i - %i", minLife>>6, maxLife>>6);
+	sprintf(InfoPanelBuffer, "Pontos de vida: %i - %i", minLife>>6, maxLife>>6);
 	drawLine(InfoPanelBuffer);
 
 }
@@ -574,166 +574,166 @@ void DrawSpellBook()
 					// show nothing
 				}
 				else {
-					sprintf(InfoPanelBuffer, "block chance: +%i", (CLVL / 10) + 5); drawLine(InfoPanelBuffer);
+					sprintf(InfoPanelBuffer, "chance de bloqueio: +%i", (CLVL / 10) + 5); drawLine(InfoPanelBuffer);
 				}
-				sprintf(InfoPanelBuffer, "chance to hit: +%i", (CLVL / 3) + 5); drawLine(InfoPanelBuffer);
-				sprintf(InfoPanelBuffer, "armor class: +%i", (CLVL / 4) + 2); drawLine(InfoPanelBuffer);
-				sprintf(InfoPanelBuffer, "damage: +%i", 7 * CLVL / 4); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "precisao: +%i", (CLVL / 3) + 5); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "classe de armadura: +%i", (CLVL / 4) + 2); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "dano: +%i", 7 * CLVL / 4); drawLine(InfoPanelBuffer);
 				break;
 			case PFC_INQUISITOR:
-				sprintf(InfoPanelBuffer, "chance to hit: +%i", (CLVL / 2) - 3); drawLine(InfoPanelBuffer);
-				sprintf(InfoPanelBuffer, "armor class: +%i", (CLVL / 3) - 1); drawLine(InfoPanelBuffer);
-				sprintf(InfoPanelBuffer, "damage: +%i", (2 * CLVL) - 1); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "precisao: +%i", (CLVL / 2) - 3); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "classe de armadura: +%i", (CLVL / 3) - 1); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "dano: +%i", (2 * CLVL) - 1); drawLine(InfoPanelBuffer);
 				break;
 			case PFC_GUARDIAN:
-				sprintf(InfoPanelBuffer, "chance to hit: +%i", CLVL / 2); drawLine(InfoPanelBuffer);
-				sprintf(InfoPanelBuffer, "armor class: +%i", (4 * CLVL / 5) + 5); drawLine(InfoPanelBuffer);
-				sprintf(InfoPanelBuffer, "damage from enemies: -%i", CLVL / 10); drawLine(InfoPanelBuffer);
-				sprintf(InfoPanelBuffer, "resist arrow damage: +%i", CLVL / 5); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "precisao: +%i", CLVL / 2); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "classe de armadura: +%i", (4 * CLVL / 5) + 5); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "dano dos inimigos: -%i", CLVL / 10); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "resistencia a projeteis: +%i", CLVL / 5); drawLine(InfoPanelBuffer);
 				break;
 			case PFC_TEMPLAR:
-				sprintf(InfoPanelBuffer, "chance to hit: +%i", (CLVL / 5) + 10); drawLine(InfoPanelBuffer);
-				sprintf(InfoPanelBuffer, "armor class: +%i", (CLVL / 9) + 15); drawLine(InfoPanelBuffer);
-				sprintf(InfoPanelBuffer, "damage: +%i", (2 * CLVL) + 1); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "precisao: +%i", (CLVL / 5) + 10); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "classe de armadura: +%i", (CLVL / 9) + 15); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "dano: +%i", (2 * CLVL) + 1); drawLine(InfoPanelBuffer);
 				break;
 					//ARCHERS
 			case PFC_ARCHER:
-				sprintf(InfoPanelBuffer, "damage: +%i", CLVL + 5); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "dano: +%i", CLVL + 5); drawLine(InfoPanelBuffer);
 				break;
 			case PFC_SCOUT:
-				sprintf(InfoPanelBuffer, "damage: +%i", (3 * CLVL / 2) + 3); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "dano: +%i", (3 * CLVL / 2) + 3); drawLine(InfoPanelBuffer);
 				break;
 			case PFC_SHARPSHOOTER:
-				sprintf(InfoPanelBuffer, "chance to hit: +%i", (CLVL / 3) + 7); drawLine(InfoPanelBuffer);
-				sprintf(InfoPanelBuffer, "damage: +%i", (2 * CLVL) - 2); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "precisao: +%i", (CLVL / 3) + 7); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "dano: +%i", (2 * CLVL) - 2); drawLine(InfoPanelBuffer);
 				break;
 			case PFC_TRAPPER:
-				sprintf(InfoPanelBuffer, "armor class: +%i", 2 * CLVL / 3); drawLine(InfoPanelBuffer);
-				sprintf(InfoPanelBuffer, "damage from enemies: -%i", 2 * CLVL / 9); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "classe de armadura: +%i", 2 * CLVL / 3); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "dano dos inimigos: -%i", 2 * CLVL / 9); drawLine(InfoPanelBuffer);
 				break;
 					// SUMMONERS
 			case PFC_DEMONOLOGIST:
-				sprintf(InfoPanelBuffer, "spell levels: +%i", 2); drawLine(InfoPanelBuffer);
-				sprintf(InfoPanelBuffer, "summon armor: +%i", CLVL / 5); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "niveis de magia: +%i", 2); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "armadura das invocacoes: +%i", CLVL / 5); drawLine(InfoPanelBuffer);
 				break;
 			case PFC_NECROMANCER:
-				sprintf(InfoPanelBuffer, "spell levels: +%i", 2); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "niveis de magia: +%i", 2); drawLine(InfoPanelBuffer);
 				sprintf(InfoPanelBuffer, "summon hp %%: +%i", (CLVL / 10) + 5); drawLine(InfoPanelBuffer);
 				break;
 			case PFC_BEASTMASTER:
-				sprintf(InfoPanelBuffer, "spell levels: +%i", 2); drawLine(InfoPanelBuffer);
-				sprintf(InfoPanelBuffer, "summon damage: +%i", CLVL / 5); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "niveis de magia: +%i", 2); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "dano das invocacoes: +%i", CLVL / 5); drawLine(InfoPanelBuffer);
 				break;
 					// CASTERS
 			case PFC_MAGE:
-				sprintf(InfoPanelBuffer, "spell levels: +%i", (CLVL / 15) + 2); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "niveis de magia: +%i", (CLVL / 15) + 2); drawLine(InfoPanelBuffer);
 				break;
 			case PFC_ELEMENTALIST:
 				if (HasTrait(CurrentPlayerIndex, TraitId::Mamluk)) {
-					sprintf(InfoPanelBuffer, "chance to hit: +%i", (CLVL / 5) + 10); drawLine(InfoPanelBuffer);
-					sprintf(InfoPanelBuffer, "armor class: +%i", (CLVL / 9) + 15); drawLine(InfoPanelBuffer);
-					sprintf(InfoPanelBuffer, "damage: +%i", (2 * CLVL) + 1); drawLine(InfoPanelBuffer);
+					sprintf(InfoPanelBuffer, "precisao: +%i", (CLVL / 5) + 10); drawLine(InfoPanelBuffer);
+					sprintf(InfoPanelBuffer, "classe de armadura: +%i", (CLVL / 9) + 15); drawLine(InfoPanelBuffer);
+					sprintf(InfoPanelBuffer, "dano: +%i", (2 * CLVL) + 1); drawLine(InfoPanelBuffer);
 				}				
 				else {
-					sprintf(InfoPanelBuffer, "spell levels: +%i", (CLVL / 10) + 2); drawLine(InfoPanelBuffer);
+					sprintf(InfoPanelBuffer, "niveis de magia: +%i", (CLVL / 10) + 2); drawLine(InfoPanelBuffer);
 				}
 				break;
 			case PFC_WARLOCK:
-				sprintf(InfoPanelBuffer, "spell levels: +%i", 2); drawLine(InfoPanelBuffer);
-				sprintf(InfoPanelBuffer, "mana regeneration: +%i", (CLVL / 2) + 1); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "niveis de magia: +%i", 2); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "regeneracao de mana: +%i", (CLVL / 2) + 1); drawLine(InfoPanelBuffer);
 				break;
 					// MONKS
 			case PFC_MONK:
-				sprintf(InfoPanelBuffer, "DAMAGE: +%i", 2 * CLVL); drawLine(InfoPanelBuffer);
-				sprintf(InfoPanelBuffer, "damage from enemies: -%i", CLVL / 4); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "DANO: +%i", 2 * CLVL); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "dano dos inimigos: -%i", CLVL / 4); drawLine(InfoPanelBuffer);
 				sprintf(InfoPanelBuffer, "resist all: +%i", CLVL / 4); drawLine(InfoPanelBuffer);
 				break;
 			case PFC_KENSEI:
 			{ if (MaxCountOfPlayersInGame != 1)
-				sprintf(InfoPanelBuffer, "DAMAGE: +%i", 3 * CLVL / 2); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "DANO: +%i", 3 * CLVL / 2); drawLine(InfoPanelBuffer);
 			}
-				sprintf(InfoPanelBuffer, "damage from enemies: -%i", CLVL / 5); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "dano dos inimigos: -%i", CLVL / 5); drawLine(InfoPanelBuffer);
 				sprintf(InfoPanelBuffer, "resist all: +%i", CLVL / 4); drawLine(InfoPanelBuffer);
 				break;
 			case PFC_SHUGOKI:
-				sprintf(InfoPanelBuffer, "DAMAGE: +%i", 2 * CLVL); drawLine(InfoPanelBuffer);
-				sprintf(InfoPanelBuffer, "damage from enemies: -%i", CLVL / 5); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "DANO: +%i", 2 * CLVL); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "dano dos inimigos: -%i", CLVL / 5); drawLine(InfoPanelBuffer);
 				sprintf(InfoPanelBuffer, "resist all: +%i", CLVL / 4); drawLine(InfoPanelBuffer);
 				break;
 			case PFC_SHINOBI:
-				sprintf(InfoPanelBuffer, "DAMAGE: +%i", 5 * CLVL / 4); drawLine(InfoPanelBuffer);
-				sprintf(InfoPanelBuffer, "damage from enemies: -%i", CLVL / 4); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "DANO: +%i", 5 * CLVL / 4); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "dano dos inimigos: -%i", CLVL / 4); drawLine(InfoPanelBuffer);
 				sprintf(InfoPanelBuffer, "resist all: +%i", CLVL / 4); drawLine(InfoPanelBuffer);
 				break;
 					// ROGUES
 			case PFC_ROGUE:
-				sprintf(InfoPanelBuffer, "DAMAGE: +%i", 3 * CLVL / 2); drawLine(InfoPanelBuffer);
-				sprintf(InfoPanelBuffer, "armor class: +%i", 3 * CLVL / 8); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "DANO: +%i", 3 * CLVL / 2); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "classe de armadura: +%i", 3 * CLVL / 8); drawLine(InfoPanelBuffer);
 				sprintf(InfoPanelBuffer, "resist all: +%i", CLVL / 4); drawLine(InfoPanelBuffer);
 				break;
 			case PFC_ASSASSIN:
-				sprintf(InfoPanelBuffer, "crit chance: +%i", (CLVL / 10) + 2); drawLine(InfoPanelBuffer);
-				sprintf(InfoPanelBuffer, "crit damage: +%i", CLVL * 7); drawLine(InfoPanelBuffer);
-				sprintf(InfoPanelBuffer, "armor class: +%i", (CLVL / 5) + 5); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "chance de critico: +%i", (CLVL / 10) + 2); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "dano critico: +%i", CLVL * 7); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "classe de armadura: +%i", (CLVL / 5) + 5); drawLine(InfoPanelBuffer);
 				sprintf(InfoPanelBuffer, "resist all: +%i", CLVL / 4); drawLine(InfoPanelBuffer);
 				break;
 			case PFC_IRON_MAIDEN:
-				sprintf(InfoPanelBuffer, "crit chance: +%i", (CLVL / 25) + 4); drawLine(InfoPanelBuffer);
-				sprintf(InfoPanelBuffer, "resist melee damage: +%i", CLVL / 5 + 5); drawLine(InfoPanelBuffer);
-				sprintf(InfoPanelBuffer, "damage from enemies: -%i", CLVL / 11 + 4); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "chance de critico: +%i", (CLVL / 25) + 4); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "resistencia a dano corpo a corpo: +%i", CLVL / 5 + 5); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "dano dos inimigos: -%i", CLVL / 11 + 4); drawLine(InfoPanelBuffer);
 				break;
 			case PFC_BOMBARDIER:
-				sprintf(InfoPanelBuffer, "armor class: +%i", CLVL / 2); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "classe de armadura: +%i", CLVL / 2); drawLine(InfoPanelBuffer);
 				sprintf(InfoPanelBuffer, "resist all: +%i", CLVL / 3); drawLine(InfoPanelBuffer);
 				break;
 					// SAVAGES
 			case PFC_SAVAGE:
-				sprintf(InfoPanelBuffer, "damage: +%i", 5 * CLVL / 2); drawLine(InfoPanelBuffer);
-				sprintf(InfoPanelBuffer, "damage from enemies: -%i", CLVL / 3); drawLine(InfoPanelBuffer);
-				sprintf(InfoPanelBuffer, "chance to hit: +%i", CLVL / 3); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "dano: +%i", 5 * CLVL / 2); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "dano dos inimigos: -%i", CLVL / 3); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "precisao: +%i", CLVL / 3); drawLine(InfoPanelBuffer);
 				break;
 			case PFC_BERSERKER:
 				sprintf(InfoPanelBuffer, "accuracy: +%i", 10 + 3 * CLVL / 5 + PerkValue(PERK_BASHING_HITS, CurrentPlayerIndex)); drawLine(InfoPanelBuffer); 
-				sprintf(InfoPanelBuffer, "damage: +%i", CLVL * player.BaseStrength / 357 + CLVL / 2 + PerkValue(PERK_BLOODTHIRST, CurrentPlayerIndex)); drawLine(InfoPanelBuffer);
-				sprintf(InfoPanelBuffer, "armor class: +%i", 1 + CLVL / 3 + PerkValue(PERK_LIKE_A_ROCK, CurrentPlayerIndex)); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "dano: +%i", CLVL * player.BaseStrength / 357 + CLVL / 2 + PerkValue(PERK_BLOODTHIRST, CurrentPlayerIndex)); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "classe de armadura: +%i", 1 + CLVL / 3 + PerkValue(PERK_LIKE_A_ROCK, CurrentPlayerIndex)); drawLine(InfoPanelBuffer);
 				sprintf(InfoPanelBuffer, "dfe: -%i", 1 + CLVL / 5 + PerkValue(PERK_FEEL_NO_PAIN, CurrentPlayerIndex)); drawLine(InfoPanelBuffer);
 				sprintf(InfoPanelBuffer, "stun threshold: +%i", 1 + CLVL / 5 + PerkValue(PERK_UNBREAKABLE, CurrentPlayerIndex)); drawLine(InfoPanelBuffer);
-				//sprintf(InfoPanelBuffer, "resist melee damage: +%i", 10 + (CLVL / 5)); drawLine(InfoPanelBuffer);
+				//sprintf(InfoPanelBuffer, "resistencia a dano corpo a corpo: +%i", 10 + (CLVL / 5)); drawLine(InfoPanelBuffer);
 				//sprintf(InfoPanelBuffer, "+(%s)", "perk improvements"); drawLine(InfoPanelBuffer);
 				break;
 			case PFC_EXECUTIONER:
-				sprintf(InfoPanelBuffer, "damage: +%i", 10 + (5 * CLVL / 2)); drawLine(InfoPanelBuffer);
-				sprintf(InfoPanelBuffer, "damage from enemies: -%i", (3 * CLVL / 7) + 4); drawLine(InfoPanelBuffer);
-				sprintf(InfoPanelBuffer, "chance to hit: +%i", CLVL / 3); drawLine(InfoPanelBuffer);
-				sprintf(InfoPanelBuffer, "life regeneration: +%i", CLVL + 10); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "dano: +%i", 10 + (5 * CLVL / 2)); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "dano dos inimigos: -%i", (3 * CLVL / 7) + 4); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "precisao: +%i", CLVL / 3); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "regeneracao de vida: +%i", CLVL + 10); drawLine(InfoPanelBuffer);
 				break;
 					// GLADIATORS
 			case PFC_THRAEX:
-				sprintf(InfoPanelBuffer, "damage: +%i", 2 * CLVL); drawLine(InfoPanelBuffer);
-				sprintf(InfoPanelBuffer, "damage from enemies: -%i", 2 * CLVL / 9); drawLine(InfoPanelBuffer);
-				sprintf(InfoPanelBuffer, "chance to hit: +%i", 5 * CLVL / 4); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "dano: +%i", 2 * CLVL); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "dano dos inimigos: -%i", 2 * CLVL / 9); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "precisao: +%i", 5 * CLVL / 4); drawLine(InfoPanelBuffer);
 				break;
 			case PFC_DIMACHAERUS:
-				sprintf(InfoPanelBuffer, "attack speed: -%i %s", 1, "frame"); drawLine(InfoPanelBuffer);
-				sprintf(InfoPanelBuffer, "chance to hit: +%i", CLVL / 2); drawLine(InfoPanelBuffer);
-				sprintf(InfoPanelBuffer, "damage: +%i", CLVL / 2); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "velocidade de ataque: -%i %s", 1, "quadro"); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "precisao: +%i", CLVL / 2); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "dano: +%i", CLVL / 2); drawLine(InfoPanelBuffer);
 				break;
 			case PFC_MURMILLO:
-				sprintf(InfoPanelBuffer, "damage: +%i", 7 * CLVL / 4); drawLine(InfoPanelBuffer);
-				sprintf(InfoPanelBuffer, "damage from enemies: -%i", 2 * CLVL / 5); drawLine(InfoPanelBuffer);
-				sprintf(InfoPanelBuffer, "armor class: +%i", 3 * CLVL / 4); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "dano: +%i", 7 * CLVL / 4); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "dano dos inimigos: -%i", 2 * CLVL / 5); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "classe de armadura: +%i", 3 * CLVL / 4); drawLine(InfoPanelBuffer);
 				break;			
 			case PFC_SECUTOR:
-				sprintf(InfoPanelBuffer, "spell levels: +%i", 2); drawLine(InfoPanelBuffer);
-				sprintf(InfoPanelBuffer, "damage: +%i", CLVL * 2); drawLine(InfoPanelBuffer);
-				sprintf(InfoPanelBuffer, "damage from enemies: -%i", (3 * CLVL / 10) - 2); drawLine(InfoPanelBuffer);
-				sprintf(InfoPanelBuffer, "armor class: +%i", CLVL / 10); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "niveis de magia: +%i", 2); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "dano: +%i", CLVL * 2); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "dano dos inimigos: -%i", (3 * CLVL / 10) - 2); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "classe de armadura: +%i", CLVL / 10); drawLine(InfoPanelBuffer);
 				break;
 			case PFC_DRUID:
-				sprintf(InfoPanelBuffer, "damage: +%i", 5 + CLVL * 3); drawLine(InfoPanelBuffer);
-				sprintf(InfoPanelBuffer, "damage from enemies: -%i", 3 * CLVL / 21 + 1); drawLine(InfoPanelBuffer);
-				sprintf(InfoPanelBuffer, "chance to hit: +%i", CLVL / 2 + 10); drawLine(InfoPanelBuffer);
-				sprintf(InfoPanelBuffer, "armor class: +%i", 5 + CLVL / 10); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "dano: +%i", 5 + CLVL * 3); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "dano dos inimigos: -%i", 3 * CLVL / 21 + 1); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "precisao: +%i", CLVL / 2 + 10); drawLine(InfoPanelBuffer);
+				sprintf(InfoPanelBuffer, "classe de armadura: +%i", 5 + CLVL / 10); drawLine(InfoPanelBuffer);
 				sprintf(InfoPanelBuffer, "stun threshold: +%i", 3 + CLVL / 15); drawLine(InfoPanelBuffer);
 				break;
 			}
@@ -741,20 +741,20 @@ void DrawSpellBook()
 			int additionalFuryDuration = player.effectFlag[EA_FURY_DURATION] ? (player.CharLevel / 6 + 10) : 0;
 			int durf = 30 + (CLVL / 5) + /*10 * missile.SpellLevel*/ + additionalFuryDuration + PerkValue(PERK_RAMPAGE, CurrentPlayerIndex);
 			sprintf(InfoPanelBuffer, " "); drawLine(InfoPanelBuffer);
-			sprintf(InfoPanelBuffer, "duration: %i seconds", durf); drawLine(InfoPanelBuffer);
+			sprintf(InfoPanelBuffer, "duracao: %i segundos", durf); drawLine(InfoPanelBuffer);
 		}
 		else if (spellIndex == PS_7_TOWN_PORTAL) {
-			sprintf(InfoPanelBuffer, "creates a magic portal");
+			sprintf(InfoPanelBuffer, "cria um portal magico");
 			drawLine(InfoPanelBuffer);
 			sprintf(InfoPanelBuffer, "that teleports caster");
 			drawLine(InfoPanelBuffer);
-			sprintf(InfoPanelBuffer, "to town and back");
+			sprintf(InfoPanelBuffer, "para a cidade e de volta");
 			drawLine(InfoPanelBuffer);
 		}
 		else if (spellIndex == PS_33_TELEKINES) {
 			sprintf(InfoPanelBuffer, "caster uses kinetic powers");
 			drawLine(InfoPanelBuffer);
-			sprintf(InfoPanelBuffer, "to manipulate objects");
+			sprintf(InfoPanelBuffer, "para manipular objetos");
 			drawLine(InfoPanelBuffer);
 			sprintf(InfoPanelBuffer, "from a distance");
 			drawLine(InfoPanelBuffer);
@@ -762,7 +762,7 @@ void DrawSpellBook()
 		else if (spellIndex == PS_16_REFLECT) {
 			sprintf(InfoPanelBuffer, "gives invulnerability");
 			drawLine(InfoPanelBuffer);
-			sprintf(InfoPanelBuffer, "to monster melee attacks");
+			sprintf(InfoPanelBuffer, "contra ataques corpo a corpo de monstros");
 			drawLine(InfoPanelBuffer);
 			sprintf(InfoPanelBuffer, " ");
 			drawLine(InfoPanelBuffer);
@@ -770,23 +770,23 @@ void DrawSpellBook()
 		else if (spellIndex == PS_23_TELEPORT) {
 			sprintf(InfoPanelBuffer, "instantly moves caster");
 			drawLine(InfoPanelBuffer);
-			sprintf(InfoPanelBuffer, "to selected location");
+			sprintf(InfoPanelBuffer, "para o local selecionado");
 			drawLine(InfoPanelBuffer);
 		}
 		else if (spellIndex == PS_11_MANA_SHIELD) {
-			sprintf(InfoPanelBuffer, "damage is substracted");
+			sprintf(InfoPanelBuffer, "o dano e descontado");
 			drawLine(InfoPanelBuffer);
-			sprintf(InfoPanelBuffer, "from mana instead of life");
+			sprintf(InfoPanelBuffer, "da mana em vez da vida");
 			drawLine(InfoPanelBuffer);
 			sprintf(InfoPanelBuffer, " ");
 			drawLine(InfoPanelBuffer);
 		}
 		else if (spellIndex == PS_2_HEALING) {
-			drawLine ("partially restores life");
+			drawLine ("restaura parte da vida");
 			drawLine("");			
 		}
 		else if (spellIndex == PS_34_HEAL_OTHER) {
-			sprintf(InfoPanelBuffer, "caster restores life");
+			sprintf(InfoPanelBuffer, "o conjurador recupera vida");
 			drawLine(InfoPanelBuffer);
 			sprintf(InfoPanelBuffer, "for selected player");
 			drawLine(InfoPanelBuffer);
@@ -800,29 +800,29 @@ void DrawSpellBook()
 			drawLine(InfoPanelBuffer);
 		}
 		else if (spellIndex == PS_20_INCINERATE) {
-			sprintf(InfoPanelBuffer, "breathe a stream of flame");
+			sprintf(InfoPanelBuffer, "lanca um jato de chamas");
 			drawLine(InfoPanelBuffer);
-			sprintf(InfoPanelBuffer, "that scorches enemies");
+			sprintf(InfoPanelBuffer, "que incinera os inimigos");
 			drawLine(InfoPanelBuffer);
 			sprintf(InfoPanelBuffer, " ");
 			drawLine(InfoPanelBuffer);
 		}
 		else if (spellIndex == PS_12_FIREBLAST) {
-			sprintf(InfoPanelBuffer, "casts a powerful fire ball");
+			sprintf(InfoPanelBuffer, "lanca uma poderosa bola de fogo");
 			drawLine(InfoPanelBuffer);
-			sprintf(InfoPanelBuffer, "that explodes on hit");
+			sprintf(InfoPanelBuffer, "que explode ao atingir");
 			drawLine(InfoPanelBuffer);
-			sprintf(InfoPanelBuffer, "and damages nearby enemies");
+			sprintf(InfoPanelBuffer, "e causa dano aos inimigos proximos");
 			drawLine(InfoPanelBuffer);
 			sprintf(InfoPanelBuffer, " ");
 			drawLine(InfoPanelBuffer);
 		}
 		else if (spellIndex == PS_6_FIRE_WALL) {
-			sprintf(InfoPanelBuffer, "creates a wall of flames");
+			sprintf(InfoPanelBuffer, "cria uma parede de chamas");
 			drawLine(InfoPanelBuffer);
-			sprintf(InfoPanelBuffer, "that prevents enemies");
+			sprintf(InfoPanelBuffer, "que impede os inimigos");
 			drawLine(InfoPanelBuffer);
-			sprintf(InfoPanelBuffer, "without fire immunity");
+			sprintf(InfoPanelBuffer, "sem imunidade a fogo");
 			drawLine(InfoPanelBuffer);
 			sprintf(InfoPanelBuffer, "from crossing it");
 			drawLine(InfoPanelBuffer);
@@ -832,9 +832,9 @@ void DrawSpellBook()
 		else if (spellIndex == PS_19_FLAME_RING) {
 			sprintf(InfoPanelBuffer, "creates a burning circle");
 			drawLine(InfoPanelBuffer);
-			sprintf(InfoPanelBuffer, "that prevents enemies");
+			sprintf(InfoPanelBuffer, "que impede os inimigos");
 			drawLine(InfoPanelBuffer);
-			sprintf(InfoPanelBuffer, "without fire immunity");
+			sprintf(InfoPanelBuffer, "sem imunidade a fogo");
 			drawLine(InfoPanelBuffer);
 			sprintf(InfoPanelBuffer, "from crossing it");
 			drawLine(InfoPanelBuffer);
@@ -844,7 +844,7 @@ void DrawSpellBook()
 		else if (spellIndex == PS_41_FIERY_NOVA) {
 			sprintf(InfoPanelBuffer, "creates expanding circle");
 			drawLine(InfoPanelBuffer);
-			sprintf(InfoPanelBuffer, "of fireballs around caster");
+			sprintf(InfoPanelBuffer, "de bolas de fogo ao redor do conjurador");
 			drawLine(InfoPanelBuffer);
 			sprintf(InfoPanelBuffer, "para destruir inimigos");
 			drawLine(InfoPanelBuffer);
@@ -855,11 +855,11 @@ void DrawSpellBook()
 			sprintf(InfoPanelBuffer, "summons a multi-headed");
 			drawLine(InfoPanelBuffer);
 			if (player.fullClassId == PFC_ELEMENTALIST) {
-				sprintf(InfoPanelBuffer, "beast to spit ice bolts");
+				sprintf(InfoPanelBuffer, "fera que cospe setas de gelo");
 				drawLine(InfoPanelBuffer);
 			}
 			else if (HasTrait(CurrentPlayerIndex, TraitId::Hydramancer)) {
-				sprintf(InfoPanelBuffer, "beast that throws fire,");
+				sprintf(InfoPanelBuffer, "fera que arremessa fogo,");
 				drawLine(InfoPanelBuffer);
 				sprintf(InfoPanelBuffer, "electric, arcane");
 				drawLine(InfoPanelBuffer);
@@ -867,10 +867,10 @@ void DrawSpellBook()
 				drawLine(InfoPanelBuffer);
 			}
 			else {
-			sprintf(InfoPanelBuffer, "beast that throws fire");
+			sprintf(InfoPanelBuffer, "fera que arremessa fogo");
 			drawLine(InfoPanelBuffer);
 			}
-			sprintf(InfoPanelBuffer, "at non-immune enemies");
+			sprintf(InfoPanelBuffer, "em inimigos nao imunes");
 			drawLine(InfoPanelBuffer);
 			sprintf(InfoPanelBuffer, " ");
 			drawLine(InfoPanelBuffer);
@@ -882,9 +882,9 @@ void DrawSpellBook()
 		else if (spellIndex == PS_40_LIGHTING_WALL) { // page 3
 			sprintf(InfoPanelBuffer, "creates electric wall");
 			drawLine(InfoPanelBuffer);
-			sprintf(InfoPanelBuffer, "that prevents enemies");
+			sprintf(InfoPanelBuffer, "que impede os inimigos");
 			drawLine(InfoPanelBuffer);
-			sprintf(InfoPanelBuffer, "without lightning immunity");
+			sprintf(InfoPanelBuffer, "sem imunidade a raios");
 			drawLine(InfoPanelBuffer);
 			sprintf(InfoPanelBuffer, "from crossing it");
 			drawLine(InfoPanelBuffer);
@@ -894,9 +894,9 @@ void DrawSpellBook()
 		else if (spellIndex == PS_17_LIGHTING_RING) {
 			sprintf(InfoPanelBuffer, "creates electric circle");
 			drawLine(InfoPanelBuffer);
-			sprintf(InfoPanelBuffer, "that prevents enemies");
+			sprintf(InfoPanelBuffer, "que impede os inimigos");
 			drawLine(InfoPanelBuffer);
-			sprintf(InfoPanelBuffer, "without lightning immunity");
+			sprintf(InfoPanelBuffer, "sem imunidade a raios");
 			drawLine(InfoPanelBuffer);
 			sprintf(InfoPanelBuffer, "from crossing it");
 			drawLine(InfoPanelBuffer);
@@ -938,9 +938,9 @@ void DrawSpellBook()
 			drawLine(InfoPanelBuffer);
 		}
 		else if (spellIndex == PS_35_ARCANE_STAR) {
-			sprintf(InfoPanelBuffer, "creates a magic star");
+			sprintf(InfoPanelBuffer, "cria uma estrela magica");
 			drawLine(InfoPanelBuffer);
-			sprintf(InfoPanelBuffer, "that inflicts arcane damage");
+			sprintf(InfoPanelBuffer, "que causa dano arcano");
 			drawLine(InfoPanelBuffer);
 			sprintf(InfoPanelBuffer, " ");
 			drawLine(InfoPanelBuffer);
@@ -948,9 +948,9 @@ void DrawSpellBook()
 		else if (spellIndex == PS_4_FLASH) {
 			sprintf(InfoPanelBuffer, "creates a magical ring");
 			drawLine(InfoPanelBuffer);
-			sprintf(InfoPanelBuffer, "of energy around caster");
+			sprintf(InfoPanelBuffer, "de energia ao redor do conjurador");
 			drawLine(InfoPanelBuffer);
-			sprintf(InfoPanelBuffer, "to damage nearby targets");
+			sprintf(InfoPanelBuffer, "para ferir alvos proximos");
 			drawLine(InfoPanelBuffer);
 			sprintf(InfoPanelBuffer, " ");
 			drawLine(InfoPanelBuffer);
@@ -958,7 +958,7 @@ void DrawSpellBook()
 		else if (spellIndex == PS_43_ARCANE_NOVA) {
 			sprintf(InfoPanelBuffer, "creates an expanding ring");
 			drawLine(InfoPanelBuffer);
-			sprintf(InfoPanelBuffer, "of stars around caster");
+			sprintf(InfoPanelBuffer, "de estrelas ao redor do conjurador");
 			drawLine(InfoPanelBuffer);
 			sprintf(InfoPanelBuffer, "para destruir inimigos");
 			drawLine(InfoPanelBuffer);
@@ -966,9 +966,9 @@ void DrawSpellBook()
 			drawLine(InfoPanelBuffer);
 		}
 		else if (spellIndex == PS_31_HOLY_BOLT) { // page 4
-			sprintf(InfoPanelBuffer, "a bolt of holy energy");
+			sprintf(InfoPanelBuffer, "um raio de energia sagrada");
 			drawLine(InfoPanelBuffer);
-			sprintf(InfoPanelBuffer, "that damages undead");
+			sprintf(InfoPanelBuffer, "que causa dano a mortos-vivos");
 			drawLine(InfoPanelBuffer);
 			if (GameMode != GM_CLASSIC) {
 				sprintf(InfoPanelBuffer, "and knocks them back");
@@ -988,9 +988,9 @@ void DrawSpellBook()
 			drawLine(InfoPanelBuffer);
 		}
 		else if (spellIndex == PS_8_STONE_CURSE) {
-			sprintf(InfoPanelBuffer, "turns non-immune enemies");
+			sprintf(InfoPanelBuffer, "transforma inimigos nao imunes");
 			drawLine(InfoPanelBuffer);
-			sprintf(InfoPanelBuffer, "to stone form");
+			sprintf(InfoPanelBuffer, "em pedra");
 			drawLine(InfoPanelBuffer);
 			if (GameMode != GM_CLASSIC) {
 				sprintf(InfoPanelBuffer, "making them invulnerable");
@@ -1012,9 +1012,9 @@ void DrawSpellBook()
 		else if (spellIndex == PS_15_FORCE_WAVE) {
 			sprintf(InfoPanelBuffer, "sends a moving wall");
 			drawLine(InfoPanelBuffer);
-			sprintf(InfoPanelBuffer, "of force energy");
+			sprintf(InfoPanelBuffer, "de energia de forca");
 			drawLine(InfoPanelBuffer);
-			sprintf(InfoPanelBuffer, "to knock back enemies");
+			sprintf(InfoPanelBuffer, "para repelir inimigos");
 			drawLine(InfoPanelBuffer);
 			sprintf(InfoPanelBuffer, "(causa dano fisico)");
 			drawLine(InfoPanelBuffer);
@@ -1041,7 +1041,7 @@ void DrawSpellBook()
 			drawLine(InfoPanelBuffer);
 		}
 		else if (spellIndex == PS_56_ICE_BOLT) { // page 5
-			sprintf(InfoPanelBuffer, "casts a shard of ice");
+			sprintf(InfoPanelBuffer, "lanca um fragmento de gelo");
 			drawLine(InfoPanelBuffer);
 			sprintf(InfoPanelBuffer, " ");
 			drawLine(InfoPanelBuffer);
@@ -1049,7 +1049,7 @@ void DrawSpellBook()
 		else if (spellIndex == PS_57_FREEZING_BALL) {
 			sprintf(InfoPanelBuffer, "launches a powerful");
 			drawLine(InfoPanelBuffer);
-			sprintf(InfoPanelBuffer, "damaging ball of ice");
+			sprintf(InfoPanelBuffer, "esfera de gelo que causa dano");
 			drawLine(InfoPanelBuffer);
 			sprintf(InfoPanelBuffer, " ");
 			drawLine(InfoPanelBuffer);
@@ -1057,7 +1057,7 @@ void DrawSpellBook()
 		else if (spellIndex == PS_58_FROST_NOVA) {
 			sprintf(InfoPanelBuffer, "creates an expanding ring");
 			drawLine(InfoPanelBuffer);
-			sprintf(InfoPanelBuffer, "of ice around caster");
+			sprintf(InfoPanelBuffer, "de gelo ao redor do conjurador");
 			drawLine(InfoPanelBuffer);
 			sprintf(InfoPanelBuffer, "para destruir inimigos");
 			drawLine(InfoPanelBuffer);
@@ -1067,7 +1067,7 @@ void DrawSpellBook()
 		else if (spellIndex == PS_59_RANCID_BOLT) {
 			sprintf(InfoPanelBuffer, "casts an acid bolt");
 			drawLine(InfoPanelBuffer);
-			sprintf(InfoPanelBuffer, "to slowly burn enemies");
+			sprintf(InfoPanelBuffer, "para queimar inimigos lentamente");
 			drawLine(InfoPanelBuffer);
 			sprintf(InfoPanelBuffer, " ");
 			drawLine(InfoPanelBuffer);
@@ -1075,7 +1075,7 @@ void DrawSpellBook()
 		else if (spellIndex == PS_60_TOXIC_BALL) {
 			sprintf(InfoPanelBuffer, "launches a powerful");
 			drawLine(InfoPanelBuffer);
-			sprintf(InfoPanelBuffer, "damaging ball of acid");
+			sprintf(InfoPanelBuffer, "esfera de acido que causa dano");
 			drawLine(InfoPanelBuffer);
 			sprintf(InfoPanelBuffer, " ");
 			drawLine(InfoPanelBuffer);
@@ -1083,7 +1083,7 @@ void DrawSpellBook()
 		else if (spellIndex == PS_61_ACID_NOVA) {
 			sprintf(InfoPanelBuffer, "creates an expanding ring");
 			drawLine(InfoPanelBuffer);
-			sprintf(InfoPanelBuffer, "of acid around caster");
+			sprintf(InfoPanelBuffer, "de acido ao redor do conjurador");
 			drawLine(InfoPanelBuffer);
 			sprintf(InfoPanelBuffer, "para destruir inimigos");
 			drawLine(InfoPanelBuffer);
@@ -1101,21 +1101,21 @@ void DrawSpellBook()
 		}
 		else if (spellIndex == PS_10_PHASING) {
 			drawLine("quickly teleports caster");
-			drawLine("to nearby random location");
+			drawLine("para um local aleatorio proximo");
 		}
 		else if(spellIndex == PS_42_WARP) {
 			drawLine("teleports caster");
-			drawLine("to nearest stairs");
+			drawLine("para a escada mais proxima");
 		}
 		else if (spellIndex == PS_24_APOCALYPSE) {
-			drawLine("engulfs visible enemies");
+			drawLine("envolve os inimigos visiveis");
 			drawLine("in infernal flames");
 			drawLine("obliterating everything");
 			drawLine("(causa dano fisico)");
 		}
 		else if (spellIndex == PS_25_ETHEREAL) {
 			drawLine("makes caster invulnerable");
-			drawLine("to all magical damage");
+			drawLine("a todo dano magico");
 			drawLine("for 20 seconds");
 		}
 		else if (spellIndex == PS_26_ITEM_REPAIR) {
@@ -1132,22 +1132,22 @@ void DrawSpellBook()
 			drawLine("disarms trapped objects");			
 		}
 		else if (spellIndex == PS_37_MANA_RECHARGE) { 
-			drawLine("restores partial mana");	
+			drawLine("restaura parte da mana");	
 			drawLine("");
 		}
 		else if (spellIndex == PS_38_MAGI) {
-			drawLine("fully restores mana");			
+			drawLine("restaura toda a mana");			
 		}
 		//else if (spellIndex == PS_42_WARP) { // somehow this didn't work !!
 		//	drawLine("quickly teleport");
-		//	drawLine("to nearest stairs");
+		//	drawLine("para a escada mais proxima");
 		//}
 		else if (spellIndex == PS_5_IDENTIFY) {
 			drawLine("identify selected item");			
 		}
 		else if (spellIndex == PS_9_INFRAVISION) {
-			drawLine("monsters outside of");
-			drawLine("caster's line of sight");
+			drawLine("monstros fora da");
+			drawLine("linha de visao do conjurador");
 			drawLine("and light radius");
 			drawLine("are highlighted red");
 		}
@@ -1175,7 +1175,7 @@ void DrawSpellBook()
                 denominator =   8;
             }
 			denominator += Difficulty;
-            sprintf( InfoPanelBuffer, "Damage: %i/%i of target's hp", numerator, denominator );
+            sprintf( InfoPanelBuffer, "Dano: %i/%i da vida do alvo", numerator, denominator );
             drawLine( InfoPanelBuffer );
         }else if( spellIndex == PS_2_HEALING || spellIndex == PS_34_HEAL_OTHER ){   //
             const POINT p = InfoPanelManaHeal( spellIndex );
@@ -1183,10 +1183,10 @@ void DrawSpellBook()
             drawLine( InfoPanelBuffer );
 		}else if (spellIndex == PS_37_MANA_RECHARGE) {   //  Реликт маны
 			const POINT p = InfoPanelManaHeal(spellIndex);
-			sprintf(InfoPanelBuffer, "mana restore: %i-%i",p.x, p.y );
+			sprintf(InfoPanelBuffer, "mana restaurada: %i-%i",p.x, p.y );
 			drawLine(InfoPanelBuffer);
         }else if( spellIndex == PS_11_MANA_SHIELD ){
-            sprintf( InfoPanelBuffer, "Damage Received: %i%%", minDamage );
+            sprintf( InfoPanelBuffer, "Dano recebido: %i%%", minDamage );
             drawLine( InfoPanelBuffer );
         }else if (spellIndex == PS_16_REFLECT) {
 			int reflect_layers = player.BaseVitality / 50 + 1; // that's basic level of Reflect layers
@@ -1195,25 +1195,25 @@ void DrawSpellBook()
 			}
 			reflect_layers += PerkValue(SYNERGY_IRON_BULWARK, CurrentPlayerIndex);
 			if( reflect_layers == 1 ){
-                drawLine( "Absorbs 1 hit" );
+                drawLine( "Absorve 1 golpe" );
             }else{
                 sprintf( InfoPanelBuffer, "Absorbs %i hits", reflect_layers);
                 drawLine( InfoPanelBuffer );
             }
 		}else if (spellIndex == PS_6_FIRE_WALL || spellIndex == PS_19_FLAME_RING) {
-			sprintf(InfoPanelBuffer, "Damage per second: %i", minDamage);
+			sprintf(InfoPanelBuffer, "Dano por segundo: %i", minDamage);
 			drawLine(InfoPanelBuffer, 4);
 		}else if (spellIndex == PS_17_LIGHTING_RING || spellIndex == PS_40_LIGHTING_WALL) {
-			sprintf(InfoPanelBuffer, "Damage per second: %i", minDamage);
+			sprintf(InfoPanelBuffer, "Dano por segundo: %i", minDamage);
 			drawLine(InfoPanelBuffer, 1);
 		}else if (spellIndex == PS_4_FLASH) {
-			sprintf(InfoPanelBuffer, "Damage per second: %i", minDamage);
+			sprintf(InfoPanelBuffer, "Dano por segundo: %i", minDamage);
 			drawLine(InfoPanelBuffer, 8);
 		}else if (spellIndex == PS_20_INCINERATE) {
-			sprintf(InfoPanelBuffer, "Damage per second: %i", minDamage);
+			sprintf(InfoPanelBuffer, "Dano por segundo: %i", minDamage);
 			drawLine(InfoPanelBuffer, 4);
 		}else if( minDamage != -1 && !( minDamage == 0 && maxDamage == 0 ) && !is(spellIndex, PS_21_GOLEM, PS_52_LESSER_SUMMON, PS_53_COMMON_SUMMON, PS_54_GREATER_SUMMON)){
-            sprintf( InfoPanelBuffer, "Damage: %i-%i", minDamage, maxDamage );
+            sprintf( InfoPanelBuffer, "Dano: %i-%i", minDamage, maxDamage );
 			int le_color;
 			//ELEMENTAL_TYPE damageType;
 			switch (spellIndex) {
@@ -1251,7 +1251,7 @@ void DrawSpellBook()
 			if( HasTrait(CurrentPlayerIndex, TraitId::Hydramancer) && spellIndex == PS_13_HYDRA ){
 				if (PlayerSpellLevel(CurrentPlayerIndex, PS_1_FIREBOLT) > 0) {
 					GetDamageOfPlayerSpell(CurrentPlayerIndex, spellIndex, PlayerSpellLevel(CurrentPlayerIndex, spellIndex), ET_1_FIRE, &minDamage, &maxDamage);
-					sprintf(InfoPanelBuffer, "Fire Damage: %i-%i", minDamage, maxDamage);
+					sprintf(InfoPanelBuffer, "Fire Dano: %i-%i", minDamage, maxDamage);
 					drawLine(InfoPanelBuffer, C_4_Orange);
 				}
 
@@ -1263,13 +1263,13 @@ void DrawSpellBook()
 
 				if (PlayerSpellLevel(CurrentPlayerIndex, PS_35_ARCANE_STAR) > 0) {
 					GetDamageOfPlayerSpell(CurrentPlayerIndex, spellIndex, PlayerSpellLevel(CurrentPlayerIndex, spellIndex), ET_3_ARCAN, &minDamage, &maxDamage);
-					sprintf(InfoPanelBuffer, "Arcane Damage: %i-%i", minDamage, maxDamage);
+					sprintf(InfoPanelBuffer, "Arcane Dano: %i-%i", minDamage, maxDamage);
 					drawLine(InfoPanelBuffer, C_8_Pink);
 				}
 
 				if (PlayerSpellLevel(CurrentPlayerIndex, PS_59_RANCID_BOLT) > 0) {
 					GetDamageOfPlayerSpell(CurrentPlayerIndex, spellIndex, PlayerSpellLevel(CurrentPlayerIndex, spellIndex), ET_4_ACID, &minDamage, &maxDamage);
-					sprintf(InfoPanelBuffer, "Acid Damage: %i-%i", minDamage, maxDamage);
+					sprintf(InfoPanelBuffer, "Acid Dano: %i-%i", minDamage, maxDamage);
 					drawLine(InfoPanelBuffer, C_5_Yellow);
 				}
 			}
