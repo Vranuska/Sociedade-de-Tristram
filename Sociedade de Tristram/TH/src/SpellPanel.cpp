@@ -746,13 +746,13 @@ void DrawSpellBook()
 		else if (spellIndex == PS_7_TOWN_PORTAL) {
 			sprintf(InfoPanelBuffer, "cria um portal magico");
 			drawLine(InfoPanelBuffer);
-			sprintf(InfoPanelBuffer, "that teleports caster");
+			sprintf(InfoPanelBuffer, "que teleporta o conjurador");
 			drawLine(InfoPanelBuffer);
 			sprintf(InfoPanelBuffer, "para a cidade e de volta");
 			drawLine(InfoPanelBuffer);
 		}
 		else if (spellIndex == PS_33_TELEKINES) {
-			sprintf(InfoPanelBuffer, "caster uses kinetic powers");
+			sprintf(InfoPanelBuffer, "o conjurador usa poderes cineticos");
 			drawLine(InfoPanelBuffer);
 			sprintf(InfoPanelBuffer, "para manipular objetos");
 			drawLine(InfoPanelBuffer);
@@ -768,7 +768,7 @@ void DrawSpellBook()
 			drawLine(InfoPanelBuffer);
 		}
 		else if (spellIndex == PS_23_TELEPORT) {
-			sprintf(InfoPanelBuffer, "instantly moves caster");
+			sprintf(InfoPanelBuffer, "move o conjurador instantaneamente");
 			drawLine(InfoPanelBuffer);
 			sprintf(InfoPanelBuffer, "para o local selecionado");
 			drawLine(InfoPanelBuffer);
@@ -830,7 +830,7 @@ void DrawSpellBook()
 			drawLine(InfoPanelBuffer);
 		}
 		else if (spellIndex == PS_19_FLAME_RING) {
-			sprintf(InfoPanelBuffer, "creates a burning circle");
+			sprintf(InfoPanelBuffer, "cria um circulo em chamas");
 			drawLine(InfoPanelBuffer);
 			sprintf(InfoPanelBuffer, "que impede os inimigos");
 			drawLine(InfoPanelBuffer);
@@ -842,7 +842,7 @@ void DrawSpellBook()
 			drawLine(InfoPanelBuffer);
 		}
 		else if (spellIndex == PS_41_FIERY_NOVA) {
-			sprintf(InfoPanelBuffer, "creates expanding circle");
+			sprintf(InfoPanelBuffer, "cria um circulo em expansao");
 			drawLine(InfoPanelBuffer);
 			sprintf(InfoPanelBuffer, "de bolas de fogo ao redor do conjurador");
 			drawLine(InfoPanelBuffer);
@@ -880,7 +880,7 @@ void DrawSpellBook()
 			drawLine(InfoPanelBuffer);
 		}
 		else if (spellIndex == PS_40_LIGHTING_WALL) { // page 3
-			sprintf(InfoPanelBuffer, "creates electric wall");
+			sprintf(InfoPanelBuffer, "cria uma parede eletrica");
 			drawLine(InfoPanelBuffer);
 			sprintf(InfoPanelBuffer, "que impede os inimigos");
 			drawLine(InfoPanelBuffer);
@@ -892,7 +892,7 @@ void DrawSpellBook()
 			drawLine(InfoPanelBuffer);
 		}
 		else if (spellIndex == PS_17_LIGHTING_RING) {
-			sprintf(InfoPanelBuffer, "creates electric circle");
+			sprintf(InfoPanelBuffer, "cria um circulo eletrico");
 			drawLine(InfoPanelBuffer);
 			sprintf(InfoPanelBuffer, "que impede os inimigos");
 			drawLine(InfoPanelBuffer);
@@ -946,7 +946,7 @@ void DrawSpellBook()
 			drawLine(InfoPanelBuffer);
 		}
 		else if (spellIndex == PS_4_FLASH) {
-			sprintf(InfoPanelBuffer, "creates a magical ring");
+			sprintf(InfoPanelBuffer, "cria um anel magico");
 			drawLine(InfoPanelBuffer);
 			sprintf(InfoPanelBuffer, "de energia ao redor do conjurador");
 			drawLine(InfoPanelBuffer);
@@ -956,7 +956,7 @@ void DrawSpellBook()
 			drawLine(InfoPanelBuffer);
 		}
 		else if (spellIndex == PS_43_ARCANE_NOVA) {
-			sprintf(InfoPanelBuffer, "creates an expanding ring");
+			sprintf(InfoPanelBuffer, "cria um anel em expansao");
 			drawLine(InfoPanelBuffer);
 			sprintf(InfoPanelBuffer, "de estrelas ao redor do conjurador");
 			drawLine(InfoPanelBuffer);
@@ -1055,7 +1055,7 @@ void DrawSpellBook()
 			drawLine(InfoPanelBuffer);
 		}
 		else if (spellIndex == PS_58_FROST_NOVA) {
-			sprintf(InfoPanelBuffer, "creates an expanding ring");
+			sprintf(InfoPanelBuffer, "cria um anel em expansao");
 			drawLine(InfoPanelBuffer);
 			sprintf(InfoPanelBuffer, "de gelo ao redor do conjurador");
 			drawLine(InfoPanelBuffer);
@@ -1081,7 +1081,7 @@ void DrawSpellBook()
 			drawLine(InfoPanelBuffer);
 		}
 		else if (spellIndex == PS_61_ACID_NOVA) {
-			sprintf(InfoPanelBuffer, "creates an expanding ring");
+			sprintf(InfoPanelBuffer, "cria um anel em expansao");
 			drawLine(InfoPanelBuffer);
 			sprintf(InfoPanelBuffer, "de acido ao redor do conjurador");
 			drawLine(InfoPanelBuffer);
@@ -1100,11 +1100,11 @@ void DrawSpellBook()
 			WriteSummonSpellBookInfo(PS_54_GREATER_SUMMON, LINE_HEIGHT, lineIndex);
 		}
 		else if (spellIndex == PS_10_PHASING) {
-			drawLine("quickly teleports caster");
+			drawLine("teleporta rapidamente o conjurador");
 			drawLine("para um local aleatorio proximo");
 		}
 		else if(spellIndex == PS_42_WARP) {
-			drawLine("teleports caster");
+			drawLine("teleporta o conjurador");
 			drawLine("para a escada mais proxima");
 		}
 		else if (spellIndex == PS_24_APOCALYPSE) {
@@ -1114,7 +1114,7 @@ void DrawSpellBook()
 			drawLine("(causa dano fisico)");
 		}
 		else if (spellIndex == PS_25_ETHEREAL) {
-			drawLine("makes caster invulnerable");
+			drawLine("torna o conjurador invulneravel");
 			drawLine("a todo dano magico");
 			drawLine("for 20 seconds");
 		}
@@ -1251,7 +1251,7 @@ void DrawSpellBook()
 			if( HasTrait(CurrentPlayerIndex, TraitId::Hydramancer) && spellIndex == PS_13_HYDRA ){
 				if (PlayerSpellLevel(CurrentPlayerIndex, PS_1_FIREBOLT) > 0) {
 					GetDamageOfPlayerSpell(CurrentPlayerIndex, spellIndex, PlayerSpellLevel(CurrentPlayerIndex, spellIndex), ET_1_FIRE, &minDamage, &maxDamage);
-					sprintf(InfoPanelBuffer, "Fire Dano: %i-%i", minDamage, maxDamage);
+					sprintf(InfoPanelBuffer, "Dano de fogo: %i-%i", minDamage, maxDamage);
 					drawLine(InfoPanelBuffer, C_4_Orange);
 				}
 
