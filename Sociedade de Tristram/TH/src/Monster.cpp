@@ -8411,6 +8411,7 @@ void __fastcall Ai_8_Fallen(uint monsterIndex)
 				ac = curAc;
 			}
 		LABEL_47:
+		{
 			MonsterSprite monstersprite = *Monsters[monsterIndex_3].SpritePtr;
 			int baseMonsterIndex = monstersprite.baseMonsterIndex; 
 			minLife = (ac << 6) + Monsters[ monsterIndex_3 ].CurrentLife;
@@ -8421,6 +8422,7 @@ void __fastcall Ai_8_Fallen(uint monsterIndex)
 //			if( minLife < Monsters[ monsterIndex_3 ].BaseLife + (Monsters[ monsterIndex_3 ].BaseLife >> 2) ){
 				Monsters[ monsterIndex_3 ].CurrentLife = minLife;
 	//		}
+		}
 		LABEL_15:
 			radius = 2 * Monsters[ monsterIndex_3 ].intel + 4;
 			for( colOfs = -radius; colOfs <= radius; ++colOfs ){

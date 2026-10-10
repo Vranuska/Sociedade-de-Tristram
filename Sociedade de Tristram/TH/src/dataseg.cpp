@@ -2757,15 +2757,15 @@ Menu MPMainMenu[5] = {
 };
 // 004A0540
 Menu OptionsMenu[8] = {
-		{MENU_ENABLED | MENU_SLIDER,	0,  MusicMenuHandler},
-		{MENU_ENABLED | MENU_SLIDER,	0,  AmbientMenuHandler},
-		{MENU_ENABLED | MENU_SLIDER,	0,  SoundMenuHandler},
-		{MENU_ENABLED | MENU_SLIDER,	"Gamma",  GammaMenuHandler},
-		{MENU_ENABLED | MENU_SLIDER,	"Contrs",	ContrastMenuHandler},
-		{MENU_ENABLED | MENU_SLIDER,	0,  WalkMenuHandler},
-		{MENU_ENABLED,	 "Previous Menu",	 GoBackMenuHandler},// 0 // "Go Back"
-		//{MENU_ENABLED,	 "More Options",	 ConfigMenuHandler},
-		{MENU_ENABLED, 0, 0}
+		{static_cast<uint>(MENU_ENABLED | MENU_SLIDER),	0,  MusicMenuHandler},
+		{static_cast<uint>(MENU_ENABLED | MENU_SLIDER),	0,  AmbientMenuHandler},
+		{static_cast<uint>(MENU_ENABLED | MENU_SLIDER),	0,  SoundMenuHandler},
+		{static_cast<uint>(MENU_ENABLED | MENU_SLIDER),	"Gamma",  GammaMenuHandler},
+		{static_cast<uint>(MENU_ENABLED | MENU_SLIDER),	"Contrs",	ContrastMenuHandler},
+		{static_cast<uint>(MENU_ENABLED | MENU_SLIDER),	0,  WalkMenuHandler},
+		{static_cast<uint>(MENU_ENABLED),	 "Previous Menu",	 GoBackMenuHandler},// 0 // "Go Back"
+		//{static_cast<uint>(MENU_ENABLED),	 "More Options",	 ConfigMenuHandler},
+		{static_cast<uint>(MENU_ENABLED), 0, 0}
 };
 
 Menu MurderConfirmationMenu[5] = {

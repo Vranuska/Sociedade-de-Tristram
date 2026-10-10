@@ -43,7 +43,7 @@ int __fastcall SetupScreenResolution(HWND ahWnd)
 
 	#if tryhackddraw
 	// Применение ключа совместимости ddraw palette mode 
-	// HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\DirectDraw\Compatibility\ 
+	// HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\DirectDraw\Compatibility (registry key)
 	((DDRAWI_DIRECTDRAW_INT*)DirectDrawPtr)->lpLcl->dwAppHackFlags |= 0x0800;
 	#endif
 	UseReservedSystemPalette = 1;

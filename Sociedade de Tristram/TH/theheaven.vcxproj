@@ -97,7 +97,7 @@
       <DataExecutionPrevention>false</DataExecutionPrevention>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <StackReserveSize>10485760</StackReserveSize>
-      <DelayLoadDLLs>ddraw.dll;xinput9_1_0.dll</DelayLoadDLLs>
+      <DelayLoadDLLs>ddraw.dll</DelayLoadDLLs>
       <ProgramDatabaseFile>$(IntDir)$(TargetName).pdb</ProgramDatabaseFile>
       <GenerateMapFile>false</GenerateMapFile>
     </Link>
