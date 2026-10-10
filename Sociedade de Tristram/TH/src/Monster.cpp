@@ -11684,7 +11684,7 @@ void __fastcall ShowMonsterInfo(int monsterIndex)
 		}else{
 			monsterResistMask = baseMonster.ResistOn1And2Difficulty;
 		}
-		InfoPanel_AddLine("Monster type : ", true, Spicies[ min( baseMonster.MonsterClass, 3ui16) ] );
+		InfoPanel_AddLine("Tipo de monstro: ", true, LocalizeDisplayName(Spicies[ min( baseMonster.MonsterClass, 3ui16) ]) );
 		#ifdef comment // 1.150
 		if( !(monsterResistMask & 0x3F) ){  // 0011 1111 в маске учитываются только первые 6 битов
 			InfoPanel_AddLine("No magic resistance", true);
