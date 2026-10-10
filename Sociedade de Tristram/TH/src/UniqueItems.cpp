@@ -2386,7 +2386,7 @@ UniqueItem UniqueItemsData[] = {
 			AE_HIT_POINTS,	0,	5,	5,	0,	0,	0,	0,
 			AE_UNIQUE_GRAPHIC,	0,	921,	0,	0,	0,	0,	0,
 		},
-{	303,	"Winged Helmet",	461,	60,	-1,	26,	6,	9000,	52,
+{	303,	"Winged Helmet",	285,	60,	-1,	26,	6,	9000,	52,
 			AE_PERCENT_AC,	0,	50,	75,	0,	0,	0,	0,
 			AE_RESIST_All,	0,	10,	15,	0,	0,	0,	0,
 			AE_ALL_STAT,	0,	1,	5,	0,	0,	0,	0,
