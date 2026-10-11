@@ -1108,7 +1108,7 @@ extern int CowClickCount;//
 extern int SomeBoolFlag_41;//	
 extern int WirtIsPlacedOnMap;//	
 extern char* CowSprite;//	
-extern Towner Towners[16];//
+extern Towner Towners[17];//
 extern int TownDoorOpen[DD_COUNT];//	
 extern int IswarpUnderCursor;//	начало блока
 extern vector<Warp> Warps;//	

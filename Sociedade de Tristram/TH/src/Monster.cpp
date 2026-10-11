@@ -4324,6 +4324,7 @@ void SpecifiedUniqueDrop(int monsterIndex, bool sendMsg) // #boss unique drops
 //----- (0043D4E1) --------------------------------------------------------
 void __fastcall MonsterKillEffect(int monsterIndex, bool sendMsg)
 {
+	MemoryGuardianKilled(monsterIndex);
 	const Player& player = Players[CurrentPlayerIndex];
 	const Monster& monster = Monsters[ monsterIndex ];
 	const int monsterDropLevel = MonsterDropLevel(monsterIndex);

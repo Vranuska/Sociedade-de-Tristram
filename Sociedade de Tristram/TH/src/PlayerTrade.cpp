@@ -88,7 +88,7 @@ static int FindSocietyQuestOnyx()
     return -1;
 }
 
-// Forgotten House, chapter one. Saved per hero in unused bytes 80..83.
+// Forgotten House. Saved per hero in unused bytes 80..85 and 96..101.
 // These offsets do not overlap the companion data (0..65).
 static constexpr int MEMORY_STATE = 80;
 static constexpr int MEMORY_TESTIMONIES = 81;
@@ -97,7 +97,7 @@ static PLAYER_DIALOG MemoryCaller = PD_5_WitchMain;
 static int MemorySpeaker = 0; // Adria, Cain, Gillian, Farnham
 static bool MemoryAvailable()
 {
-    return MaxCountOfPlayersInGame == 1 && GameMode != GM_COLISEUM;
+    return MaxCountOfPlayersInGame == 1 && !is(GameMode, GM_COLISEUM, GM_IRONMAN, GM_SURVIVAL, GM_SPEEDRUN, GM_NIGHTMARE);
 }
 static unsigned char MemoryState()
 {
@@ -106,6 +106,115 @@ static unsigned char MemoryState()
 static unsigned char MemoryTestimonies()
 {
     return (unsigned char)AdditionalStateData.unused[MEMORY_TESTIMONIES] & 7;
+}
+static constexpr int MEMORY_CLUES = 83;
+static constexpr int MEMORY_RESCUED = 84;
+static constexpr int MEMORY_ENDING = 85;
+static int MemoryCombatTicks = 0;
+static int MemoryAimRow = 0, MemoryAimCol = 0;
+static const int MemoryObjectRows[4] = {36, 50, 42, 44};
+static const int MemoryObjectCols[4] = {38, 38, 50, 44};
+static int FindMemoryGuardian()
+{
+    for( int i = 0; i < MonstersCount; ++i ){
+        const int index = MonsterIndexes[i];
+        const Monster& monster = Monsters[index];
+        if( monster.SpritePtr && monster.SpritePtr->baseMonsterIndex == BM_29_HIDDEN
+            && monster.CurrentLife > 0 && !(monster.flag & MF_15_KILLED) ) return index;
+    }
+    return -1;
+}
+static void SpawnMemoryGuardian()
+{
+    if( Dungeon != DUN_115_FORGOTTEN_HOUSE || MemoryState() != 2
+        || ((unsigned char)AdditionalStateData.unused[MEMORY_CLUES] & 7) != 7 || FindMemoryGuardian() >= 0 ) return;
+    const int sprite = AddMonsterTypeToDungeon(BM_29_HIDDEN, MPF_2_DONT);
+    if( sprite < 0 || !IsCellFreeForMonster(50, 48) ) return;
+    const int index = AddMonster(50, 48, 0, sprite, 1);
+    if( index < 0 ) return;
+    Monster& monster = Monsters[index];
+    monster.Name = "A Quarta Batida";
+    // Bound the multiplication even if a later balance patch raises base health.
+    monster.BaseLife = std::min(monster.BaseLife, 100000000) * 3;
+    monster.CurrentLife = monster.BaseLife;
+    MemoryCombatTicks = 0;
+}
+void MemoryGenerateHouse()
+{
+    LoadQuestDungeonMainMapChurch("Levels\\L1Data\\ForgottenHouse.DUN", 40, 34);
+    LoadPalette("Levels\\L1Data\\zContrastique.pal");
+    AddMonsterTypeToDungeon(BM_29_HIDDEN, MPF_2_DONT);
+    for( int i = 0; i < 4; ++i ) AddObject(BO_52_BOOK1, MemoryObjectRows[i], MemoryObjectCols[i]);
+    AddObject(BO_9_CANDLE2, 37, 39);
+    AddObject(BO_9_CANDLE2, 51, 39);
+    AddObject(BO_9_CANDLE2, 43, 51);
+    AddWarp(40, 33, WM_1028_RETURN_FROM_QUEST_DUNGEON, DUN_0_TOWN);
+    MemoryCombatTicks = 0;
+    SpawnMemoryGuardian();
+}
+void MemoryUpdateGuardian()
+{
+    if( Dungeon != DUN_115_FORGOTTEN_HOUSE || !MemoryAvailable() || MemoryState() != 2 ) return;
+    const int index = FindMemoryGuardian();
+    if( index < 0 ) return;
+    Monster& monster = Monsters[index];
+    monster.Name = "A Quarta Batida"; // Name is a runtime pointer, rebuilt after LoadLevel.
+    const Player& player = Players[CurrentPlayerIndex];
+    // The reflection makes the hidden creature visible. The bowl quenches its fourth beat.
+    if( abs(player.Row - 36) <= 3 && abs(player.Col - 38) <= 3 ) monster.flag &= ~MF_1_INVISIBLE;
+    if( CurrentDialogIndex != PD_0_None || player.CurLife <= 0 ) return;
+    const int beat = ++MemoryCombatTicks % 80;
+    if( beat == 20 ){
+        MemoryAimRow = player.Row; MemoryAimCol = player.Col;
+        PlayGlobalSound(S_76_I_TITLSLCT);
+    }else if( beat == 40 ) PlayGlobalSound(S_76_I_TITLSLCT);
+    else if( beat == 60 ){
+        PlayGlobalSound(S_76_I_TITLSLCT);
+        ErrorPlrMsg("Tres batidas. A quarta procura onde voce estava.");
+    }else if( beat == 0 && !(abs(player.Row - 50) <= 3 && abs(player.Col - 38) <= 3) ){
+        const int missile = CastMissile(monster.Row, monster.Col, MemoryAimRow, MemoryAimCol,
+            monster.Orientation, MI_1_FIREBOLT, CT_1_MONSTER_AND_TRAP, index, 8 + Difficulty * 4, 0, 0);
+        if( missile >= 0 ) Missiles[missile].Damage = (8 + Difficulty * 4) * 64;
+    }
+}
+void MemoryGuardianKilled(int monsterIndex)
+{
+    if( Dungeon != DUN_115_FORGOTTEN_HOUSE || !MemoryAvailable() || MemoryState() != 2 ) return;
+    const Monster& monster = Monsters[monsterIndex];
+    if( !monster.SpritePtr || monster.SpritePtr->baseMonsterIndex != BM_29_HIDDEN ) return;
+    AdditionalStateData.unused[MEMORY_STATE] = 3;
+    ErrorPlrMsg("A quarta batida cessou. Leia o nome no centro da casa.");
+}
+bool MemoryCaretakerRescued()
+{
+    return MemoryAvailable() && MemoryState() == 4 && AdditionalStateData.unused[MEMORY_RESCUED] == 1;
+}
+const char* MemoryObjectLabel(int objectIndex)
+{
+    if( Dungeon != DUN_115_FORGOTTEN_HOUSE || objectIndex < 0 || objectIndex >= MaxObjects_127 ) return nullptr;
+    const Object& object = Objects[objectIndex];
+    if( object.BaseObjectIndex != BO_52_BOOK1 ) return nullptr;
+    static const char* names[4] = { "Lembranca do Espelho", "Lembranca da Tigela", "Lembranca da Cadeira", "Nome sob as Cinzas" };
+    for( int i = 0; i < 4; ++i )
+        if( object.Row == MemoryObjectRows[i] && object.Col == MemoryObjectCols[i] ) return names[i];
+    return nullptr;
+}
+bool MemoryOperateObject(int playerIndex, int objectIndex)
+{
+    if( Dungeon != DUN_115_FORGOTTEN_HOUSE || !MemoryAvailable() ) return false;
+    if( objectIndex < 0 || objectIndex >= MaxObjects_127 ) return false;
+    const Object& object = Objects[objectIndex];
+    if( object.BaseObjectIndex != BO_52_BOOK1 ) return false;
+    for( int i = 0; i < 4; ++i ){
+        if( object.Row != MemoryObjectRows[i] || object.Col != MemoryObjectCols[i] ) continue;
+        if( playerIndex == CurrentPlayerIndex ){
+            MemorySpeaker = 4 + i;
+            MemoryCaller = PD_0_None;
+            ChangeTownerDialog(PD_31_ForgottenHouse);
+        }
+        return true;
+    }
+    return false;
 }
 static void MemoryTopic(PLAYER_DIALOG caller)
 {
@@ -162,9 +271,10 @@ void ForgottenHouseMenu()
             "Alguem nao queria esconder um corpo.",
             "Queria esconder uma pessoa de quem a procurava.",
             "Voce ouviu a cancao. Agora ela pode ouvir voce.",
-            "A historia continua sob a catedral." };
+            "Siga a cancao. A casa devolvera o caminho." };
         MemoryLines(lines);
-        SetDialogRow(PT_DialogRows_NoIndent, 14, true, "Rever minhas anotacoes", C_1_Blue, true);
+        if( state < 4 ) SetDialogRow(PT_DialogRows_NoIndent, 14, true, "Rever minhas anotacoes", C_1_Blue, true);
+        if( state >= 2 && state < 4 ) SetDialogRow(PT_DialogRows_NoIndent, 16, true, "Seguir a cancao ate a casa", C_2_Red, true);
     }
     if( MemorySpeaker == 1 ){
         const char* lines[7] = {
@@ -197,18 +307,76 @@ void ForgottenHouseMenu()
             "Nao cante o resto. Nem se voce lembrar." };
         MemoryLines(lines);
     }
-    if( MemorySpeaker > 0 )
+    if( MemorySpeaker > 0 && MemorySpeaker <= 3 )
         SetDialogRow(PT_DialogRows_NoIndent, 14, true, "Guardar este relato", C_1_Blue, true);
+    if( MemorySpeaker >= 4 && MemorySpeaker <= 6 ){
+        const char* texts[3][7] = {
+            { "O espelho conserva o reflexo de uma mulher.", "Seu rosto muda. Sua sombra, nao.",
+              "Ela diz: Nao sou quem aquela coisa recorda.", "A moldura guarda uma frase, escrita ao contrario:",
+              "Fique junto de mim quando ela desaparecer.", "O reflexo revela o que a casa tenta esconder.", "A lembranca espera sua resposta." },
+            { "Ha uma tigela rachada sobre uma mesa ausente.", "A agua esta morna. Nao ha fogo nesta sala.",
+              "Uma voz pergunta se os animais ja comeram.", "Voce lembra da quarta batida descrita por Farnham.",
+              "A agua apaga a chama antes que ela encontre voce.", "Fique junto da tigela quando a cancao terminar.", "A lembranca espera sua resposta." },
+            { "Uma cadeira vazia canta com a voz de Farnham.", "Tres batidas para entrar. Uma para ficar.",
+              "A primeira memoriza onde voce esta.", "A quarta ataca essa lembranca, nao seus passos.",
+              "Mude de lugar depois de ouvir a primeira.", "Reunir as tres lembrancas acordara a entidade.", "A mulher ainda espera debaixo de seu nome." }
+        };
+        MemoryLines(texts[MemorySpeaker-4]);
+        if( state == 2 ) SetDialogRow(PT_DialogRows_NoIndent, 14, true, "Devolver esta lembranca a casa", C_1_Blue, true);
+    }else if( MemorySpeaker == 7 ){
+        if( state == 3 ){
+            const char* lines[7] = {
+                "O nome surge nas cinzas: MAERA.", "Nao era uma crianca. Era sua primeira lembranca.",
+                "Ela cuidava dos animais que Tristram abandonava.", "Apagou seu nome para esconder deles a entidade.",
+                "Adria quer guardar a lembranca que a denunciaria.", "Maera pede: Deixe ao menos minha vida ser minha.",
+                "Voce decide o que Tristram podera recordar." };
+            MemoryLines(lines);
+            SetDialogRow(PT_DialogRows_NoIndent, 12, true, "Devolver o nome a Maera", C_1_Blue, true);
+            SetDialogRow(PT_DialogRows_NoIndent, 14, true, "Apagar o nome, preservar sua vida", C_0_White, true);
+            SetDialogRow(PT_DialogRows_NoIndent, 16, true, "Entregar a lembranca a Adria", C_2_Red, true);
+        }else{
+            const char* lines[7] = { "A cadeira ja nao canta.", "O nome permanece nas cinzas.",
+                state == 4 ? "Maera deixou a casa e voltou a Tristram." : "Uma sombra protege o nome. A entidade ainda vive.",
+                "A tigela tem agua suficiente para dois animais.", "A porta de saida continua aberta.", "", "" };
+            MemoryLines(lines);
+        }
+    }
+    if( MemorySpeaker == 0 && state == 4 ){
+        const char* lines[7] = { "Adria: Ela voltou. Isso deveria bastar.",
+            AdditionalStateData.unused[MEMORY_ENDING] == 3 ? "E o que ela esqueceu esta em boas maos." : "Ha nomes que seria mais prudente esquecer.",
+            "Voce: Maera vai escolher o que contar.", "Adria: Naturalmente.",
+            "Uma tigela vazia esta junto da porta da cabana.", "Adria percebe seu olhar e a vira de boca para baixo.", "" };
+        MemoryLines(lines);
+    }
     SetDialogRow(PT_DialogRows_NoIndent, 18, true, "Voltar", C_0_White, true);
     DialogRowsCount = PT_DialogRows_20_SmallDialog_RowsCount;
 }
 static void HandleForgottenHouse()
 {
+    if( MemorySpeaker == 0 && MemoryState() >= 2 && MemoryState() < 4 && SelectedDialogRow == 16 ){
+        CurrentDialogIndex = PD_0_None;
+        StartNewLvl(CurrentPlayerIndex, WM_1029_GOTO_QUEST_DUNGEON, DUN_115_FORGOTTEN_HOUSE);
+        return;
+    }
+    if( MemorySpeaker >= 4 && MemorySpeaker <= 6 && MemoryState() == 2 && SelectedDialogRow == 14 ){
+        AdditionalStateData.unused[MEMORY_CLUES] |= (char)(1 << (MemorySpeaker-4));
+        CurrentDialogIndex = PD_0_None;
+        SpawnMemoryGuardian();
+        return;
+    }
+    if( MemorySpeaker == 7 && MemoryState() == 3 && (SelectedDialogRow == 12 || SelectedDialogRow == 14 || SelectedDialogRow == 16) ){
+        AdditionalStateData.unused[MEMORY_ENDING] = (char)((SelectedDialogRow-12)/2+1);
+        AdditionalStateData.unused[MEMORY_RESCUED] = 1;
+        AdditionalStateData.unused[MEMORY_STATE] = 4;
+        CurrentDialogIndex = PD_0_None;
+        ErrorPlrMsg("Maera esta livre. Encontre-a perto de Gillian em Tristram.");
+        return;
+    }
     if( SelectedDialogRow == 18 ){
         ChangeTownerDialog(MemoryCaller);
         return;
     }
-    if( MemorySpeaker > 0 && SelectedDialogRow == 14 ){
+    if( MemorySpeaker > 0 && MemorySpeaker <= 3 && SelectedDialogRow == 14 ){
         if( MemoryState() == 1 )
             AdditionalStateData.unused[MEMORY_TESTIMONIES] |= (char)(1 << (MemorySpeaker - 1));
         ChangeTownerDialog(MemoryCaller);
@@ -220,15 +388,15 @@ static void HandleForgottenHouse()
         AdditionalStateData.unused[MEMORY_RESPONSE] = SelectedDialogRow == 16 ? 2 : 1;
         AdditionalStateData.unused[MEMORY_STATE] = 2;
         ChangeTownerDialog(PD_31_ForgottenHouse);
-    }else if( MemorySpeaker == 0 && MemoryState() == 2 && SelectedDialogRow == 14 ){
+    }else if( MemorySpeaker == 0 && MemoryState() >= 2 && MemoryState() < 4 && SelectedDialogRow == 14 ){
         const char* lines[7] = {
             "Cain: tres mortes; nome raspado; uma tigela.",
             "Gillian: uma crianca; uma cadeira; comida morna.",
             "Farnham: uma voz; quatro batidas; Adria sabia.",
             "Todos lembram da casa. Nenhum lembra do nome.",
             "Adria diz que o esquecimento era uma protecao.",
-            "As anotacoes terminam aqui.",
-            "Ainda nao ha um caminho seguro ate a casa." };
+            "O espelho, a tigela e a cadeira podem devolver o nome.",
+            "Adria oferece um caminho pela cancao." };
         ClearRowsInInterval(5, 17);
         MemoryLines(lines);
         SelectedDialogRow = 18;
@@ -2782,6 +2950,71 @@ void ColiseumDifficultyMenu()
     DialogRowsCount = PT_DialogRows_20_SmallDialog_RowsCount;
 }
 
+void MaeraMenu()
+{
+    IsBigMenuBox = true;
+    DialogHasScroolBox = false;
+    SetDialogRow(PT_DialogRows_NoIndent, 2, true, "MAERA, GUARDADORA DE NOMES", C_3_Gold, false);
+    const unsigned char ending = (unsigned char)AdditionalStateData.unused[MEMORY_ENDING];
+    const char* lines[7] = {
+        ending == 1 ? "Gillian me chamou pelo nome hoje. Eu chorei." : ending == 2 ? "Ninguem lembra de mim. Posso comecar outra vez." : "Adria guarda meu passado. Meu futuro e meu.",
+        "Os animais nao precisaram que voce me apresentasse.",
+        "Eles lembram pelo cheiro, pelo cuidado, pela espera.",
+        "Posso ajudar voce a criar esse vinculo.",
+        "Preparei um petisco para cada etapa de crescimento.",
+        "Uma porcao por nivel de cada companheiro.",
+        "E nao deixe que chamem seu amigo apenas de arma." };
+    MemoryLines(lines);
+    SetDialogRow(PT_DialogRows_NoIndent, 12, true, "Cuidar dos companheiros", C_1_Blue, true);
+    const unsigned char active = ActiveCompanion();
+    if( active != COMPANION_NONE ){
+        char label[128];
+        sprintf_s(label, "Petisco de %s: %d ouro", CompanionName(active), CompanionLevel(active)*300);
+        SetDialogRow(PT_DialogRows_NoIndent, 14, true, label, C_0_White, true);
+    }
+    SetDialogRow(PT_DialogRows_NoIndent, 18, true, "Voltar", C_0_White, true);
+    DialogRowsCount = PT_DialogRows_20_SmallDialog_RowsCount;
+}
+void MemoryCaretakerOpen()
+{
+    if( MemoryCaretakerRescued() ) ChangeTownerDialog(PD_32_Maera);
+}
+static void HandleMaera()
+{
+    if( !MemoryCaretakerRescued() || SelectedDialogRow == 18 ){
+        CurrentDialogIndex = PD_0_None;
+        return;
+    }
+    if( SelectedDialogRow == 12 ){
+        CompanionOpenPanel();
+        return;
+    }
+    const unsigned char active = ActiveCompanion();
+    if( SelectedDialogRow != 14 || active == COMPANION_NONE ) return;
+    const int level = CompanionLevel(active);
+    // Six bytes, one last-served level per companion. Reward cannot be farmed by reopening.
+    char& servedLevel = AdditionalStateData.unused[96 + active - 1];
+    if( (unsigned char)servedLevel >= level ){
+        ErrorPlrMsg("Maera: ja preparei o petisco desta etapa. Volte quando seu amigo crescer.");
+        return;
+    }
+    if( CompanionAffinity(active) >= 100 ){
+        ErrorPlrMsg("Maera: seu amigo ja confia plenamente em voce.");
+        return;
+    }
+    const int price = level*300;
+    if( Players[CurrentPlayerIndex].TotalGold < price ){
+        ErrorPlrMsg("Maera: faltam moedas para os ingredientes.");
+        return;
+    }
+    ClearGoldByInventoryAsPrice(price);
+    AddCompanionAffinity(active, 5);
+    servedLevel = (char)level;
+    RecalcPlayer(CurrentPlayerIndex, true);
+    ErrorPlrMsg("Maera preparou a comida favorita. Afinidade aumentada em 5.");
+    ChangeTownerDialog(PD_32_Maera);
+}
+
 int DialogBackIndex = -1;
 //----- (0046F23E) --------------------------------------------------------
 void __fastcall ChangeTownerDialog(PLAYER_DIALOG dialogIndex)
@@ -2831,6 +3064,7 @@ void __fastcall ChangeTownerDialog(PLAYER_DIALOG dialogIndex)
 	case PD_29_ColiseumDiff            : ColiseumDifficultyMenu();                       break;
 	case PD_30_Companions              : CompanionMenu();                                break;
 	case PD_31_ForgottenHouse           : ForgottenHouseMenu();                            break;
+	case PD_32_Maera                    : MaeraMenu();                                     break;
     }
 
     int selectedDialogRow;
@@ -2915,6 +3149,9 @@ void PrevTownerDialog()
         case PD_22_FarnhamMain:
 			CurrentDialogIndex = PD_0_None;
 			break;
+		case PD_32_Maera:
+            CurrentDialogIndex = PD_0_None;
+            break;
 		case PD_31_ForgottenHouse:
             ChangeTownerDialog(MemoryCaller);
             break;
@@ -4369,6 +4606,7 @@ void HandleTownersMenu()
     if( OpenMemoryTopic() ) return;
     switch( CurrentDialogIndex ) {
         case PD_31_ForgottenHouse: HandleForgottenHouse(); return;
+        case PD_32_Maera: HandleMaera(); return;
         //Griswold the Blacksmith
         case PD_1_BlacksmithMain:		HandleGriswoldMainMenu();				return;
         case PD_2_BasicalItems:			HandleBasicalItemBuy();					return;

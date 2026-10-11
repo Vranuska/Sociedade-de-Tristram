@@ -1399,6 +1399,10 @@ void __fastcall AddDungeonQuestPatternToWallMap( int startRow, int startCol ) //
 //----- (0046031F) --------------------------------------------------------
 void SetReturnDungeonPos(DUNGEON dungeon) // TODO: fix double call on change level (then in LoadGameLevel)
 {
+	if( dungeon == DUN_115_FORGOTTEN_HOUSE ){
+		Dungeon.returnRow = 55; Dungeon.returnCol = 45; Dungeon.returnLvl = DUN_0_TOWN;
+		return;
+	}
 	QUEST quest = Q_NO;
 	int row = 0, col = 0;
 

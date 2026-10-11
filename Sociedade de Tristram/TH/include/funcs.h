@@ -2536,3 +2536,12 @@ char* SaveFileStash();
 int PlayerMaxLevel();
 i64 LevelUp(uint charLevel);
 int SpellLevelBookMax();
+
+// Sociedade: Forgotten House and the rescued caretaker.
+void MemoryGenerateHouse();
+bool MemoryOperateObject(int playerIndex, int objectIndex);
+void MemoryGuardianKilled(int monsterIndex);
+void MemoryUpdateGuardian();
+bool MemoryCaretakerRescued();
+void MemoryCaretakerOpen();
+const char* MemoryObjectLabel(int objectIndex);

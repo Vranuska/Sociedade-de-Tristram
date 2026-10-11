@@ -3350,6 +3350,7 @@ void __fastcall ActivateAnvil(int playerIndex, int objectIndex)
 //----- (004504B2) --------------------------------------------------------
 void __fastcall OperateObject(int playerIndex, int objectIndex, int telekines)
 {
+	if( MemoryOperateObject(playerIndex, objectIndex) ) return;
 	int isCurrentPlayer = playerIndex == CurrentPlayerIndex;
 	int baseObjectIndex = Objects[objectIndex].BaseObjectIndex;
 	bool ActivatedIronmanObject = IsIronmanObject(Objects[objectIndex]);
@@ -6357,6 +6358,10 @@ void __fastcall WithDoors_3(int objectIndex)
 //----- (0045460B) --------------------------------------------------------
 void __fastcall IdentifyObjectOnMapInFocus(int objectIndex)
 {
+	if( const char* label = MemoryObjectLabel(objectIndex) ){
+		strcpy(InfoPanelHeader, label);
+		return;
+	}
 	int baseObjectIndex = Objects[objectIndex].BaseObjectIndex;
 	Object& objectOnMap = Objects[objectIndex];
 	switch (baseObjectIndex ){

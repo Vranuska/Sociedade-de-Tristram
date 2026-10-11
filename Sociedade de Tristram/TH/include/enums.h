@@ -5137,6 +5137,7 @@ enum DUNGEON: char
 	DUN_112_STILL_SPRINGS		   = 112,
 	DUN_113_THE_MAZE			   = 113,
 	DUN_114_LOWER_SCRIPTORIUM	   = 114,
+	DUN_115_FORGOTTEN_HOUSE = 115,
 	DungeonCount
 };
 static_assert( DungeonCount <= 127, "DUNGEON enum size needs expansion");
@@ -5432,7 +5433,8 @@ enum TOWNER_IDENTIFICATOR
 	TI_12_NUT =  12,
 	TI_13_TREMAIN =  13,
 	TI_14_COLISEUM = 14,
-	TI_15_COUNT =  15,
+	TI_15_MAERA = 15,
+	TI_15_COUNT = 16,
 };
 
 enum PLAYER_CLASS : char
@@ -7541,6 +7543,7 @@ enum PLAYER_DIALOG
 	PD_29_ColiseumDiff = 29,
 	PD_30_Companions = 30,
 	PD_31_ForgottenHouse = 31,
+	PD_32_Maera = 32,
 	PD_Count,
 };
 

@@ -2958,6 +2958,7 @@ void Open_the_Gates_Blood_Hive()
 void LoadSetMap()
 {
 	switch( (DUNGEON)Dungeon ){ // TODO: may be add dungeon generation funcs to Dungeons[]
+	case DUN_115_FORGOTTEN_HOUSE: MemoryGenerateHouse(); break;
 	case DUN_25_KING_LEORICS_TOMB      : GenerateQuestFloor_25_KingLeoricsTomb();			break;
 	case DUN_26_BONE_CHAMBER           : GenerateQuestFloor_26_BoneChamber();				break;
 	case DUN_27_THE_INFESTED_CELLAR    : GenerateQuestFloor_27_TheInfestedCellar();			break;

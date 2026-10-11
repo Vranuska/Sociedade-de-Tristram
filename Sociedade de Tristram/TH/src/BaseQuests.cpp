@@ -160,7 +160,8 @@ BaseDungeon Dungeons[DungeonCount] = {
 	{ DUN_111_CHURCH_SACRISTY,		   DT_1_CHURCH,	  DT_1_CHURCH,	  1, 1, "Church Sacristy"		   , "the Church Sacristy"		, 0 },
 	{ DUN_112_STILL_SPRINGS,		   DT_3_CAVE,	  DT_3_CAVE,	 12, 1, "Still Springs"			   , "the Still Springs"		, 0 },
 	{ DUN_113_THE_MAZE,				   DT_4_HELL,	  DT_4_HELL,	 14, 1, "Maze"					   , "the Maze"					, 0 },
-	{ DUN_114_LOWER_SCRIPTORIUM,	   DT_1_CHURCH,	  DT_1_CHURCH,	  4, 1, "Lower Scriptorium"		   , "the Lower Scriptorium"	, 0 }
+	{ DUN_114_LOWER_SCRIPTORIUM,	   DT_1_CHURCH,	  DT_1_CHURCH,	  4, 1, "Lower Scriptorium"		   , "the Lower Scriptorium"	, 0 },
+	{ DUN_115_FORGOTTEN_HOUSE, DT_1_CHURCH, DT_1_CHURCH, 4, 1, "A Casa Esquecida", "A Casa Esquecida", 0 }
 
 };
 

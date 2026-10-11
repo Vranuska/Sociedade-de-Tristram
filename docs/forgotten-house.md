@@ -1,39 +1,49 @@
 # A casa que Tristram esqueceu
 
-História original da Sociedade de Tristram. Não é conteúdo atribuído ao Patreon/TH4.
+História original da Sociedade de Tristram; não atribuída ao Patreon/TH4.
 
-## Estado da implementação
+## Primeira versão jogável
 
-Capítulo I implementado: conversa da Adria, depoimentos de Cain/Gillian/Farnham, duas respostas à Adria, anotações consultáveis e progresso por personagem. Conteúdo inicialmente exclusivo do modo solo, fora do Coliseu. Sem alteração de quests originais ou serviços dos NPCs.
+Adria abre a investigação. Cain, Gillian e Farnham guardam relatos incompatíveis, que o jogador registra em qualquer ordem. Depois dos três relatos, duas respostas à Adria ficam salvas. A opção **Seguir a canção até a casa** abre uma instância própria, sem mudar as quests originais.
 
-A casa, pistas físicas, encontro final, recompensas e NPC permanente ainda não estão implementados. O estado 2 é o fim do capítulo I, não conclusão da quest nem resgate.
+Na casa, três lembranças ensinam o confronto: o espelho revela a criatura oculta, a tigela impede seu ataque periódico quando o jogador está próximo e a cadeira explica as quatro batidas. A primeira registra a posição do jogador; a quarta lança uma chama naquela direção. Reunir as três lembranças acorda **A Quarta Batida**, uma criatura com três vezes a vida de sua base. Seu comportamento original também permanece ativo.
 
-## Direção narrativa
+Depois do combate, o nome no centro da sala oferece três decisões: devolver o nome a Maera, apagar o nome preservando sua vida, ou entregar a lembrança à Adria. Todas libertam Maera nesta primeira versão. A escolha fica salva e altera os diálogos; consequências e recompensas distintas ainda são expansão futura.
 
-Alguém protegeu uma pessoa de uma entidade apagando sua existência da memória de Tristram. Investigar devolve lembranças, mas também torna essa pessoa localizável. Adria precisa de um intermediário porque a entidade reconheceria sua presença. A intenção dela permanece ambígua e deve ser demonstrada por contradições concretas, não explicada inteiramente num monólogo.
+Maera aparece permanentemente perto de Gillian **somente após o resgate**. Seu menu independente oferece acesso ao painel dos companheiros e petiscos: +5 de afinidade por 300 ouro multiplicado pelo nível do companheiro. Uma porção por nível de cada companheiro; sem cobrança quando já servido, afinidade máxima ou ouro insuficiente. A recompensa inicial da quest é esse serviço.
 
-O jogador não precisa escolher em quem acreditar antes de ouvir todos. O registro de Cain, a tigela de Gillian e a canção de Farnham são três manifestações do mesmo evento. A resposta à Adria fica registrada para influenciar diálogos futuros; não encerra caminhos de conteúdo.
+Disponível no solo, fora de Coliseu, Ironman, Survival, Speedrun e Nightmare. Esses modos ficam excluídos para não abrir retorno à cidade que contorne suas regras.
 
-## Próximos capítulos
+## Visual provisório e expansão
 
-1. Entrada própria para a casa, pistas físicas e mudanças no ambiente. Evitar alterar a geometria original de Tristram antes de validar carregamento, colisões e persistência.
-2. Objetos recuperados alteram as lembranças dos moradores. A cadeira e a tigela associam a sobrevivente aos animais desaparecidos, preparando sua futura função sem um anúncio de serviços.
-3. Encontro próprio: canção anuncia ataque, espelho revela posição e cadeira indica alvo. Investigar ensina o combate. Não reutilizar uma morte normal de boss como se fosse o confronto da história.
-4. Decisão entre apagar o nome, devolvê-lo ou entregar a lembrança à Adria. Consequências narrativas e recompensas distintas, sem rótulos de moralidade ou lista antecipada de prêmios.
-5. Devolver o nome resgata diretamente a cuidadora. Outras decisões podem levar a um resgate posterior com consequências. A NPC só é colocada permanentemente na cidade após o resgate efetivo.
+A sala usa a arte de igreja existente. As lembranças usam livros como suportes visuais, com nomes e textos próprios; não há sprites dedicados de espelho/tigela/cadeira. Maera usa provisoriamente a arte da Gillian, com alocação própria. Novas missões de companheiros, treinamento de habilidades, receitas como itens e consequências maiores das escolhas ainda não foram implementados.
 
-## NPC após o resgate
+A narrativa preserva a ambiguidade da Adria: ela conhece a canção, pede um intermediário e quer guardar a memória que poderia denunciá-la. A mulher apagou sua identidade para proteger os animais que acolhia. O jogador decide o que a cidade pode recordar, sem rótulos de moralidade.
 
-Cuidadora adulta, nome próprio ainda a definir. Mora num ponto validado da cidade. Deve aparecer após recarregar o personagem e em novas partidas, usando o estado individual de resgate. Retrato/sprite dedicado é desejável; uma arte existente pode servir como provisória, claramente identificada na entrega.
+## Persistência
 
-Funções planejadas: missões de treinamento que liberam habilidades individuais dos companheiros; receitas de comidas favoritas; histórias de novos resgates. Serviços devem ter implementação real antes de aparecerem como opções disponíveis.
+`AdditionalSaveInfo.unused`, já existente no save:
 
-Limite técnico atual: Towners[16], FreeTowners percorre 16 e algumas tabelas de fofoca usam IDs existentes. Não aumentar esse limite nem inserir um ID em tabelas antigas sem auditar todos os consumidores. NPC nova precisa de diálogo independente e slot disponível, ou expansão consistente de toda a estrutura.
+| Bytes | Conteúdo |
+|---|---|
+| 80 | Estado: 0 não iniciada; 1 relatos; 2 casa/confronto; 3 entidade derrotada; 4 resgate concluído |
+| 81 | Depoimentos: Cain 1, Gillian 2, Farnham 4 |
+| 82 | Resposta à Adria: 1 contradição; 2 acusação |
+| 83 | Lembranças: espelho 1, tigela 2, cadeira 4 |
+| 84 | Resgate de Maera |
+| 85 | Decisão final, 1..3 |
+| 96..101 | Último nível alimentado de cada um dos seis companheiros |
 
-## Persistência e validação
+Nenhuma estrutura de save foi aumentada. O dungeon novo usa ID 115, dentro do limite reservado de 128. Não houve renumeração dos mapas anteriores. Towners foi ampliado consistentemente para 17 slots e o identificador novo usa diálogo independente, sem consultar tabelas antigas de fofocas.
 
-AdditionalSaveInfo.unused: byte 80 = estado (0 não iniciado, 1 investigação, 2 capítulo I concluído); 81 = máscara dos depoimentos (Cain 1, Gillian 2, Farnham 4); 82 = resposta à Adria (1 contradição, 2 acusação). Bytes 0..65 pertencem aos sistemas anteriores. Nenhum formato de save foi aumentado.
+## Validação
 
-Teste isolado executado com as funções reais: aceitar/adiar; ouvir relatos sem registrar; registrar em sequência; exigir três relatos para avançar; salvar resposta; consultar anotações; impedir início no multiplayer; preservar bytes anteriores. Compilação MSVC e apresentação visual precisam ser verificadas no Windows.
+Teste isolado das funções reais em C++ com interfaces simuladas: transições da investigação, ordem dos relatos, restrições de modo, pistas, proteção contra guardião duplicado, quatro batidas, proteção da tigela, revelação pelo espelho, três finais e cobrança limitada dos petiscos. Não substitui o MSVC nem execução do jogo.
 
-Para testar no jogo: Adria → A casa esquecida → aceitar; procurar o novo assunto em Cain, Gillian e Farnham; registrar cada relato; voltar à Adria; escolher uma resposta; fechar/reabrir e salvar/carregar para conferir persistência. Os serviços existentes devem continuar acessíveis.
+Asset DUN conferido: dimensões, tamanho das quatro camadas finas, conectividade do piso e posições de entrada, saída, pistas, luzes e guardião. O gerador reproduzível está em `tools/generate_forgotten_house.py`.
+
+Pendente no Windows: compilar e testar colisões/renderização, combate, retorno à cidade, save/load durante cada etapa e reaparecimento de Maera em outra partida. A inicialização dos NPCs não é sobrescrita pelo carregamento do mapa salvo da cidade, que não restaura MonsterMap nesse caso.
+
+## Roteiro de teste manual
+
+Adria → aceitar → registrar os três relatos → Adria → responder → seguir canção. Ler e devolver as três lembranças, combater, ler o nome central e escolher. Voltar pela saída e falar com Maera perto de Gillian. Salvar/carregar e conferir que ela permanece. Alimentar um companheiro duas vezes no mesmo nível: apenas a primeira deve cobrar e dar afinidade. Após subir um nível, uma nova porção deve ser permitida.

@@ -5390,6 +5390,7 @@ void GameLogic()
 			DamageMonstersByAuras(); // There is a little bit righter place for this, so you need to modify FPS dependency in this, it calls 20 times per second
 			if( Dungeon->genType || Dungeon->isQuest /*&& QuestFloorIndex == QF_20_RAVENHOLM*/ ){ // not town
 				ProcessMonsters();
+				MemoryUpdateGuardian();
 				CompanionProcessAbilities();
 				ProcessObjects();
 				ProcessMissiles();

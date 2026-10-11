@@ -97,7 +97,7 @@ int CowClickCount;	// 006FF1EC
 int SomeBoolFlag_41;	// 006FF1F0
 int WirtIsPlacedOnMap;	// 006FF1F4
 char* CowSprite;	// 006FF1F8
-Towner Towners[16];	// 006FF200
+Towner Towners[17];	// 006FF200
 Sign Signes[] = { // 00B01110 signes patch (1) did
 	{ 1, 1, 0, 0, 32, 12, 0, 0, 1, 0, "here lies the programmer\nburied under the code\nfragments of this game\nrest in peace, desert dragon", 0, 0 },
 	{ 1, 1, 0, 0, 36, 8, 0, 0, 1, 0, "here lies mordor\nan outsider in life\n...and in afterlife", 0, 0 },
@@ -1022,9 +1022,40 @@ void LoadColiseumGirl()
 }
 
 //----- (004764F7) --------------------------------------------------------
+static void LoadMaera()
+{
+    if( !MemoryCaretakerRescued() || TownersCount >= (int)countof(Towners) ) return;
+    int row = -1, col = -1;
+    for( int distance = 0; distance <= 4 && row < 0; ++distance ){
+        for( int dr = -distance; dr <= distance && row < 0; ++dr ){
+            for( int dc = -distance; dc <= distance; ++dc ){
+                const int r = 52 + dr, c = 45 + dc;
+                if( IsCellBlocking(r, c) || MonsterMap[r][c] || ObjectsMap[r][c] || PlayerMap[r][c] ) continue;
+                if( abs(r-55) <= 1 && abs(c-45) <= 1 ) continue; // Keep the quest return area clear.
+                bool nearWarp = false;
+                for( auto& warp: Warps )
+                    if( abs(warp.Row-r) <= 2 && abs(warp.Col-c) <= 2 ) nearWarp = true;
+                if( nearWarp ) continue;
+                row = r; col = c; break;
+            }
+        }
+    }
+    if( row < 0 ) return;
+    Towner& towner = Towners[TownersCount];
+    InitTownerStruct(TownersCount, 96, 1, TI_15_MAERA, row, col, -1, 10);
+    // Temporary town-woman sprite; own allocation so FreeTowners never frees a shared pointer twice.
+    towner.spritePtr = (char*)LoadFile("Towners\\TownWmn1\\WmnN.CEL");
+    for( int d = 0; d < 8; ++d ) towner.animationFrameArray[d] = towner.spritePtr;
+    towner.animationFrameCount = 18;
+    InitTownerAnimation(TownersCount, towner.animationFrameArray[0], 18, 6);
+    strcpy(towner.Name, "Maera, Guardadora de Nomes");
+    ++TownersCount;
+}
+
 void InitTowners()
 {
 	TownersCount = 0;
+	for( int& speech: TownersSpeechAboutQuestArray[TI_15_MAERA] ) speech = SP_M1;
 	WirtIsPlacedOnMap = 0;
 	LoadGriswold();
 	LoadPepin();
@@ -1063,12 +1094,13 @@ void InitTowners()
 			LoadCelia();
 		}
 	}
+	LoadMaera();
 }
 
 //----- (0047657E) --------------------------------------------------------
 void FreeTowners()
 {
-	for( int townerIndex = 0; townerIndex < 16; ++townerIndex ){
+	for( int townerIndex = 0; townerIndex < (int)countof(Towners); ++townerIndex ){
 		Towner& towner = Towners[townerIndex];
 		if( towner.spritePtr && towner.spritePtr != CowSprite ){
 			FreeMem(towner.spritePtr);
@@ -1116,7 +1148,7 @@ void SlainTownsmanAction()
 //----- (00476754) --------------------------------------------------------
 void ProcessTowners()
 {
-	for( int townerIndex = 0; townerIndex < 16; ++townerIndex ){
+	for( int townerIndex = 0; townerIndex < (int)countof(Towners); ++townerIndex ){
 		Towner& towner = Towners[townerIndex];
 		//if( towner.TownerIdentificator <= 12 ){ // в оригинале нет этой проверки
 			switch( towner.TownerIdentificator ){
@@ -2694,10 +2726,11 @@ void __fastcall TalkToTowner(int playerIndex, int townerIndex)
 	if( Cur.GraphicsID >= CM_12_ITEMS_PICS_START && !DropCursorItemBeforeTrig() ){
 		return;
 	}
-	if (HasTrait(playerIndex, TraitId::Leper) && not(towner.TownerIdentificator, TI_7_GILLIAN, TI_9_COWS)) {
+	if (HasTrait(playerIndex, TraitId::Leper) && not(towner.TownerIdentificator, TI_7_GILLIAN, TI_9_COWS, TI_15_MAERA)) {
 		return;
 	}
 	switch (towner.TownerIdentificator) {
+	case TI_15_MAERA: MemoryCaretakerOpen(); return;
 	case TI_0_GRISWOLD:					GriswoldGreeting(playerIndex, townerIndex);	return;
 	case TI_1_PEPIN:					PepinGreeting(playerIndex, townerIndex);		return;
 	case TI_2_WOUNDED_GUY:				WoundedGuyGreeting(playerIndex, townerIndex);	return;
@@ -2719,6 +2752,7 @@ void __fastcall TalkToTowner(int playerIndex, int townerIndex)
 
 bool IsTownerHasActiveSpeech( int playerIndex, int townerIndex )
 {
+    if( Towners[townerIndex].TownerIdentificator == TI_15_MAERA ) return false;
     bool result = false;
     Towner& towner = Towners[townerIndex];
     
@@ -2728,7 +2762,7 @@ bool IsTownerHasActiveSpeech( int playerIndex, int townerIndex )
     }
     towner.IsTownerActionSelected = false;
     
-	if (HasTrait(playerIndex, TraitId::Leper) && not(towner.TownerIdentificator, TI_7_GILLIAN, TI_9_COWS)) {
+	if (HasTrait(playerIndex, TraitId::Leper) && not(towner.TownerIdentificator, TI_7_GILLIAN, TI_9_COWS, TI_15_MAERA)) {
 		return false;
 	}
 
