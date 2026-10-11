@@ -18,6 +18,7 @@ abilities = section('void CompanionProcessAbilities()', '//----- (0046C43D)')
 menu = section('static bool MaeraConvergenceEligible(', 'void MaeraMenu()')
 guide = section('static void BuildCompanionJourneyLines(', 'void CompanionMenu()')
 bond_target = section('static unsigned char MaeraBondTarget()\n', 'static bool MaeraBondCompanionPresent()')
+bowls = section('// Empty Bowls follow-up:', 'static unsigned char MaeraBondTarget();')
 prefix = r'''
 #include <cassert>
 #include <cstring>
@@ -25,15 +26,15 @@ prefix = r'''
 #include <algorithm>
 #include <cstdlib>
 #include <string>
-using i64=long long;
+using i64=long long; using PLAYER_DIALOG=int;
 enum {COMPANION_NONE,COMPANION_JASON,COMPANION_KUROKO,COMPANION_MIZUKI,COMPANION_THOR,COMPANION_LORD,COMPANION_PITTY,COMPANION_COUNT};
-const int MEMORY_CLUES=83,COMPANION_SAVE_GEMS=40,COMPANION_MAX_LEVEL=50,DUN_0_TOWN=0;
-const int PD_0_None=0,PD_32_Maera=32,PD_34_MaeraTraining=34,PD_35_MaeraConvergence=35;
+const int MEMORY_CLUES=83,COMPANION_SAVE_GEMS=40,COMPANION_MAX_LEVEL=50,DUN_0_TOWN=0,DUN_2_CHURCH_2=2,DUN_3_CHURCH_3=3,DUN_5_CATACOMB_1=5,COMPANION_SAVE_SUMMON_DISABLED=58;
+const int PD_30_Companions=30,PD_36_EmptyBowls=36,PD_0_None=0,PD_32_Maera=32,PD_34_MaeraTraining=34,PD_35_MaeraConvergence=35;
 const int PT_DialogRows_NoIndent=0,PT_DialogRows_20_SmallDialog_RowsCount=20,C_3_Gold=3,C_1_Blue=1,C_0_White=0;
 const int CT_0_PLAYER=0,MSF_COMPANION=16,MF_6_FRIENDLY=64,MF_15_KILLED=32768,CF_2_VISIBLE_BY_PLAYER=2;
 const int SummonMonsters_Count=16;
 struct {char unused[412]={};} AdditionalStateData;
-struct Player {int CharLevel=20,CurMana=100,BaseMana=100,MaxCurMana=100,MaxBaseMana=100,TotalGold=10000;} Players[4];
+struct Player {int Row=20,Col=20,CurLife=100,CharLevel=20,CurMana=100,BaseMana=100,MaxCurMana=100,MaxBaseMana=100,TotalGold=10000;} Players[4];
 struct Monster {int Row=20,Col=20,NextRow=20,NextCol=20,CurrentLife=100,flag=0;void* SpritePtr=(void*)1;} Monsters[200];
 struct Missile {int flag=0,Damage=0;} Missiles[200];
 int FlagMap[112][112]={},MonstersCount=1,MonsterIndexes[200]={20};
@@ -46,6 +47,8 @@ std::string error;bool selectable[32]={};
 static int CompanionLevel(unsigned char id){return levels[id];}
 static int CompanionEvolutionStage(unsigned char){return stage;}
 unsigned char ActiveCompanion(){return active;}
+void AddCompanionAffinity(unsigned char id,int n){affinities[id]=std::min(100,affinities[id]+n);}
+bool CompanionIsSummoned(){return active>0&&Monsters[0].SpritePtr&&Monsters[0].CurrentLife>0&&Dungeon!=0;}
 int CompanionAffinity(unsigned char id){return affinities[id];}
 const char* CompanionName(unsigned char){return "Jason";}
 bool MemoryCaretakerRescued(){return rescued;}
@@ -147,6 +150,30 @@ int main(){
   assert(Missiles[castCount-1].Damage==250*specialScales[id]*64*140/100);
  }
 
+ // Shelter routes: acceptance, proximity, out-of-order trails, town-only reward and repeat protection.
+ Dungeon=0;active=0;OpenShelterQuest(PD_32_Maera);SelectedDialogRow=14;HandleEmptyBowls();assert(ShelterState()==0);
+ active=1;OpenShelterQuest(PD_30_Companions);HandleEmptyBowls();assert(ShelterState()==0);
+ OpenShelterQuest(PD_32_Maera);HandleEmptyBowls();assert(ShelterState()==1&&MaeraFoodPrice(20)==6000);
+ Dungeon=4;OpenShelterQuest(PD_30_Companions);HandleEmptyBowls();assert(ShelterReadingTrail==-1);
+ Dungeon=2;Monsters[0].Row=30;HandleEmptyBowls();assert(ShelterReadingTrail==-1);
+ Monsters[0].Row=20;AdditionalStateData.unused[58]=1;HandleEmptyBowls();assert(ShelterReadingTrail==-1);AdditionalStateData.unused[58]=0;
+ for(int floor:{5,2,3}){
+  Dungeon=floor;OpenShelterQuest(PD_30_Companions);HandleEmptyBowls();assert(ShelterReadingTrail==ShelterFloorTrail());
+  const char mask=AdditionalStateData.unused[SHELTER_TRAILS];Dungeon=4;HandleEmptyBowls();assert(AdditionalStateData.unused[SHELTER_TRAILS]==mask);
+  Dungeon=floor;HandleEmptyBowls();assert(ShelterReadingTrail==-1);
+ }
+ assert(ShelterState()==2&&AdditionalStateData.unused[SHELTER_TRAILS]==7);
+ memset(selectable,0,sizeof(selectable));EmptyBowlsMenu();assert(!selectable[14]);HandleEmptyBowls();assert(ShelterState()==2);
+ Dungeon=0;OpenShelterQuest(PD_30_Companions);HandleEmptyBowls();assert(ShelterState()==2);
+ for(int choice:{14,16}){
+  AdditionalStateData.unused[SHELTER_STATE]=2;for(int id=1;id<7;id++)affinities[id]=id==6?98:50;
+  const int gold=Players[0].TotalGold;OpenShelterQuest(PD_32_Maera);SelectedDialogRow=choice;HandleEmptyBowls();
+  assert(ShelterState()==3&&AdditionalStateData.unused[SHELTER_CHOICE]==(choice==14?1:2)&&MaeraFoodPrice(20)==4500);
+  for(int id=1;id<7;id++)assert(affinities[id]==(id==6?100:55));
+  HandleEmptyBowls();for(int id=1;id<7;id++)assert(affinities[id]==(id==6?100:55));
+  assert(Players[0].TotalGold==gold);EmptyBowlsMenu();
+ }
+ SelectedDialogRow=14;
  // Guide reads all quest stages and memory combinations without changing saved data or gold.
  char lines[10][128],snapshot[412];const int goldBeforeGuide=Players[0].TotalGold;
  for(int state=0;state<=4;state++)for(unsigned char pet=0;pet<7;pet++)for(int mask=0;mask<8;mask++){
@@ -165,6 +192,6 @@ int main(){
 '''
 with tempfile.TemporaryDirectory() as tmp:
     cpp=Path(tmp)/'maera_echo_test.cpp';binary=Path(tmp)/'maera_echo_test'
-    cpp.write_text(prefix+learned+training+delay+missile+abilities+menu+bond_target+guide+tests)
+    cpp.write_text(prefix+learned+training+delay+missile+abilities+menu+bowls+bond_target+guide+tests)
     subprocess.run(['g++','-std=c++17','-Wall','-Wextra','-Werror','-Wno-unused-function',str(cpp),'-o',str(binary)],check=True)
     subprocess.run([str(binary)],check=True)

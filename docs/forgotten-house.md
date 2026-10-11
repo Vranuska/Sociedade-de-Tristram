@@ -103,3 +103,13 @@ Cain, Gillian e Farnham mantêm um assunto próprio sobre a casa depois da concl
 As cenas leem o final já salvo no byte 85. Não concedem recompensas, não alteram depoimentos e não repetem a investigação. O botão Guardar este relato aparece apenas durante a etapa original de investigação. Conversas podem ser revisitadas após salvar/carregar. O guia da jornada sugere visitar os moradores quando não há jornada de companheiro ativa.
 
 Validação: compilação isolada da tabela de diálogos com a assinatura real de MemoryLines, limites dos textos e revisão das condições de abertura; testes anteriores de ataques, treinamento e guia permanecem passando. Compilação MSVC e apresentação dentro do jogo ficam pendentes para esta etapa.
+
+## As tigelas vazias
+
+Após resgatar Maera, seu menu oferece uma investigação sobre as iscas deixadas na antiga rota do abrigo. Aceite na cidade com um companheiro selecionado. Pela Jornada, abra a missão na Igreja 2, Igreja 3 e Catacumbas 1, com um companheiro chamado e próximo, investigue e guarde cada rastro. A ordem é livre.
+
+Volte a Maera e escolha entre refazer a rota discretamente ou alimentar os animais na cidade. As duas respostas têm epílogos distintos e a mesma recompensa: +5 de afinidade, limitada a 100, para cada companheiro já resgatado, e desconto permanente de 25% nos petiscos vendidos por Maera (225 ouro por nível, antes 300). A recompensa só é entregue uma vez.
+
+Persistência: bytes reservados 122 (estado), 123 (máscara dos três rastros), 124 (decisão final). Não altera o formato do save. Esta primeira versão apresenta pistas por cenas de texto no painel; não adiciona objetos, sprites ou encontros físicos às masmorras.
+
+Validação isolada cobre aceitação, proximidade, companheiro dispensado, pisos incorretos, ordem livre, entrega apenas com Maera na cidade, ambas as decisões e bloqueio de recompensa repetida. Compilação Windows e teste no jogo ainda são necessários para esta atualização.

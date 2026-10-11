@@ -3025,6 +3025,140 @@ static const char* CompanionSpecialName(unsigned char id)
     return id < COMPANION_COUNT ? names[id] : names[0];
 }
 
+// Empty Bowls follow-up: no new items, objects or save layout are required.
+static constexpr int SHELTER_STATE = 122; // 0 not started, 1 investigating, 2 ready, 3 finished
+static constexpr int SHELTER_TRAILS = 123; // church 2, church 3, catacombs 1
+static constexpr int SHELTER_CHOICE = 124; // 1 secret route, 2 town shelter
+static PLAYER_DIALOG ShelterCaller = PD_32_Maera;
+static int ShelterReadingTrail = -1;
+static unsigned char ShelterState()
+{
+    return (unsigned char)AdditionalStateData.unused[SHELTER_STATE];
+}
+static int MaeraFoodPrice(int level)
+{
+    return level * (ShelterState() == 3 ? 225 : 300);
+}
+static int ShelterFloorTrail()
+{
+    if( Dungeon == DUN_2_CHURCH_2 ) return 0;
+    if( Dungeon == DUN_3_CHURCH_3 ) return 1;
+    if( Dungeon == DUN_5_CATACOMB_1 ) return 2;
+    return -1;
+}
+static bool ShelterCompanionPresent()
+{
+    if( !CompanionIsSummoned() || AdditionalStateData.unused[COMPANION_SAVE_SUMMON_DISABLED] ) return false;
+    const Monster& pet = Monsters[CompanionMonsterSlot(CurrentPlayerIndex)];
+    const Player& player = Players[CurrentPlayerIndex];
+    return player.CurLife > 0 && abs(pet.Row-player.Row) <= 5 && abs(pet.Col-player.Col) <= 5;
+}
+static void OpenShelterQuest(PLAYER_DIALOG caller)
+{
+    if( !MemoryCaretakerRescued() ) return;
+    ShelterCaller = caller;
+    ShelterReadingTrail = -1;
+    ChangeTownerDialog(PD_36_EmptyBowls);
+}
+void EmptyBowlsMenu()
+{
+    IsBigMenuBox = true;
+    DialogHasScroolBox = false;
+    SetDialogRow(PT_DialogRows_NoIndent, 2, true, "AS TIGELAS VAZIAS", C_3_Gold, false);
+    const unsigned char state = ShelterState();
+    const unsigned char trails = (unsigned char)AdditionalStateData.unused[SHELTER_TRAILS] & 7;
+    if( ShelterReadingTrail >= 0 && ShelterReadingTrail < 3 ){
+        static const char* const clues[3][7] = {
+            { "Seu companheiro fareja um pano sob o entulho.", "Ha nomes costurados, pequenos demais para pessoas.",
+              "Cada nome termina numa marca de tigela.", "As marcas indicam a descida, nao a saida.",
+              "Ninguem perdeu uma coleira aqui. Alguem fez uma trilha.", "O pano foi lavado. O cheiro permaneceu.",
+              "Igreja 2: os animais eram atraidos pelo que conheciam." },
+            { "O cheiro leva seu companheiro ate uma tigela rachada.", "A comida apodreceu sem uma unica marca de mordida.",
+              "Os riscos no chao apontam para fora do esconderijo.", "Alguem ofereceu comida. Um animal percebeu a armadilha.",
+              "No fundo da tigela, uma palavra: VOLTE.", "Nao era comida que faltava aos animais.",
+              "Igreja 3: a ordem tentava usar uma lembranca de casa." },
+            { "Seu companheiro recua de uma marca feita em cera.", "Ha uma instrucao gravada junto do caminho:",
+              "Nao leve o animal. Leve o lugar para onde ele volta.", "A trilha nao terminava numa jaula. Terminava num nome.",
+              "Maera protegia animais. Alguem usou isso para acha-la.", "A criatura morreu. As iscas ficaram.",
+              "Catacumbas 1: o abrigo precisa de uma nova rota." }
+        };
+        MemoryLines(clues[ShelterReadingTrail]);
+        if( state == 1 && !(trails & (1 << ShelterReadingTrail)) )
+            SetDialogRow(PT_DialogRows_NoIndent, 14, true, "Guardar este rastro para Maera", C_1_Blue, true);
+    }else if( state == 0 ){
+        const char* lines[7] = { "Maera: Os animais voltaram. As tigelas, nao.", "Eu deixava comida em lugares onde eles se escondiam.",
+            "Agora reconhecem o cheiro e se recusam a chegar perto.", "Leve um companheiro para investigar tres descidas.",
+            "Igreja 2, Igreja 3 e a primeira das Catacumbas.", "Abra esta missao na Jornada e investigue com ele perto.",
+            "Nao procure um inimigo. Procure o que o faz voltar." };
+        MemoryLines(lines);
+        if( Dungeon == DUN_0_TOWN && ShelterCaller == PD_32_Maera && ActiveCompanion() != COMPANION_NONE )
+            SetDialogRow(PT_DialogRows_NoIndent, 14, true, "Vou descobrir o que houve com a rota.", C_1_Blue, true);
+        else SetDialogRow(PT_DialogRows_NoIndent, 14, true, "Aceite com Maera na cidade e selecione um companheiro.", C_0_White, false);
+    }else if( state == 3 ){
+        const char* lines[7] = { "Maera: A comida voltou a ser apenas comida.",
+            AdditionalStateData.unused[SHELTER_CHOICE] == 1 ? "Mudamos a rota. Ninguem anuncia seus novos nomes." : "Trouxemos as tigelas para ca. Ninguem precisa descer.",
+            "Os animais escolhem quando se aproximar.", "Voce nao precisou guardar nenhum deles numa jaula.",
+            "Os petiscos agora custam 25% menos aqui comigo.", "O cuidado chegou aos companheiros que voce resgatou.", "Obrigada por voltar para contar, em vez de ordenar." };
+        MemoryLines(lines);
+    }else{
+        char progress[128];
+        sprintf_s(progress, "Igreja 2 [%s]  Igreja 3 [%s]  Catacumbas 1 [%s]", trails & 1 ? "OK" : "falta", trails & 2 ? "OK" : "falta", trails & 4 ? "OK" : "falta");
+        const char* lines[7] = { "As tigelas eram iscas para quem procurava o abrigo.", progress,
+            "Investigue cada piso com um companheiro chamado perto.", "Os rastros podem ser guardados em qualquer ordem.",
+            trails == 7 ? "Volte a Maera. Ela precisa decidir onde alimentar." : "Na masmorra, escolha Investigar os arredores abaixo.",
+            "Recompensa: petiscos de Maera 25% mais baratos.", "Mais 5 de afinidade nos companheiros ja resgatados." };
+        MemoryLines(lines);
+        if( trails == 7 && Dungeon == DUN_0_TOWN && ShelterCaller == PD_32_Maera ){
+            SetDialogRow(PT_DialogRows_NoIndent, 14, true, "Refazer a rota sem anunciar os nomes.", C_1_Blue, true);
+            SetDialogRow(PT_DialogRows_NoIndent, 16, true, "Recolher as iscas e alimentar na cidade.", C_0_White, true);
+        }else if( state == 1 && ShelterFloorTrail() >= 0 )
+            SetDialogRow(PT_DialogRows_NoIndent, 14, true, "Investigar os arredores com meu companheiro", C_1_Blue, true);
+    }
+    SetDialogRow(PT_DialogRows_NoIndent, 18, true, "Voltar", C_0_White, true);
+    DialogRowsCount = PT_DialogRows_20_SmallDialog_RowsCount;
+}
+static void HandleEmptyBowls()
+{
+    if( !MemoryCaretakerRescued() ){ CurrentDialogIndex = PD_0_None; return; }
+    if( SelectedDialogRow == 18 ){
+        if( ShelterReadingTrail >= 0 ){
+            ShelterReadingTrail = -1; ChangeTownerDialog(PD_36_EmptyBowls);
+        }else ChangeTownerDialog(ShelterCaller);
+        return;
+    }
+    if( SelectedDialogRow != 14 && SelectedDialogRow != 16 ) return;
+    const unsigned char state = ShelterState();
+    if( ShelterReadingTrail >= 0 ){
+        if( SelectedDialogRow != 14 || state != 1 || ShelterReadingTrail >= 3 || ShelterReadingTrail != ShelterFloorTrail() || !ShelterCompanionPresent() ) return;
+        AdditionalStateData.unused[SHELTER_TRAILS] |= (char)(1 << ShelterReadingTrail);
+        if( ((unsigned char)AdditionalStateData.unused[SHELTER_TRAILS] & 7) == 7 ) AdditionalStateData.unused[SHELTER_STATE] = 2;
+        ShelterReadingTrail = -1;
+        ChangeTownerDialog(PD_36_EmptyBowls);
+        return;
+    }
+    if( state == 0 ){
+        if( SelectedDialogRow != 14 || Dungeon != DUN_0_TOWN || ShelterCaller != PD_32_Maera || ActiveCompanion() == COMPANION_NONE ) return;
+        AdditionalStateData.unused[SHELTER_STATE] = 1;
+        AdditionalStateData.unused[SHELTER_TRAILS] = 0;
+        ChangeTownerDialog(PD_36_EmptyBowls);
+    }else if( state == 2 && ((unsigned char)AdditionalStateData.unused[SHELTER_TRAILS] & 7) == 7 ){
+        if( Dungeon != DUN_0_TOWN || ShelterCaller != PD_32_Maera ) return;
+        AdditionalStateData.unused[SHELTER_STATE] = 3;
+        AdditionalStateData.unused[SHELTER_CHOICE] = SelectedDialogRow == 14 ? 1 : 2;
+        for( unsigned char id = COMPANION_JASON; id < COMPANION_COUNT; ++id )
+            if( CompanionUnlocked(id) ) AddCompanionAffinity(id, 5);
+        RecalcPlayer(CurrentPlayerIndex, true);
+        ErrorPlrMsg("Abrigo reorganizado: +5 afinidade e petiscos de Maera 25% mais baratos.");
+        ChangeTownerDialog(PD_36_EmptyBowls);
+    }else if( state == 1 && SelectedDialogRow == 14 && ShelterFloorTrail() >= 0 ){
+        if( !ShelterCompanionPresent() ){
+            ErrorPlrMsg("Chame um companheiro e espere que se aproxime para investigar."); return;
+        }
+        ShelterReadingTrail = ShelterFloorTrail();
+        ChangeTownerDialog(PD_36_EmptyBowls);
+    }
+}
+
 static unsigned char MaeraBondTarget();
 // This guide only reads the saved quest/companion data. Opening it never advances a quest.
 static void BuildCompanionJourneyLines(char (&lines)[10][128], unsigned char active)
@@ -3107,6 +3241,7 @@ void CompanionMenu()
         BuildCompanionJourneyLines(lines, active);
         for( int i = 0; i < 10; ++i )
             SetDialogRow(PT_DialogRows_NoIndent, 7+i, true, lines[i], C_0_White, false);
+        if( MemoryCaretakerRescued() ) SetDialogRow(PT_DialogRows_NoIndent, 17, true, "As tigelas vazias: investigar a rota", C_3_Gold, true);
         if( CompanionPanelDetails ) SetDialogRow(PT_DialogRows_NoIndent, 18, true, "Voltar as habilidades", C_1_Blue, true);
         SetDialogRow(PT_DialogRows_NoIndent, 20, true, "Voltar aos companheiros", C_0_White, true);
         DialogRowsCount = PT_DialogRows_20_SmallDialog_RowsCount;
@@ -3435,13 +3570,14 @@ void MaeraMenu()
         "Uma porcao por nivel de cada companheiro.",
         "E nao deixe que chamem seu amigo apenas de arma." };
     MemoryLines(lines);
-    ClearRowsInInterval(9, 11);
+    ClearRowsInInterval(8, 11);
+    SetDialogRow(PT_DialogRows_NoIndent, 8, true, "As tigelas vazias: a rota do abrigo", C_3_Gold, true);
     SetDialogRow(PT_DialogRows_NoIndent, 10, true, "Treinamento: Eco do Vinculo", C_3_Gold, true);
     SetDialogRow(PT_DialogRows_NoIndent, 12, true, "Cuidar dos companheiros", C_1_Blue, true);
     const unsigned char active = ActiveCompanion();
     if( active != COMPANION_NONE ){
         char label[128];
-        sprintf_s(label, "Petisco de %s: %d ouro", CompanionName(active), CompanionLevel(active)*300);
+        sprintf_s(label, "Petisco de %s: %d ouro", CompanionName(active), MaeraFoodPrice(CompanionLevel(active)));
         SetDialogRow(PT_DialogRows_NoIndent, 14, true, label, C_0_White, true);
     }
     SetDialogRow(PT_DialogRows_NoIndent, 16, true, "Quem fica esperando: jornada de vinculo", C_3_Gold, true);
@@ -3456,6 +3592,10 @@ static void HandleMaera()
 {
     if( !MemoryCaretakerRescued() || SelectedDialogRow == 18 ){
         CurrentDialogIndex = PD_0_None;
+        return;
+    }
+    if( SelectedDialogRow == 8 ){
+        OpenShelterQuest(PD_32_Maera);
         return;
     }
     if( SelectedDialogRow == 10 ){
@@ -3484,7 +3624,7 @@ static void HandleMaera()
         ErrorPlrMsg("Maera: seu amigo ja confia plenamente em voce.");
         return;
     }
-    const int price = level*300;
+    const int price = MaeraFoodPrice(level);
     if( Players[CurrentPlayerIndex].TotalGold < price ){
         ErrorPlrMsg("Maera: faltam moedas para os ingredientes.");
         return;
@@ -3546,6 +3686,7 @@ void __fastcall ChangeTownerDialog(PLAYER_DIALOG dialogIndex)
 	case PD_29_ColiseumDiff            : ColiseumDifficultyMenu();                       break;
 	case PD_30_Companions              : CompanionMenu();                                break;
 	case PD_31_ForgottenHouse           : ForgottenHouseMenu();                            break;
+	case PD_36_EmptyBowls               : EmptyBowlsMenu();                                  break;
 	case PD_35_MaeraConvergence         : MaeraConvergenceMenu();                            break;
 	case PD_34_MaeraTraining            : MaeraTrainingMenu();                               break;
 	case PD_33_MaeraBond                : MaeraBondMenu();                                   break;
@@ -3634,6 +3775,10 @@ void PrevTownerDialog()
         case PD_22_FarnhamMain:
 			CurrentDialogIndex = PD_0_None;
 			break;
+		case PD_36_EmptyBowls:
+            SelectedDialogRow = 18;
+            HandleEmptyBowls();
+            break;
 		case PD_35_MaeraConvergence:
             ChangeTownerDialog(PD_34_MaeraTraining);
             break;
@@ -4985,6 +5130,7 @@ void HandleCompanionMenu()
 {
     const unsigned char active = ActiveCompanion();
     if( CompanionPanelJourney ){
+        if( SelectedDialogRow == 17 ){ OpenShelterQuest(PD_30_Companions); return; }
         if( SelectedDialogRow == 18 || SelectedDialogRow == 20 ){
             CompanionPanelJourney = false;
             if( SelectedDialogRow == 20 ) CompanionPanelDetails = false;
@@ -5119,6 +5265,7 @@ void HandleTownersMenu()
     if( OpenMemoryTopic() ) return;
     switch( CurrentDialogIndex ) {
         case PD_31_ForgottenHouse: HandleForgottenHouse(); return;
+        case PD_36_EmptyBowls: HandleEmptyBowls(); return;
         case PD_35_MaeraConvergence: HandleMaeraConvergence(); return;
         case PD_34_MaeraTraining: HandleMaeraTraining(); return;
         case PD_33_MaeraBond: HandleMaeraBond(); return;
