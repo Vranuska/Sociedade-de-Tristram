@@ -88,6 +88,168 @@ static int FindSocietyQuestOnyx()
     return -1;
 }
 
+// Forgotten House, chapter one. Saved per hero in unused bytes 80..83.
+// These offsets do not overlap the companion data (0..65).
+static constexpr int MEMORY_STATE = 80;
+static constexpr int MEMORY_TESTIMONIES = 81;
+static constexpr int MEMORY_RESPONSE = 82;
+static PLAYER_DIALOG MemoryCaller = PD_5_WitchMain;
+static int MemorySpeaker = 0; // Adria, Cain, Gillian, Farnham
+static bool MemoryAvailable()
+{
+    return MaxCountOfPlayersInGame == 1 && GameMode != GM_COLISEUM;
+}
+static unsigned char MemoryState()
+{
+    return (unsigned char)AdditionalStateData.unused[MEMORY_STATE];
+}
+static unsigned char MemoryTestimonies()
+{
+    return (unsigned char)AdditionalStateData.unused[MEMORY_TESTIMONIES] & 7;
+}
+static void MemoryTopic(PLAYER_DIALOG caller)
+{
+    if( !MemoryAvailable() ) return;
+    if( caller == PD_5_WitchMain || MemoryState() == 1 ){
+        const char* label = caller == PD_5_WitchMain ? "A casa esquecida" :
+            caller == PD_15_ElderMain ? "O nome no registro" :
+            caller == PD_23_GilianMain ? "A cadeira vazia" : "A cancao sem dono";
+        SetDialogRow(PT_DialogRows_NoIndent, 7, true, label, C_2_Red, true);
+    }
+}
+static void MemoryLines(const char* const (&lines)[7])
+{
+    for( int i = 0; i < 7; ++i )
+        SetDialogRow(PT_DialogRows_NoIndent, 5 + i, true, lines[i], C_0_White, false);
+}
+void ForgottenHouseMenu()
+{
+    IsBigMenuBox = true;
+    DialogHasScroolBox = false;
+    SetDialogRow(PT_DialogRows_NoIndent, 2, true, "A CASA QUE TRISTRAM ESQUECEU", C_3_Gold, false);
+    const unsigned char state = MemoryState();
+    if( MemorySpeaker == 0 && state == 0 ){
+        const char* lines[7] = {
+            "Adria: Ouvi tres batidas esta noite.",
+            "Vieram de uma casa que nao tem porta.",
+            "Havia uma mulher ali. Ninguem recorda seu nome.",
+            "Pergunte a Cain, Gillian e Farnham.",
+            "Nao conte a nenhum deles o relato dos outros.",
+            "Quero saber o que lembram, nao o que repetem.",
+            "Se ouvir uma quarta batida, nao responda." };
+        MemoryLines(lines);
+        SetDialogRow(PT_DialogRows_NoIndent, 14, true, "Vou ouvir o que eles lembram.", C_1_Blue, true);
+    }else if( MemorySpeaker == 0 && state == 1 ){
+        const char* lines[7] = {
+            "Adria: Uma cidade tambem aprende a mentir.",
+            "Cain guarda os nomes de quem morreu.",
+            "Gillian guarda lugares para quem pode voltar.",
+            "Farnham bebe para nao guardar coisa alguma.",
+            "Ou assim ele gosta de dizer.",
+            "Escute os tres antes de escolher em quem crer.",
+            "Nao traga ouro. Desta vez, preciso de palavras." };
+        MemoryLines(lines);
+        if( MemoryTestimonies() == 7 ){
+            SetDialogRow(PT_DialogRows_NoIndent, 14, true, "Os tres relatos nao podem ser verdade.", C_1_Blue, true);
+            SetDialogRow(PT_DialogRows_NoIndent, 16, true, "Voce ja conhecia a cancao, Adria.", C_2_Red, true);
+        }
+    }else if( MemorySpeaker == 0 ){
+        const bool accused = AdditionalStateData.unused[MEMORY_RESPONSE] == 2;
+        const char* lines[7] = {
+            accused ? "Adria: Conhecer uma cancao nao e confissao." : "Adria: Podem ser verdade. Em noites diferentes.",
+            "O registro de Cain foi escrito pela mesma mao.",
+            "A mulher morreu tres vezes. O nome foi raspado.",
+            "Alguem nao queria esconder um corpo.",
+            "Queria esconder uma pessoa de quem a procurava.",
+            "Voce ouviu a cancao. Agora ela pode ouvir voce.",
+            "A historia continua sob a catedral." };
+        MemoryLines(lines);
+        SetDialogRow(PT_DialogRows_NoIndent, 14, true, "Rever minhas anotacoes", C_1_Blue, true);
+    }
+    if( MemorySpeaker == 1 ){
+        const char* lines[7] = {
+            "Cain: Encontrei tres registros de uma morte.",
+            "Anos diferentes. A mesma casa. A mesma mulher.",
+            "O nome foi raspado; o papel nao foi rasgado.",
+            "Isso exige paciencia. E medo de ser descoberto.",
+            "Ha uma marca onde deveria estar a assinatura.",
+            "Parece uma tigela com uma rachadura.",
+            "Nao me lembro de quem me entregou este livro." };
+        MemoryLines(lines);
+    }else if( MemorySpeaker == 2 ){
+        const char* lines[7] = {
+            "Gillian: Eu levava comida para aquela casa.",
+            "Nao havia mulher alguma. Havia uma crianca.",
+            "Ela punha uma cadeira diante da porta, vazia.",
+            "Dizia que era para quem estava vindo busca-la.",
+            "A tigela sempre voltava rachada.",
+            "Ontem encontrei a tigela entre minhas coisas.",
+            "Ainda estava morna." };
+        MemoryLines(lines);
+    }else if( MemorySpeaker == 3 ){
+        const char* lines[7] = {
+            "Farnham: Nao havia crianca. Eu ouviria o choro.",
+            "Havia uma voz cantando debaixo do assoalho.",
+            "Tres batidas para entrar. Uma para ficar.",
+            "Eu tapei os ouvidos. A voz usou a minha boca.",
+            "Adria me deu algo para dormir naquela noite.",
+            "Nao disse que noite? Engracado. Ela tambem nao.",
+            "Nao cante o resto. Nem se voce lembrar." };
+        MemoryLines(lines);
+    }
+    if( MemorySpeaker > 0 )
+        SetDialogRow(PT_DialogRows_NoIndent, 14, true, "Guardar este relato", C_1_Blue, true);
+    SetDialogRow(PT_DialogRows_NoIndent, 18, true, "Voltar", C_0_White, true);
+    DialogRowsCount = PT_DialogRows_20_SmallDialog_RowsCount;
+}
+static void HandleForgottenHouse()
+{
+    if( SelectedDialogRow == 18 ){
+        ChangeTownerDialog(MemoryCaller);
+        return;
+    }
+    if( MemorySpeaker > 0 && SelectedDialogRow == 14 ){
+        if( MemoryState() == 1 )
+            AdditionalStateData.unused[MEMORY_TESTIMONIES] |= (char)(1 << (MemorySpeaker - 1));
+        ChangeTownerDialog(MemoryCaller);
+    }else if( MemorySpeaker == 0 && SelectedDialogRow == 14 && MemoryState() == 0 ){
+        AdditionalStateData.unused[MEMORY_STATE] = 1;
+        ChangeTownerDialog(PD_31_ForgottenHouse);
+    }else if( MemorySpeaker == 0 && MemoryState() == 1 && MemoryTestimonies() == 7
+        && (SelectedDialogRow == 14 || SelectedDialogRow == 16) ){
+        AdditionalStateData.unused[MEMORY_RESPONSE] = SelectedDialogRow == 16 ? 2 : 1;
+        AdditionalStateData.unused[MEMORY_STATE] = 2;
+        ChangeTownerDialog(PD_31_ForgottenHouse);
+    }else if( MemorySpeaker == 0 && MemoryState() == 2 && SelectedDialogRow == 14 ){
+        const char* lines[7] = {
+            "Cain: tres mortes; nome raspado; uma tigela.",
+            "Gillian: uma crianca; uma cadeira; comida morna.",
+            "Farnham: uma voz; quatro batidas; Adria sabia.",
+            "Todos lembram da casa. Nenhum lembra do nome.",
+            "Adria diz que o esquecimento era uma protecao.",
+            "As anotacoes terminam aqui.",
+            "Ainda nao ha um caminho seguro ate a casa." };
+        ClearRowsInInterval(5, 17);
+        MemoryLines(lines);
+        SelectedDialogRow = 18;
+    }
+}
+static bool OpenMemoryTopic()
+{
+    if( SelectedDialogRow != 7 || !MemoryAvailable() ) return false;
+    if( CurrentDialogIndex != PD_5_WitchMain && MemoryState() != 1 ) return false;
+    switch( CurrentDialogIndex ){
+    case PD_5_WitchMain: MemorySpeaker = 0; break;
+    case PD_15_ElderMain: MemorySpeaker = 1; break;
+    case PD_23_GilianMain: MemorySpeaker = 2; break;
+    case PD_22_FarnhamMain: MemorySpeaker = 3; break;
+    default: return false;
+    }
+    MemoryCaller = (PLAYER_DIALOG)CurrentDialogIndex;
+    ChangeTownerDialog(PD_31_ForgottenHouse);
+    return true;
+}
+
 enum SocietyCompanionId : unsigned char
 {
     COMPANION_NONE = 0,
@@ -1783,6 +1945,7 @@ void WitchAdriaMenu()
     SetDialogRow(PT_DialogRows_NoIndent, PT_DialogRows_5_WitchMain_Leave, true, "Sair da cabana", C_0_White, true);
 	SetDialogLine( PT_DialogRows_5_SmallDialog_Separator );
     DialogRowsCount = PT_DialogRows_20_SmallDialog_RowsCount;
+    MemoryTopic(PD_5_WitchMain);
 }
 
 //----- (0046DC04) --------------------------------------------------------
@@ -2298,6 +2461,7 @@ void TownElderMainMenu()
 	}
 	SetDialogRow(PT_DialogRows_NoIndent, PT_DialogRows_15_ElderMain_Leave, true, "Despedir-se", C_0_White, true);
 	SetDialogLine( PT_DialogRows_5_SmallDialog_Separator );
+    MemoryTopic(PD_15_ElderMain);
 }
 
 //----- (0046EA8F) --------------------------------------------------------
@@ -2502,6 +2666,7 @@ void GillianMainMenu()
     }
     SetDialogRow(PT_DialogRows_NoIndent, PT_DialogRows_GilianMain_18_Leave, true, "Despedir-se", C_0_White, true);
     DialogRowsCount = PT_DialogRows_20_SmallDialog_RowsCount;
+    MemoryTopic(PD_23_GilianMain);
 }
 
 //----- (0046F1CC) --------------------------------------------------------
@@ -2523,6 +2688,7 @@ void FarnhamMainMenu()
     SetDialogRow(PT_DialogRows_NoIndent, PT_DialogRows_22_FarnhamMain_Leave, true, "Despedir-se", C_0_White, true);
     SetDialogLine(PT_DialogRows_5_SmallDialog_Separator);
     DialogRowsCount = PT_DialogRows_20_SmallDialog_RowsCount;
+    MemoryTopic(PD_22_FarnhamMain);
 }
 
 void CompanionMenu()
@@ -2664,6 +2830,7 @@ void __fastcall ChangeTownerDialog(PLAYER_DIALOG dialogIndex)
 	case PD_28_ColiseumMain            : ColiseumMainMenu();                             break;
 	case PD_29_ColiseumDiff            : ColiseumDifficultyMenu();                       break;
 	case PD_30_Companions              : CompanionMenu();                                break;
+	case PD_31_ForgottenHouse           : ForgottenHouseMenu();                            break;
     }
 
     int selectedDialogRow;
@@ -2748,6 +2915,9 @@ void PrevTownerDialog()
         case PD_22_FarnhamMain:
 			CurrentDialogIndex = PD_0_None;
 			break;
+		case PD_31_ForgottenHouse:
+            ChangeTownerDialog(MemoryCaller);
+            break;
 		case PD_30_Companions:
             if( CompanionPanelDetails ){
                 CompanionPanelDetails = false;
@@ -4196,7 +4366,9 @@ void HandleTownersMenu()
         return;
     }
     PlayGlobalSound(S_76_I_TITLSLCT);
+    if( OpenMemoryTopic() ) return;
     switch( CurrentDialogIndex ) {
+        case PD_31_ForgottenHouse: HandleForgottenHouse(); return;
         //Griswold the Blacksmith
         case PD_1_BlacksmithMain:		HandleGriswoldMainMenu();				return;
         case PD_2_BasicalItems:			HandleBasicalItemBuy();					return;

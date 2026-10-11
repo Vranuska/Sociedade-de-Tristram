@@ -7540,6 +7540,7 @@ enum PLAYER_DIALOG
 	PD_28_ColiseumMain = 28,
 	PD_29_ColiseumDiff = 29,
 	PD_30_Companions = 30,
+	PD_31_ForgottenHouse = 31,
 	PD_Count,
 };
 
