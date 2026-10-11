@@ -220,10 +220,13 @@ bool MemoryOperateObject(int playerIndex, int objectIndex)
 static void MemoryTopic(PLAYER_DIALOG caller)
 {
     if( !MemoryAvailable() ) return;
-    if( caller == PD_5_WitchMain || MemoryState() == 1 ){
+    if( caller == PD_5_WitchMain || MemoryState() == 1 || MemoryState() == 4 ){
         const char* label = caller == PD_5_WitchMain ? "A casa esquecida" :
             caller == PD_15_ElderMain ? "O nome no registro" :
             caller == PD_23_GilianMain ? "A cadeira vazia" : "A cancao sem dono";
+        if( MemoryState() == 4 && caller != PD_5_WitchMain )
+            label = caller == PD_15_ElderMain ? "O registro depois da casa" :
+                caller == PD_23_GilianMain ? "Uma cadeira ocupada" : "Depois da cancao";
         SetDialogRow(PT_DialogRows_NoIndent, 7, true, label, C_2_Red, true);
     }
 }
@@ -232,6 +235,85 @@ static void MemoryLines(const char* const (&lines)[7])
     for( int i = 0; i < 7; ++i )
         SetDialogRow(PT_DialogRows_NoIndent, 5 + i, true, lines[i], C_0_White, false);
 }
+// Three townspeople react to each saved ending. These conversations cannot reset progress.
+static void MemoryAftermathLines(int speaker)
+{
+    static const char* const aftermath[3][3][7] = {
+        { // Cain: restore the name, preserve anonymity, entrust the memory to Adria.
+            { "Cain: Tres mortes. E uma pessoa viva diante de mim.",
+              "Nao apaguei o registro antigo. Corrigi a margem.",
+              "Maera escolheu como queria ser chamada.",
+              "Quem ler o livro vera a mentira e a emenda.",
+              "Adria pediu uma copia. Entreguei uma pagina.",
+              "Em branco.",
+              "Ela soube exatamente o que eu quis dizer." },
+            { "Cain: A nova vizinha diz que se chama Maera.",
+              "Nao encontrei nada sobre ela nos meus registros.",
+              "Os nomes raspados continuam raspados.",
+              "Perguntei de onde veio. Ela pediu que nao anotasse.",
+              "Deixei uma linha em branco, a pedido dela.",
+              "Nem todo silencio precisa ser preenchido.",
+              "Um registro tambem deve saber onde parar." },
+            { "Cain: Os nomes voltaram ao registro esta manha.",
+              "Reconheco a letra de Adria. Nao sua tinta.",
+              "Ela escreveu que Maera sempre esteve conosco.",
+              "Nao trouxe testemunha, nem pediu minha assinatura.",
+              "Uma historia sem erros me preocupa mais que tres.",
+              "Guardei o livro antigo em outro lugar.",
+              "Ainda nao sei qual dos dois sera preciso ler." }
+        },
+        { // Gillian: memory recovered, a fresh beginning, or a past held by someone else.
+            { "Gillian: Maera contou por que a tigela era morna.",
+              "Ela segurava a comida enquanto esperava alguem.",
+              "A crianca que eu lembrava era a menina que ela foi.",
+              "Ontem nao trouxe a tigela de volta.",
+              "Ficou para comer comigo.",
+              "Nao havia nada a provar naquela mesa.",
+              "Havia alguem que eu queria conhecer de novo." },
+            { "Gillian: Nao conhecia Maera antes desta manha.",
+              "Mesmo assim, preparei comida para duas pessoas.",
+              "Ela perguntou se alguem esperava por aquela cadeira.",
+              "Eu disse que sim. Nao sabia dizer quem.",
+              "Ela se sentou sem pedir mais explicacoes.",
+              "Nao precisamos inventar um passado para recebe-la.",
+              "Amanha tambem vou preparar comida para duas." },
+            { "Gillian: Adria disse que Maera sempre viveu aqui.",
+              "Depois me ensinou uma historia sobre nossa infancia.",
+              "Era bonita. Eu quase consegui me lembrar dela.",
+              "Maera pediu que eu nao a repetisse.",
+              "Entao perguntei qual era sua comida favorita.",
+              "Isso, ela quis me contar por conta propria.",
+              "Prefiro aprender uma pessoa a decorar sua historia." }
+        },
+        { // Farnham: ordinary silence, a voice returned, or a new claimant to the song.
+            { "Farnham: A cancao parou. Nao fiquei menos bebado.",
+              "Achei que a lembranca curaria tudo. Que piada.",
+              "Maera trouxe agua. Nao pediu que eu fosse outro.",
+              "Sentei com ela ate a vontade de cantar passar.",
+              "Tres batidas depois disso. Fiquei com medo.",
+              "Era Gillian chamando a gente para comer.",
+              "Engracado descobrir que uma porta pode ser so isso." },
+            { "Farnham: Nao conheco a mulher nova perto de Gillian.",
+              "Mas minha boca voltou a ser minha.",
+              "Pode rir. Eu vou usar isso para dizer bobagens.",
+              "Ela me ouviu cantar ontem e nao pareceu assustada.",
+              "Perguntou se eu sabia uma cancao diferente.",
+              "Sabia. Nao lembrava que sabia.",
+              "Nessa eu consigo parar quando quero." },
+            { "Farnham: A voz saiu da minha boca, mas nao morreu.",
+              "Esta cantando em algum lugar mais fundo.",
+              "Nao pede mais para entrar. Pergunta o meu nome.",
+              "Adria disse que era so ressaca.",
+              "Ela respondeu antes de eu contar a pergunta.",
+              "Maera me pediu que viesse falar com voce.",
+              "Hoje prefiro ouvir as vacas. Elas nao sabem mentir." }
+        }
+    };
+    const unsigned char ending = (unsigned char)AdditionalStateData.unused[MEMORY_ENDING];
+    const int choice = ending >= 1 && ending <= 3 ? ending-1 : 0;
+    MemoryLines(aftermath[speaker-1][choice]);
+}
+
 void ForgottenHouseMenu()
 {
     IsBigMenuBox = true;
@@ -308,7 +390,9 @@ void ForgottenHouseMenu()
             "Nao cante o resto. Nem se voce lembrar." };
         MemoryLines(lines);
     }
-    if( MemorySpeaker > 0 && MemorySpeaker <= 3 )
+    if( MemorySpeaker > 0 && MemorySpeaker <= 3 && state == 4 )
+        MemoryAftermathLines(MemorySpeaker);
+    if( MemorySpeaker > 0 && MemorySpeaker <= 3 && state == 1 )
         SetDialogRow(PT_DialogRows_NoIndent, 14, true, "Guardar este relato", C_1_Blue, true);
     if( MemorySpeaker >= 4 && MemorySpeaker <= 6 ){
         const char* texts[3][7] = {
@@ -406,7 +490,7 @@ static void HandleForgottenHouse()
 static bool OpenMemoryTopic()
 {
     if( SelectedDialogRow != 7 || !MemoryAvailable() ) return false;
-    if( CurrentDialogIndex != PD_5_WitchMain && MemoryState() != 1 ) return false;
+    if( CurrentDialogIndex != PD_5_WitchMain && MemoryState() != 1 && MemoryState() != 4 ) return false;
     switch( CurrentDialogIndex ){
     case PD_5_WitchMain: MemorySpeaker = 0; break;
     case PD_15_ElderMain: MemorySpeaker = 1; break;
@@ -2977,7 +3061,10 @@ static void BuildCompanionJourneyLines(char (&lines)[10][128], unsigned char act
             sprintf_s(lines[2], "Jornada em andamento: %s", CompanionName(target));
             sprintf_s(lines[3], "Espelho [%s]  Tigela [%s]  Cadeira [%s]", mask & 1 ? "OK" : "falta", mask & 2 ? "OK" : "falta", mask & 4 ? "OK" : "falta");
             strcpy_s(lines[4], mask == 7 ? "As tres lembrancas estao prontas. Volte a Maera." : active != target ? "Selecione o companheiro desta jornada antes de partir." : "Volte a casa com ele chamado e perto de voce.");
-        }else strcpy_s(lines[2], "Sem jornada em andamento. Consulte Maera na cidade.");
+        }else{
+            strcpy_s(lines[2], "Sem jornada em andamento. Consulte Maera na cidade.");
+            strcpy_s(lines[3], "Cain, Gillian e Farnham comentam o destino da casa.");
+        }
     }else{
         strcpy_s(lines[0], "Consulte Adria para conferir o estado da casa.");
     }

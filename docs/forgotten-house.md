@@ -95,3 +95,11 @@ A identidade da sobrevivente não é revelada pelo objetivo inicial. Os nomes e 
 A janela dos companheiros usa agora o formato largo nativo, para acomodar nomes de habilidades e requisitos. Esc ou Voltar retorna à página anterior; a página da jornada oferece voltar à ficha quando veio dela, ou à lista dos companheiros. Não foi criado um novo formato de save nem atalho de teclado.
 
 Validação isolada do guia: todas as cinco etapas da casa, seis companheiros ou nenhum, e as oito máscaras de relatos/lembranças; limites dos textos e preservação integral dos bytes salvos e ouro. O teste também continua cobrindo os ataques e treinamentos anteriores. A aparência, o clique e a navegação ainda precisam ser conferidos no Windows/jogo.
+
+## Reações de Tristram após o resgate
+
+Cain, Gillian e Farnham mantêm um assunto próprio sobre a casa depois da conclusão, com nove cenas: três moradores multiplicados pelos três finais. Restaurar o nome devolve lembranças e permite corrigir o registro; preservar o anonimato faz os moradores conhecerem Maera como nova vizinha; entregar a memória à Adria deixa indícios de uma história reescrita e da canção em outro lugar. São consequências narrativas em diálogos, sem novos objetos ou alterações de serviços na cidade.
+
+As cenas leem o final já salvo no byte 85. Não concedem recompensas, não alteram depoimentos e não repetem a investigação. O botão Guardar este relato aparece apenas durante a etapa original de investigação. Conversas podem ser revisitadas após salvar/carregar. O guia da jornada sugere visitar os moradores quando não há jornada de companheiro ativa.
+
+Validação: compilação isolada da tabela de diálogos com a assinatura real de MemoryLines, limites dos textos e revisão das condições de abertura; testes anteriores de ataques, treinamento e guia permanecem passando. Compilação MSVC e apresentação dentro do jogo ficam pendentes para esta etapa.
