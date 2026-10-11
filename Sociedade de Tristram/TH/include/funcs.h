@@ -1674,7 +1674,7 @@ void __fastcall ClearRowsInInterval( int startRowIndex, int endRowIndex	);//	Pla
 void __fastcall SetDialogLine( int rowIndex	);//	PlayerTrade		
 void __fastcall SetItemPrice( int rowIndex, int price	);//	PlayerTrade		
 void __fastcall LowerRow( int rowIndex, int indent	);//	PlayerTrade		
-void __fastcall SetDialogRow( int position, int rowIndex, int isAligned, char* text, char color, int selectable	);//	PlayerTrade		
+void __fastcall SetDialogRow( int position, int rowIndex, int isAligned, const char* text, char color, int selectable	);//	PlayerTrade
 bool  AutoPutCursorToInventoryOrDrop( bool allowDropWhenInvFull = true, int cell = -1 );//	PlayerTrade
 void  GriswoldMainMenu( );//	PlayerTrade		
 void __fastcall DrawBuyBasicalItems( int firstItem	);//	PlayerTrade		

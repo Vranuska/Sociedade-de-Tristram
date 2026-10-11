@@ -1389,7 +1389,7 @@ void __fastcall LowerRow( int rowIndex, int indent )
 }
 
 //----- (0046CA38) --------------------------------------------------------
-void __fastcall SetDialogRow( int position, int rowIndex, int isAligned, char* text, char color, int selectable )
+void __fastcall SetDialogRow( int position, int rowIndex, int isAligned, const char* text, char color, int selectable )
 {
     TownersDialogRow& curDialogRow = TownersDialogRows[rowIndex];
     curDialogRow.position = position;
