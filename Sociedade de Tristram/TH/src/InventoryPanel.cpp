@@ -9,6 +9,7 @@ DisplayObject InventoryStoreAllButton;
 DisplayObject InventoryCompanionButton;
 DisplayObject InventoryCompanionSummonButton;
 static int InventoryStoreFilter = 0;
+static int InventoryOrganizeMode = 0;
 int HowMuchGoldYouWantToRemove;// 004D1108
 bool IsGoldSplitPanelVisible;// 004D0E44
 
@@ -125,56 +126,111 @@ void SetupInventoryQoLButtons()
 
 static bool CursorInInventoryQoLButton(const DisplayObject& button)
 {
-	return CursorX >= button.Left && CursorX <= button.Right && CursorY >= button.Top && CursorY <= button.Down;
+    // Bitmap glyphs extend above the text baseline. Include the complete glyph
+    // area and padding, while keeping adjacent controls horizontally separate.
+    return CursorX >= button.Left && CursorX <= button.Right
+        && CursorY >= button.Top - 16 && CursorY <= button.Down + 2;
+}
+
+bool InventoryPanel_CursorOnControls()
+{
+    return CursorInInventoryQoLButton(InventoryOrganizeButton)
+        || (IsStashPanelVisible && (CursorInInventoryQoLButton(InventoryStoreFilterButton)
+            || CursorInInventoryQoLButton(InventoryStoreAllButton)))
+        || (!IsStashPanelVisible && (CursorInInventoryQoLButton(InventoryCompanionButton)
+            || (CompanionHasActive() && CursorInInventoryQoLButton(InventoryCompanionSummonButton))));
+}
+
+static bool InventoryIsPotionOrOil(const Item& item)
+{
+    return is(item.MagicCode, MC_2_POTION_OF_FULL_HEALING, MC_3_POTION_OF_HEALING,
+        MC_6_POTION_OF_MANA, MC_7_POTION_OF_FULL_MANA,
+        MC_18_POTION_OF_REJUVENATION, MC_19_POTION_OF_FULL_REJUVENATION)
+        || (item.MagicCode >= MC_30_OIL_OF_SOMETHING && item.MagicCode <= MC_40_OIL_OF_HARDENING);
+}
+
+static int InventoryOrganizeCategory(const Item& item)
+{
+    if( InventoryIsPotionOrOil(item) ) return 0;
+    if( item.MagicCode == MC_GEM ) return 1;
+    if( is(item.MagicCode, MC_21_RELIC_NEED_NO_TARGET, MC_22_RELIC_NEED_TARGET)
+        || (item.MagicCode >= MC_47_RUNE_OF_FIRE && item.MagicCode <= MC_51_RUNE_OF_STONE) ){
+        return !strncmp(item.Name, "Scroll of ", 10) ? 3 : 2;
+    }
+    if( item.MagicCode == MC_24_BOOKS ) return 4;
+    if( is(item.ItemCode, IC_12_RING, IC_13_AMULET) ) return 5;
+    if( item.EquippedLocation != EL_7_INVENTORY && item.EquippedLocation != EL_8_BELT ) return 6;
+    return 7;
+}
+
+static bool InventoryBuildOrganizedLayout(const vector<int>& order,
+    const vector<pair<int, int>>& sizes, char (&layout)[InvRows][InvCols], int columns, bool vertical)
+{
+    memset(layout, 0, sizeof(layout));
+    for( int itemIndex : order ){
+        const int width = sizes[itemIndex].first, height = sizes[itemIndex].second;
+        bool placed = false;
+        const int outerCount = vertical ? columns - width + 1 : InvRows - height + 1;
+        const int innerCount = vertical ? InvRows - height + 1 : columns - width + 1;
+        for( int outer = 0; outer < outerCount && !placed; ++outer ){
+            for( int inner = 0; inner < innerCount && !placed; ++inner ){
+                const int x = vertical ? outer : inner, y = vertical ? inner : outer;
+                bool free = true;
+                for( int yy = 0; yy < height && free; ++yy )
+                    for( int xx = 0; xx < width; ++xx )
+                        if( layout[y + yy][x + xx] ){ free = false; break; }
+                if( !free ) continue;
+                const int number = itemIndex + 1;
+                for( int yy = 0; yy < height; ++yy )
+                    for( int xx = 0; xx < width; ++xx )
+                        layout[y + yy][x + xx] = (yy == height - 1 && xx == 0) ? number : -number;
+                placed = true;
+            }
+        }
+        if( !placed ) return false;
+    }
+    return true;
 }
 
 void InventoryPanel_AutoOrganize()
 {
-	Player& player = Players[CurrentPlayerIndex];
-	if (player.ItemOnCursor.ItemCode != IC_M1_NONE || player.InvItemCount < 2) return;
-
-	char oldLayout[InvRows][InvCols];
-	memcpy(oldLayout, player.InvUsedAlt, sizeof(oldLayout));
-	memset(player.InvUsedAlt, 0, sizeof(player.InvUsedAlt));
-
-	vector<int> order;
-	order.reserve(player.InvItemCount);
-	for (int i = 0; i < player.InvItemCount; ++i) order.push_back(i);
-	std::stable_sort(order.begin(), order.end(), [&player](int a, int b) {
-		const int ga = player.InventorySlots[a].GraphicValue + CM_12_ITEMS_PICS_START;
-		const int gb = player.InventorySlots[b].GraphicValue + CM_12_ITEMS_PICS_START;
-		const int areaA = max(1, ItemWidthTable[ga] / CELL_SIZE) * max(1, ItemHeightTable[ga] / CELL_SIZE);
-		const int areaB = max(1, ItemWidthTable[gb] / CELL_SIZE) * max(1, ItemHeightTable[gb] / CELL_SIZE);
-		return areaA > areaB;
-	});
-
-	for (int itemIndex : order) {
-		const int graphic = player.InventorySlots[itemIndex].GraphicValue + CM_12_ITEMS_PICS_START;
-		const int width = max(1, ItemWidthTable[graphic] / CELL_SIZE);
-		const int height = max(1, ItemHeightTable[graphic] / CELL_SIZE);
-		bool placed = false;
-		for (int y = 0; y <= InvRows - height && !placed; ++y) {
-			for (int x = 0; x <= player.invCols - width && !placed; ++x) {
-				bool free = true;
-				for (int yy = 0; yy < height && free; ++yy)
-					for (int xx = 0; xx < width; ++xx)
-						if (player.InvUsedAlt[y + yy][x + xx]) { free = false; break; }
-				if (!free) continue;
-				const int number = itemIndex + 1;
-				for (int yy = 0; yy < height; ++yy)
-					for (int xx = 0; xx < width; ++xx)
-						player.InvUsedAlt[y + yy][x + xx] = (yy == height - 1 && xx == 0) ? number : -number;
-				placed = true;
-			}
-		}
-		if (!placed) {
-			memcpy(player.InvUsedAlt, oldLayout, sizeof(oldLayout));
-			PlayGlobalSound(S_1515);
-			return;
-		}
-	}
-	UpdateRelictsState(player);
-	PlayGlobalSound(S_75_I_TITLEMOV);
+    Player& player = Players[CurrentPlayerIndex];
+    if( player.ItemOnCursor.ItemCode != IC_M1_NONE || player.InvItemCount < 2 ) return;
+    const int mode = InventoryOrganizeMode;
+    InventoryOrganizeMode = (InventoryOrganizeMode + 1) % 4;
+    const bool grouped = mode >= 2, vertical = (mode & 1) != 0;
+    vector<int> order;
+    vector<pair<int, int>> sizes;
+    for( int i = 0; i < player.InvItemCount; ++i ){
+        order.push_back(i);
+        const int graphic = player.InventorySlots[i].GraphicValue + CM_12_ITEMS_PICS_START;
+        sizes.push_back(pair<int, int>(max(1, ItemWidthTable[graphic] / CELL_SIZE), max(1, ItemHeightTable[graphic] / CELL_SIZE)));
+    }
+    std::stable_sort(order.begin(), order.end(), [&player, &sizes, grouped](int a, int b) {
+        if( grouped ){
+            const int ca = InventoryOrganizeCategory(player.InventorySlots[a]);
+            const int cb = InventoryOrganizeCategory(player.InventorySlots[b]);
+            if( ca != cb ) return ca < cb;
+            const int nameOrder = strcmp(player.InventorySlots[a].Name, player.InventorySlots[b].Name);
+            if( nameOrder != 0 ) return nameOrder < 0;
+            if( player.InventorySlots[a].baseItemIndex != player.InventorySlots[b].baseItemIndex )
+                return player.InventorySlots[a].baseItemIndex < player.InventorySlots[b].baseItemIndex;
+        }
+        return sizes[a].first * sizes[a].second > sizes[b].first * sizes[b].second;
+    });
+    char layout[InvRows][InvCols];
+    if( !InventoryBuildOrganizedLayout(order, sizes, layout, player.invCols, vertical) ){
+        // No layout is committed until every item fits: preserve all items and
+        // positions when a grouped arrangement cannot fit the current backpack.
+        ErrorPlrMsg((char*)"Esta organizacao nao cabe. Clique novamente para outro modo.");
+        PlayGlobalSound(S_1515);
+        return;
+    }
+    memcpy(player.InvUsedAlt, layout, sizeof(layout));
+    UpdateRelictsState(player);
+    const char* modes[] = { "Organizacao horizontal", "Organizacao vertical", "Por tipo: horizontal", "Por tipo: vertical" };
+    ErrorPlrMsg((char*)modes[mode]);
+    PlayGlobalSound(S_75_I_TITLEMOV);
 }
 
 static void InventoryPanel_CycleStoreFilter()
@@ -187,9 +243,7 @@ bool InventoryPanel_ItemMatchesStoreFilter(const Item& item)
 {
 	switch (InventoryStoreFilter) {
 	case 0: return true; // tudo
-	case 1: return is(item.MagicCode, MC_2_POTION_OF_FULL_HEALING, MC_3_POTION_OF_HEALING,
-		MC_6_POTION_OF_MANA, MC_7_POTION_OF_FULL_MANA,
-		MC_18_POTION_OF_REJUVENATION, MC_19_POTION_OF_FULL_REJUVENATION);
+	case 1: return InventoryIsPotionOrOil(item);
 	case 2: return item.MagicCode == MC_24_BOOKS;
 	case 3: return is(item.MagicCode, MC_21_RELIC_NEED_NO_TARGET, MC_22_RELIC_NEED_TARGET)
 		|| (item.MagicCode >= MC_47_RUNE_OF_FIRE && item.MagicCode <= MC_51_RUNE_OF_STONE);
@@ -226,23 +280,6 @@ void Inventory_LButtonClick()
 {
 	int playerIndex = CurrentPlayerIndex;
 	Player& player = Players[playerIndex];
-	// An Aquamarine held on the cursor can be dropped directly over any valid
-	// equipment.  The stone is consumed only after the socket survives UpdateItem.
-	if( player.ItemOnCursor.ItemCode != IC_M1_NONE
-	 && player.ItemOnCursor.baseItemIndex == BI_301_AQUAMARINE
-	 && Cur.InventoryCellID != -1 ){
-		Item* target = InventoryPanel_GetEquipmentByCellId(player, Cur.InventoryCellID);
-		if( target && TryAddSocketToEquipment(*target) ){
-			PlayLocalSound(1294, player.Row, player.Col);
-			player.ItemOnCursor.ItemCode = IC_M1_NONE;
-			FixItemCursor(1);
-			SetCursorGraphics(CM_1_NORMAL_HAND);
-			RecalcPlayer(playerIndex, 1);
-		}else{
-			PlayGlobalSound(S_1515);
-		}
-		return;
-	}
 	// The complete label rectangle must remain clickable even when an item icon
 	// from the last inventory row is detected below it.
 	if (CursorInInventoryQoLButton(InventoryOrganizeButton)) {
@@ -265,6 +302,24 @@ void Inventory_LButtonClick()
 		StashPanel_StoreAllInventoryItems();
 		return;
 	}
+	// An Aquamarine held on the cursor can be dropped directly over any valid
+	// equipment.  The stone is consumed only after the socket survives UpdateItem.
+	if( player.ItemOnCursor.ItemCode != IC_M1_NONE
+	 && player.ItemOnCursor.baseItemIndex == BI_301_AQUAMARINE
+	 && Cur.InventoryCellID != -1 ){
+		Item* target = InventoryPanel_GetEquipmentByCellId(player, Cur.InventoryCellID);
+		if( target && TryAddSocketToEquipment(*target) ){
+			PlayLocalSound(1294, player.Row, player.Col);
+			player.ItemOnCursor.ItemCode = IC_M1_NONE;
+			FixItemCursor(1);
+			SetCursorGraphics(CM_1_NORMAL_HAND);
+			RecalcPlayer(playerIndex, 1);
+		}else{
+			PlayGlobalSound(S_1515);
+		}
+		return;
+	}
+
     if( Cur.GraphicsID < CM_12_ITEMS_PICS_START ){
         for( int i = 0; i < 3; ++i ){
             if( IsCursorInInvPanelRect( &WpnSwapBtnsRects[ i ] ) || IsCursorInInvPanelRect( &WpnSwapBtnsRects[ i + 3 ] ) ){

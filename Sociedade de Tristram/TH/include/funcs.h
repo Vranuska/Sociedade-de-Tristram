@@ -589,6 +589,7 @@ void __fastcall StripPlayer( int playerIndex	);//	Item
 void __fastcall ClearBeltSlot( int playerIndex, int beltSlot	);//	Item		
 void  Inventory_LButtonClick( );//	Item		
 void InventoryPanel_AutoOrganize();
+bool InventoryPanel_CursorOnControls();
 bool InventoryPanel_ItemMatchesStoreFilter(const Item& item);
 bool CursorIntoBelt();
 void __fastcall CheckItemStats( int playerIndex	);//	Item		

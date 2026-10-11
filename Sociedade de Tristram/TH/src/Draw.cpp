@@ -225,6 +225,16 @@ const char* LocalizeDisplayName( const char* text )
 	if( !text ) return "";
 	struct Translation { const char* en; const char* pt; };
 	static const Translation names[] = {
+		{ "Blacksmith Oil", "Oleo de Ferreiro" },
+		{ "Oil of Repair I", "Oleo de Reparo I" },
+		{ "Oil of Repair II", "Oleo de Reparo II" },
+		{ "Oil of Repair III", "Oleo de Reparo III" },
+		{ "Oil of Repair IV", "Oleo de Reparo IV" },
+		{ "Oil of Repair V", "Oleo de Reparo V" },
+		{ "Oil of Repair VI", "Oleo de Reparo VI" },
+		{ "Oil of Repair VII", "Oleo de Reparo VII" },
+		{ "Oil of Fortitude", "Oleo de Fortitude" },
+		{ "Oil of Hardening", "Oleo de Endurecimento" },
 		{ "Physical", "Fisico" },
 		{ "Fire", "Fogo" },
 		{ "Lightning", "Raio" },

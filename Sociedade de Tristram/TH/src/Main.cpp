@@ -3607,7 +3607,7 @@ int __stdcall GameWindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         Craft_LButtonDown();
 		return 0;
 	}
-	if( IsINVPanelVisible && CursorIntoDisplayObject(InventoryPanelRect) ){
+	if( IsINVPanelVisible && (CursorIntoDisplayObject(InventoryPanelRect) || InventoryPanel_CursorOnControls()) ){
 		if( /*Berserk*/HasTrait(CurrentPlayerIndex, TraitId::Psychotic) && (Players[CurrentPlayerIndex].activeBuffFlag & BF_2_FURY_ACTIVE) && Dungeon != DUN_0_TOWN ){
 			return 0;
 		}
