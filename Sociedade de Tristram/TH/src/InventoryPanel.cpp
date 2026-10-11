@@ -7,6 +7,7 @@ DisplayObject InventoryOrganizeButton;
 DisplayObject InventoryStoreFilterButton;
 DisplayObject InventoryStoreAllButton;
 DisplayObject InventoryCompanionButton;
+DisplayObject InventoryCompanionSummonButton;
 static int InventoryStoreFilter = 0;
 int HowMuchGoldYouWantToRemove;// 004D1108
 bool IsGoldSplitPanelVisible;// 004D0E44
@@ -119,6 +120,7 @@ void SetupInventoryQoLButtons()
 	SetupDisplayObject(InventoryStoreFilterButton, InventoryPanelRect.Left + 102, InventoryPanelRect.Top + 429, 116, 18);
 	SetupDisplayObject(InventoryStoreAllButton, InventoryPanelRect.Left + 220, InventoryPanelRect.Top + 429, 82, 18);
 	SetupDisplayObject(InventoryCompanionButton, InventoryPanelRect.Left + 102, InventoryPanelRect.Top + 429, 116, 18);
+	SetupDisplayObject(InventoryCompanionSummonButton, InventoryPanelRect.Left + 220, InventoryPanelRect.Top + 429, 82, 18);
 }
 
 static bool CursorInInventoryQoLButton(const DisplayObject& button)
@@ -247,6 +249,10 @@ void Inventory_LButtonClick()
 		InventoryPanel_AutoOrganize();
 		return;
 	}
+	if (!IsStashPanelVisible && CompanionHasActive() && CursorInInventoryQoLButton(InventoryCompanionSummonButton)) {
+        CompanionToggleSummoned();
+        return;
+    }
 	if (!IsStashPanelVisible && CursorInInventoryQoLButton(InventoryCompanionButton)) {
 		CompanionOpenPanel();
 		return;
@@ -944,6 +950,7 @@ void DrawINVPanel()
 	Surface_DrawCEL(InventoryPanelRect.Left + Screen_LeftBorder, InventoryPanelRect.Down + Screen_TopBorder, InvPanelCEL, 1, InventoryPanelRect.Width);// Тут рисуется сама картинка инвентаря
 	DrawText(InventoryOrganizeButton.Left, InventoryOrganizeButton.Top + 13, InventoryOrganizeButton.Right, "ORGANIZAR", C_0_White);
 	if (!IsStashPanelVisible) {
+		if( CompanionHasActive() ) DrawText(InventoryCompanionSummonButton.Left, InventoryCompanionSummonButton.Top + 13, InventoryCompanionSummonButton.Right, CompanionIsSummoned() ? "DISPENSAR" : "CHAMAR", C_3_Gold);
 		const char* petLabel = "COMPANHEIROS";
 		DrawText(InventoryCompanionButton.Left, InventoryCompanionButton.Top + 13, InventoryCompanionButton.Right, petLabel, C_2_Red);
 	}

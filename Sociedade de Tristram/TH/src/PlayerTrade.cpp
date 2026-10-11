@@ -125,9 +125,22 @@ static int CompanionTraining(unsigned char id, int slot)
     return value <= (slot == 2 ? 2 : 1) ? value : 0;
 }
 
+static int CompanionLevel(unsigned char companionId);
+static int CompanionEvolutionStage(unsigned char companionId);
+
 static int CompanionAbilityDelay(unsigned char id, int slot, int seconds)
 {
-    return seconds * (CompanionTraining(id, slot) == 1 ? 800 : 1000);
+    const int level = CompanionLevel(id);
+    int percent = level < 10 ? 150 - (level - 1) * 50 / 9
+                : level < 25 ? 100 - (level - 10) * 30 / 15
+                : level < 40 ? 70 - (level - 25) * 30 / 15
+                : 40 - (level - 40) * 15 / 10;
+    // The final barrage requires both maximum level and final evolution.
+    if( level >= COMPANION_MAX_LEVEL && CompanionEvolutionStage(id) == 3 ) percent = 15;
+    int delay = seconds * 10 * percent;
+    if( CompanionTraining(id, slot) == 1 ) delay = delay * 80 / 100;
+    const int minimum = slot == 0 ? 350 : 2000;
+    return delay < minimum ? minimum : delay;
 }
 
 void CompanionOpenPanel()
@@ -233,7 +246,7 @@ static int CompanionLevel(unsigned char companionId)
 {
     if( companionId <= COMPANION_NONE || companionId >= COMPANION_COUNT ) return 1;
     const int level = (unsigned char)AdditionalStateData.unused[COMPANION_SAVE_LEVEL + companionId - 1];
-    return level > 0 ? level : 1;
+    return level > COMPANION_MAX_LEVEL ? COMPANION_MAX_LEVEL : level > 0 ? level : 1;
 }
 
 static uint32_t CompanionExperience(unsigned char companionId)
@@ -252,7 +265,15 @@ static void SetCompanionExperience(unsigned char companionId, uint32_t experienc
 
 static uint32_t CompanionExperienceForNextLevel(int level)
 {
-    return 100u + (uint32_t)level * (uint32_t)level * 35u;
+    // Explicit XP per level. Level 50 is capped; existing progress is retained.
+    static const uint32_t experience[COMPANION_MAX_LEVEL] = {
+        135u, 155u, 180u, 205u, 235u, 270u, 310u, 360u, 415u, 475u,
+        545u, 630u, 720u, 830u, 955u, 1100u, 1265u, 1455u, 1670u, 1920u,
+        2210u, 2540u, 2920u, 3360u, 3865u, 4445u, 5110u, 5875u, 6760u, 7775u,
+        8940u, 10280u, 11820u, 13595u, 15635u, 17980u, 20675u, 23775u, 27345u, 31445u,
+        36160u, 41585u, 47825u, 54995u, 63245u, 72735u, 83645u, 96190u, 110620u, 0u
+    };
+    return level >= 1 && level <= COMPANION_MAX_LEVEL ? experience[level - 1] : 0;
 }
 
 static int CompanionEvolutionStage(unsigned char companionId)
@@ -290,8 +311,8 @@ void CompanionApplyOwnerBonuses(int playerIndex)
     Player& owner = Players[playerIndex];
     const int stage = CompanionEvolutionStage(companionId);
     const int affinity = CompanionAffinity(companionId);
-    if( CompanionTraining(companionId, 2) == 1 ) owner.lifeRegen += 15;
-    if( CompanionTraining(companionId, 2) == 2 ) owner.elementToHit[ET_0_PHYSICAL] += 8;
+    if( CompanionLevel(companionId) >= 10 && CompanionTraining(companionId, 2) == 1 ) owner.lifeRegen += 15;
+    if( CompanionLevel(companionId) >= 10 && CompanionTraining(companionId, 2) == 2 ) owner.elementToHit[ET_0_PHYSICAL] += 8;
     if( companionId == COMPANION_THOR ){
         // Carga do Trovao: Thor electrifies every lightning source used by
         // his owner. Affinity contributes up to another 10% damage.
@@ -654,7 +675,7 @@ void CompanionProcessAbilities()
     const i64 now = GetTickCountTh();
     const int evolutionStage = CompanionEvolutionStage(companionId);
 
-    const bool castStorm = now >= CompanionUltimateReadyAt[ownerIndex];
+    const bool castStorm = CompanionLevel(companionId) >= 15 && now >= CompanionUltimateReadyAt[ownerIndex];
     const bool castPrimary = now >= CompanionPrimaryReadyAt[ownerIndex];
     if( !castStorm && !castPrimary ) return;
 
@@ -2521,17 +2542,19 @@ void CompanionMenu()
 
     if( CompanionPanelDetails && active != COMPANION_NONE ){
         char line[128];
-        sprintf_s(line, "Experiencia: %u / %u", (unsigned int)CompanionExperience(active), (unsigned int)CompanionExperienceForNextLevel(CompanionLevel(active)));
+        if( CompanionLevel(active) >= COMPANION_MAX_LEVEL ) strcpy_s(line, "Nivel maximo: 50");
+        else sprintf_s(line, "Experiencia: %u / %u", (unsigned int)CompanionExperience(active), (unsigned int)CompanionExperienceForNextLevel(CompanionLevel(active)));
         SetDialogRow(PT_DialogRows_NoIndent, 7, true, line, C_0_White, false);
         SetDialogRow(PT_DialogRows_NoIndent, 9, true, CompanionIsSummoned() ? "Dispensar companheiro" : "Chamar companheiro", C_1_Blue, true);
         sprintf_s(line, "Basica: %s", CompanionTraining(active, 0) ? "Agilidade (-20% recarga)" : "Original");
         SetDialogRow(PT_DialogRows_NoIndent, 11, true, line, C_1_Blue, active != COMPANION_JASON);
-        sprintf_s(line, "Especial: %s", CompanionTraining(active, 1) ? "Agilidade (-20% recarga)" : "Original");
-        SetDialogRow(PT_DialogRows_NoIndent, 13, true, line, C_1_Blue, active != COMPANION_JASON);
+        sprintf_s(line, "Especial: %s", CompanionLevel(active) < 15 ? "Desbloqueia no nivel 15" : CompanionTraining(active, 1) ? "Agilidade (-20% recarga)" : "Original");
+        SetDialogRow(PT_DialogRows_NoIndent, 13, true, line, C_1_Blue, active != COMPANION_JASON && CompanionLevel(active) >= 15);
         const int passive = CompanionTraining(active, 2);
-        sprintf_s(line, "Passiva extra: %s", passive == 1 ? "Vigor (regeneracao)" : passive == 2 ? "Precisao (+8 fisica)" : "Nenhuma");
-        SetDialogRow(PT_DialogRows_NoIndent, 15, true, line, C_1_Blue, true);
+        sprintf_s(line, "Passiva extra: %s", CompanionLevel(active) < 10 ? "Desbloqueia no nivel 10" : passive == 1 ? "Vigor (regeneracao)" : passive == 2 ? "Precisao (+8 fisica)" : "Nenhuma");
+        SetDialogRow(PT_DialogRows_NoIndent, 15, true, line, C_1_Blue, CompanionLevel(active) >= 10);
         SetDialogRow(PT_DialogRows_NoIndent, 17, true, active == COMPANION_JASON ? "Jason: basica e especial em preparo" : "Clique nas habilidades para trocar", C_3_Gold, false);
+        SetDialogRow(PT_DialogRows_NoIndent, 18, true, "Nv.50 + evolucao final: poder maximo", C_3_Gold, false);
         SetDialogRow(PT_DialogRows_NoIndent, 20, true, "Voltar aos companheiros", C_0_White, true);
         DialogRowsCount = PT_DialogRows_20_SmallDialog_RowsCount;
         return;
@@ -4060,6 +4083,7 @@ void HandleCompanionMenu()
         if( SelectedDialogRow == 9 ) CompanionToggleSummoned();
         else if( SelectedDialogRow == 11 || SelectedDialogRow == 13 || SelectedDialogRow == 15 ){
             const int slot = (SelectedDialogRow - 11) / 2;
+            if( (slot == 1 && CompanionLevel(active) < 15) || (slot == 2 && CompanionLevel(active) < 10) ) return;
             AdditionalStateData.unused[COMPANION_SAVE_GEMS + (active - 1) * 3 + slot] = (char)((CompanionTraining(active, slot) + 1) % (slot == 2 ? 3 : 2));
             RecalcPlayer(CurrentPlayerIndex, true);
         }else if( SelectedDialogRow == 20 ) CompanionPanelDetails = false;
