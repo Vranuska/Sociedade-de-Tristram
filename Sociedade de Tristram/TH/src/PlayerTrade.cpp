@@ -114,6 +114,34 @@ static constexpr int COMPANION_SAVE_SUMMON_DISABLED = 58; // 0 = automatic, 1 = 
 static constexpr int COMPANION_SAVE_UNLOCK_FLAGS = 60; // one byte per pet; avoids old quest-bit collisions
 static constexpr int COMPANION_MAX_LEVEL = 50;
 
+static bool CompanionPanelStandalone = false;
+static bool CompanionPanelDetails = false;
+
+// Reserved skill bytes: zero retains the complete original ability set.
+static int CompanionTraining(unsigned char id, int slot)
+{
+    if( id <= COMPANION_NONE || id >= COMPANION_COUNT || slot < 0 || slot >= 3 ) return 0;
+    const int value = (unsigned char)AdditionalStateData.unused[COMPANION_SAVE_GEMS + (id - 1) * 3 + slot];
+    return value <= (slot == 2 ? 2 : 1) ? value : 0;
+}
+
+static int CompanionAbilityDelay(unsigned char id, int slot, int seconds)
+{
+    return seconds * (CompanionTraining(id, slot) == 1 ? 800 : 1000);
+}
+
+void CompanionOpenPanel()
+{
+    if( MaxCountOfPlayersInGame != 1 ){
+        ErrorPlrMsg((char*)"Companheiros disponiveis no modo individual.");
+        return;
+    }
+    CompanionPanelStandalone = true;
+    CompanionPanelDetails = false;
+    ChangeTownerDialog(PD_30_Companions);
+}
+
+
 static i64 CompanionBondReadyAt[PlayersMax_4] = {};
 static i64 CompanionPrimaryReadyAt[PlayersMax_4] = {};
 static i64 CompanionUltimateReadyAt[PlayersMax_4] = {};
@@ -262,6 +290,8 @@ void CompanionApplyOwnerBonuses(int playerIndex)
     Player& owner = Players[playerIndex];
     const int stage = CompanionEvolutionStage(companionId);
     const int affinity = CompanionAffinity(companionId);
+    if( CompanionTraining(companionId, 2) == 1 ) owner.lifeRegen += 15;
+    if( CompanionTraining(companionId, 2) == 2 ) owner.elementToHit[ET_0_PHYSICAL] += 8;
     if( companionId == COMPANION_THOR ){
         // Carga do Trovao: Thor electrifies every lightning source used by
         // his owner. Affinity contributes up to another 10% damage.
@@ -659,11 +689,11 @@ void CompanionProcessAbilities()
         }
 
         if( targets == 0 ) return;
-        CompanionPrimaryReadyAt[ownerIndex] = now + 3 * 1000;
+        CompanionPrimaryReadyAt[ownerIndex] = now + CompanionAbilityDelay(companionId, 0, 3);
         if( castStorm ){
             CompanionCastPureMissile(companion.Row, companion.Col, companion.Row, companion.Col, 0,
                 MI_15_ARCANE_NOVA, ownerIndex, 5, evolutionStage + 1, PS_43_ARCANE_NOVA);
-            CompanionUltimateReadyAt[ownerIndex] = now + 20 * 1000;
+            CompanionUltimateReadyAt[ownerIndex] = now + CompanionAbilityDelay(companionId, 1, 20);
             if( CompanionAiShowSkillMessages ) ErrorPlrMsg((char*)"Kuroko: Labirinto das Sombras!");
         }
         return;
@@ -691,11 +721,11 @@ void CompanionProcessAbilities()
         }
 
         if( targets == 0 ) return;
-        CompanionPrimaryReadyAt[ownerIndex] = now + 5 * 1000;
+        CompanionPrimaryReadyAt[ownerIndex] = now + CompanionAbilityDelay(companionId, 0, 5);
         if( castStorm ){
             CompanionCastPureMissile(companion.Row, companion.Col, companion.Row, companion.Col, 0,
                 MI_32_HOLY_NOVA, ownerIndex, 4, evolutionStage + 2, PS_39_HOLY_NOVA);
-            CompanionUltimateReadyAt[ownerIndex] = now + 22 * 1000;
+            CompanionUltimateReadyAt[ownerIndex] = now + CompanionAbilityDelay(companionId, 1, 22);
             if( CompanionAiShowSkillMessages ) ErrorPlrMsg((char*)"Lord: Julgamento do Guardiao!");
         }
         return;
@@ -720,11 +750,11 @@ void CompanionProcessAbilities()
             ++targets;
         }
         if( targets == 0 ) return;
-        CompanionPrimaryReadyAt[ownerIndex] = now + 4 * 1000;
+        CompanionPrimaryReadyAt[ownerIndex] = now + CompanionAbilityDelay(companionId, 0, 4);
         if( castStorm ){
             CompanionCastPureMissile(companion.Row, companion.Col, companion.Row, companion.Col, 0,
                 MI_134_FROST_NOVA, ownerIndex, 4, evolutionStage + 2, PS_58_FROST_NOVA);
-            CompanionUltimateReadyAt[ownerIndex] = now + 20 * 1000;
+            CompanionUltimateReadyAt[ownerIndex] = now + CompanionAbilityDelay(companionId, 1, 20);
             if( CompanionAiShowSkillMessages ) ErrorPlrMsg((char*)"Mizuki: Coroa Invernal!");
         }
         return;
@@ -749,11 +779,11 @@ void CompanionProcessAbilities()
             ++targets;
         }
         if( targets == 0 ) return;
-        CompanionPrimaryReadyAt[ownerIndex] = now + 3 * 1000;
+        CompanionPrimaryReadyAt[ownerIndex] = now + CompanionAbilityDelay(companionId, 0, 3);
         if( castStorm ){
             CompanionCastPureMissile(companion.Row, companion.Col, companion.Row, companion.Col, 0,
                 MI_72_FIRE_NOVA, ownerIndex, 5, evolutionStage + 3, PS_41_FIERY_NOVA);
-            CompanionUltimateReadyAt[ownerIndex] = now + 17 * 1000;
+            CompanionUltimateReadyAt[ownerIndex] = now + CompanionAbilityDelay(companionId, 1, 17);
             if( CompanionAiShowSkillMessages ) ErrorPlrMsg((char*)"Pitty: Furia Resoluta!");
         }
         return;
@@ -779,9 +809,9 @@ void CompanionProcessAbilities()
     }
 
     if( targets == 0 ) return;
-    CompanionPrimaryReadyAt[ownerIndex] = now + 4 * 1000;
+    CompanionPrimaryReadyAt[ownerIndex] = now + CompanionAbilityDelay(companionId, 0, 4);
     if( castStorm ){
-        CompanionUltimateReadyAt[ownerIndex] = now + 18 * 1000;
+        CompanionUltimateReadyAt[ownerIndex] = now + CompanionAbilityDelay(companionId, 1, 18);
         if( CompanionAiShowSkillMessages ) ErrorPlrMsg((char*)"Thor: Tempestade!");
     }
 }
@@ -2489,6 +2519,24 @@ void CompanionMenu()
     SetDialogRow(PT_DialogRows_NoIndent, PT_DialogRows_30_Companions_Logo, true, "COMPANHEIROS", C_3_Gold, false);
     SetDialogRow(PT_DialogRows_NoIndent, PT_DialogRows_30_Companions_Status, true, status, C_0_White, false);
 
+    if( CompanionPanelDetails && active != COMPANION_NONE ){
+        char line[128];
+        sprintf_s(line, "Experiencia: %u / %u", (unsigned int)CompanionExperience(active), (unsigned int)CompanionExperienceForNextLevel(CompanionLevel(active)));
+        SetDialogRow(PT_DialogRows_NoIndent, 7, true, line, C_0_White, false);
+        SetDialogRow(PT_DialogRows_NoIndent, 9, true, CompanionIsSummoned() ? "Dispensar companheiro" : "Chamar companheiro", C_1_Blue, true);
+        sprintf_s(line, "Basica: %s", CompanionTraining(active, 0) ? "Agilidade (-20% recarga)" : "Original");
+        SetDialogRow(PT_DialogRows_NoIndent, 11, true, line, C_1_Blue, active != COMPANION_JASON);
+        sprintf_s(line, "Especial: %s", CompanionTraining(active, 1) ? "Agilidade (-20% recarga)" : "Original");
+        SetDialogRow(PT_DialogRows_NoIndent, 13, true, line, C_1_Blue, active != COMPANION_JASON);
+        const int passive = CompanionTraining(active, 2);
+        sprintf_s(line, "Passiva extra: %s", passive == 1 ? "Vigor (regeneracao)" : passive == 2 ? "Precisao (+8 fisica)" : "Nenhuma");
+        SetDialogRow(PT_DialogRows_NoIndent, 15, true, line, C_1_Blue, true);
+        SetDialogRow(PT_DialogRows_NoIndent, 17, true, active == COMPANION_JASON ? "Jason: basica e especial em preparo" : "Clique nas habilidades para trocar", C_3_Gold, false);
+        SetDialogRow(PT_DialogRows_NoIndent, 20, true, "Voltar aos companheiros", C_0_White, true);
+        DialogRowsCount = PT_DialogRows_20_SmallDialog_RowsCount;
+        return;
+    }
+
     struct CompanionRow { int row; unsigned char id; };
     const CompanionRow rows[] = {
         { PT_DialogRows_30_Companions_Jason, COMPANION_JASON },
@@ -2505,7 +2553,8 @@ void CompanionMenu()
         SetDialogRow(PT_DialogRows_NoIndent, entry.row, true, label, CompanionUnlocked(entry.id) ? C_1_Blue : C_0_White, CompanionUnlocked(entry.id));
     }
 
-    if( active != COMPANION_NONE ) SetDialogRow(PT_DialogRows_NoIndent, PT_DialogRows_30_Companions_Gift, true, "Oferecer petisco favorito (250 ouro)", C_3_Gold, true);
+    if( active != COMPANION_NONE ) SetDialogRow(PT_DialogRows_NoIndent, 16, true, "Ficha e habilidades", C_1_Blue, true);
+    if( !CompanionPanelStandalone && active != COMPANION_NONE ) SetDialogRow(PT_DialogRows_NoIndent, PT_DialogRows_30_Companions_Gift, true, "Oferecer petisco favorito (250 ouro)", C_3_Gold, true);
     SetDialogRow(PT_DialogRows_NoIndent, PT_DialogRows_30_Companions_Back, true, "Voltar", C_0_White, true);
     DialogRowsCount = PT_DialogRows_20_SmallDialog_RowsCount;
 }
@@ -2677,7 +2726,12 @@ void PrevTownerDialog()
 			CurrentDialogIndex = PD_0_None;
 			break;
 		case PD_30_Companions:
-			ChangeTownerDialog(PD_22_FarnhamMain);
+            if( CompanionPanelDetails ){
+                CompanionPanelDetails = false;
+                ChangeTownerDialog(PD_30_Companions);
+            }else if( CompanionPanelStandalone ){
+                CurrentDialogIndex = PD_0_None;
+            }else ChangeTownerDialog(PD_22_FarnhamMain);
 			break;
         case PD_23_GilianMain:
 			CurrentDialogIndex = PD_0_None;
@@ -3991,6 +4045,8 @@ void HandleFarnhamMainMenu ()
         EndIndexOfGossibSpeechByCurrentCityzen = SP_211;
         ChangeTownerDialog(PD_19_Talk);
     }else if( SelectedDialogRow == PT_DialogRows_22_FarnhamMain_Companions ){
+        CompanionPanelStandalone = false;
+        CompanionPanelDetails = false;
         ChangeTownerDialog(PD_30_Companions);
     }else if( SelectedDialogRow == PT_DialogRows_22_FarnhamMain_Leave ){
         CurrentDialogIndex = PD_0_None;
@@ -3999,6 +4055,23 @@ void HandleFarnhamMainMenu ()
 
 void HandleCompanionMenu()
 {
+    const unsigned char active = ActiveCompanion();
+    if( CompanionPanelDetails && active != COMPANION_NONE ){
+        if( SelectedDialogRow == 9 ) CompanionToggleSummoned();
+        else if( SelectedDialogRow == 11 || SelectedDialogRow == 13 || SelectedDialogRow == 15 ){
+            const int slot = (SelectedDialogRow - 11) / 2;
+            AdditionalStateData.unused[COMPANION_SAVE_GEMS + (active - 1) * 3 + slot] = (char)((CompanionTraining(active, slot) + 1) % (slot == 2 ? 3 : 2));
+            RecalcPlayer(CurrentPlayerIndex, true);
+        }else if( SelectedDialogRow == 20 ) CompanionPanelDetails = false;
+        ChangeTownerDialog(PD_30_Companions);
+        return;
+    }
+    if( SelectedDialogRow == 16 && active != COMPANION_NONE ){
+        CompanionPanelDetails = true;
+        ChangeTownerDialog(PD_30_Companions);
+        return;
+    }
+
     unsigned char selected = COMPANION_NONE;
     switch( SelectedDialogRow ){
     case PT_DialogRows_30_Companions_Jason:  selected = COMPANION_JASON; break;
@@ -4010,18 +4083,25 @@ void HandleCompanionMenu()
     }
 
     if( selected != COMPANION_NONE && CompanionUnlocked(selected) ){
+        if( selected != active && CompanionIsSummoned() ){
+            const int summonSlot = CompanionMonsterSlot(CurrentPlayerIndex);
+            ClearMonsterOnMap(summonSlot);
+            Monsters[summonSlot].Row = 1;
+            Monsters[summonSlot].Col = 0;
+            Monsters[summonSlot].CurrentLife = 0;
+        }
         AdditionalStateData.unused[COMPANION_SAVE_ACTIVE] = (char)selected;
         AdditionalStateData.unused[COMPANION_SAVE_SUMMON_DISABLED] = 0;
         RecalcPlayer(CurrentPlayerIndex, true);
+        CompanionEnsureSummoned();
         char message[128];
-        sprintf_s(message, "Farnham: %s vai acompanhar voce.", CompanionName(selected));
+        sprintf_s(message, "%s vai acompanhar voce.", CompanionName(selected));
         ErrorPlrMsg(message);
         ChangeTownerDialog(PD_30_Companions);
         return;
     }
 
-    if( SelectedDialogRow == PT_DialogRows_30_Companions_Gift ){
-        const unsigned char active = ActiveCompanion();
+    if( !CompanionPanelStandalone && SelectedDialogRow == PT_DialogRows_30_Companions_Gift ){
         if( active == COMPANION_NONE ) return;
         if( Players[CurrentPlayerIndex].TotalGold < 250 ){
             ErrorPlrMsg((char*)"Farnham: voce precisa de 250 de ouro para preparar o presente.");
@@ -4036,7 +4116,8 @@ void HandleCompanionMenu()
     }
 
     if( SelectedDialogRow == PT_DialogRows_30_Companions_Back ){
-        ChangeTownerDialog(PD_22_FarnhamMain);
+        if( CompanionPanelStandalone ) CurrentDialogIndex = PD_0_None;
+        else ChangeTownerDialog(PD_22_FarnhamMain);
     }
 }
 

@@ -247,8 +247,8 @@ void Inventory_LButtonClick()
 		InventoryPanel_AutoOrganize();
 		return;
 	}
-	if (!IsStashPanelVisible && CompanionHasActive() && CursorInInventoryQoLButton(InventoryCompanionButton)) {
-		CompanionToggleSummoned();
+	if (!IsStashPanelVisible && CursorInInventoryQoLButton(InventoryCompanionButton)) {
+		CompanionOpenPanel();
 		return;
 	}
 	if (IsStashPanelVisible && CursorInInventoryQoLButton(InventoryStoreFilterButton)) {
@@ -943,8 +943,8 @@ void DrawINVPanel()
 
 	Surface_DrawCEL(InventoryPanelRect.Left + Screen_LeftBorder, InventoryPanelRect.Down + Screen_TopBorder, InvPanelCEL, 1, InventoryPanelRect.Width);// Тут рисуется сама картинка инвентаря
 	DrawText(InventoryOrganizeButton.Left, InventoryOrganizeButton.Top + 13, InventoryOrganizeButton.Right, "ORGANIZAR", C_0_White);
-	if (!IsStashPanelVisible && CompanionHasActive()) {
-		const char* petLabel = CompanionIsSummoned() ? "PET: DISPENSAR" : "PET: CHAMAR";
+	if (!IsStashPanelVisible) {
+		const char* petLabel = "COMPANHEIROS";
 		DrawText(InventoryCompanionButton.Left, InventoryCompanionButton.Top + 13, InventoryCompanionButton.Right, petLabel, C_2_Red);
 	}
 	if (IsStashPanelVisible) {

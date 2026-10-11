@@ -42,6 +42,7 @@ bool CompanionGetRenderInfo(int monsterIndex, int* companionId, int* evolutionSt
 bool CompanionHasActive();
 bool CompanionIsSummoned();
 void CompanionToggleSummoned();
+void CompanionOpenPanel();
 bool CompanionUseFood(int companionId);
 void RepairInvalidBook(Item& item);
 void RepairInvalidBook(Item& item, uint baseItemIndex);
