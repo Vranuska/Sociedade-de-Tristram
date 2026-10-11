@@ -473,6 +473,7 @@ static bool MaeraConvergenceLearned(unsigned char id)
 
 static bool CompanionPanelStandalone = false;
 static bool CompanionPanelDetails = false;
+static bool CompanionPanelJourney = false;
 
 // Reserved skill bytes: zero retains the complete original ability set.
 static int CompanionTraining(unsigned char id, int slot)
@@ -510,6 +511,7 @@ void CompanionOpenPanel()
     }
     CompanionPanelStandalone = true;
     CompanionPanelDetails = false;
+    CompanionPanelJourney = false;
     ChangeTownerDialog(PD_30_Companions);
 }
 
@@ -2939,9 +2941,68 @@ static const char* CompanionSpecialName(unsigned char id)
     return id < COMPANION_COUNT ? names[id] : names[0];
 }
 
+static unsigned char MaeraBondTarget();
+// This guide only reads the saved quest/companion data. Opening it never advances a quest.
+static void BuildCompanionJourneyLines(char (&lines)[10][128], unsigned char active)
+{
+    for( auto& line : lines ) line[0] = 0;
+    if( !MemoryAvailable() ){
+        strcpy_s(lines[0], "A jornada de Maera nao esta disponivel neste modo.");
+        strcpy_s(lines[1], "Consulte as habilidades na ficha do companheiro.");
+        return;
+    }
+    const unsigned char state = MemoryState();
+    const unsigned char target = MaeraBondTarget();
+    if( state == 0 ){
+        strcpy_s(lines[0], "A casa esquecida: investigacao ainda nao iniciada.");
+        strcpy_s(lines[1], "Proximo passo: fale com Adria sobre a casa.");
+    }else if( state == 1 ){
+        strcpy_s(lines[0], "A casa esquecida: reunindo os relatos de Tristram.");
+        const unsigned char mask = MemoryTestimonies();
+        sprintf_s(lines[1], "Cain [%s]  Gillian [%s]  Farnham [%s]", mask & 1 ? "OK" : "falta", mask & 2 ? "OK" : "falta", mask & 4 ? "OK" : "falta");
+        strcpy_s(lines[2], mask == 7 ? "Volte a Adria e confronte os tres relatos." : "Abra cada relato e escolha Guardar este relato.");
+    }else if( state == 2 ){
+        strcpy_s(lines[0], "A casa esquecida: entre pela cancao de Adria.");
+        const unsigned char mask = (unsigned char)AdditionalStateData.unused[MEMORY_CLUES] & 7;
+        sprintf_s(lines[1], "Espelho [%s]  Tigela [%s]  Cadeira [%s]", mask & 1 ? "OK" : "falta", mask & 2 ? "OK" : "falta", mask & 4 ? "OK" : "falta");
+        strcpy_s(lines[2], mask == 7 ? "Enfrente A Quarta Batida. As pistas ensinam a luta." : "Leia e devolva as tres lembrancas da casa.");
+    }else if( state == 3 ){
+        strcpy_s(lines[0], "A Quarta Batida foi derrotada.");
+        strcpy_s(lines[1], "Leia o nome no centro da casa e escolha seu destino.");
+    }else if( state == 4 ){
+        strcpy_s(lines[0], "A casa esquecida: resgate concluido.");
+        strcpy_s(lines[1], "Maera espera perto de Gillian, em Tristram.");
+        if( target != COMPANION_NONE ){
+            const unsigned char mask = (unsigned char)AdditionalStateData.unused[MAERA_BOND_MEMORIES] & 7;
+            sprintf_s(lines[2], "Jornada em andamento: %s", CompanionName(target));
+            sprintf_s(lines[3], "Espelho [%s]  Tigela [%s]  Cadeira [%s]", mask & 1 ? "OK" : "falta", mask & 2 ? "OK" : "falta", mask & 4 ? "OK" : "falta");
+            strcpy_s(lines[4], mask == 7 ? "As tres lembrancas estao prontas. Volte a Maera." : active != target ? "Selecione o companheiro desta jornada antes de partir." : "Volte a casa com ele chamado e perto de voce.");
+        }else strcpy_s(lines[2], "Sem jornada em andamento. Consulte Maera na cidade.");
+    }else{
+        strcpy_s(lines[0], "Consulte Adria para conferir o estado da casa.");
+    }
+    if( active == COMPANION_NONE ){
+        strcpy_s(lines[5], "Selecione um companheiro para ver sua progressao.");
+        return;
+    }
+    if( !MaeraBondLearned(active) )
+        strcpy_s(lines[5], state < 4 ? "Instinto: investigue a casa e avance ate o resgate." : CompanionLevel(active) < 5 ? "Instinto: alcance nivel 5 e procure Maera." : "Instinto: conclua a jornada deste companheiro com Maera.");
+    else if( !MaeraEchoLearned(active) )
+        sprintf_s(lines[5], "Proximo: Eco com Maera. Nivel 15 e %d ouro.", MAERA_ECHO_PRICE);
+    else if( !MaeraConvergenceLearned(active) )
+        sprintf_s(lines[5], "Proximo: Convergencia. Nivel 25, afinidade 50, %d ouro.", MAERA_CONVERGENCE_PRICE);
+    else strcpy_s(lines[5], "Os tres ensinamentos de Maera foram aprendidos.");
+    sprintf_s(lines[6], "Instinto [%s]  Eco [%s]  Convergencia [%s]", MaeraBondLearned(active) ? "OK" : "falta", MaeraEchoLearned(active) ? "OK" : "falta", MaeraConvergenceLearned(active) ? "OK" : "falta");
+    const int stage = CompanionEvolutionStage(active);
+    strcpy_s(lines[7], stage == 1 ? "Evolucao seguinte: nivel 10 e afinidade 25." : stage == 2 ? "Evolucao final: nivel 25 e afinidade 75." : "Evolucao final alcancada. Continue rumo ao nivel 50.");
+    if( CompanionLevel(active) >= COMPANION_MAX_LEVEL ) strcpy_s(lines[8], "Nivel maximo alcancado: 50.");
+    else sprintf_s(lines[8], "Nivel %d: XP %u / %u para subir.", CompanionLevel(active), (unsigned int)CompanionExperience(active), (unsigned int)CompanionExperienceForNextLevel(CompanionLevel(active)));
+    strcpy_s(lines[9], "Nivel 50 + evolucao final: recarga de poder maximo.");
+}
+
 void CompanionMenu()
 {
-    IsBigMenuBox = false;
+    IsBigMenuBox = true;
     DialogHasScroolBox = false;
     char status[128];
     const unsigned char active = ActiveCompanion();
@@ -2953,6 +3014,17 @@ void CompanionMenu()
 
     SetDialogRow(PT_DialogRows_NoIndent, PT_DialogRows_30_Companions_Logo, true, "COMPANHEIROS", C_3_Gold, false);
     SetDialogRow(PT_DialogRows_NoIndent, PT_DialogRows_30_Companions_Status, true, status, C_0_White, false);
+
+    if( CompanionPanelJourney ){
+        char lines[10][128];
+        BuildCompanionJourneyLines(lines, active);
+        for( int i = 0; i < 10; ++i )
+            SetDialogRow(PT_DialogRows_NoIndent, 7+i, true, lines[i], C_0_White, false);
+        if( CompanionPanelDetails ) SetDialogRow(PT_DialogRows_NoIndent, 18, true, "Voltar as habilidades", C_1_Blue, true);
+        SetDialogRow(PT_DialogRows_NoIndent, 20, true, "Voltar aos companheiros", C_0_White, true);
+        DialogRowsCount = PT_DialogRows_20_SmallDialog_RowsCount;
+        return;
+    }
 
     if( CompanionPanelDetails && active != COMPANION_NONE ){
         char line[128];
@@ -2968,7 +3040,7 @@ void CompanionMenu()
         sprintf_s(line, "Passiva extra: %s", CompanionLevel(active) < 10 ? "Desbloqueia no nivel 10" : passive == 1 ? "Vigor (regeneracao)" : passive == 2 ? "Precisao (+8 fisica)" : "Nenhuma");
         SetDialogRow(PT_DialogRows_NoIndent, 15, true, line, C_1_Blue, CompanionLevel(active) >= 10);
         SetDialogRow(PT_DialogRows_NoIndent, 17, true, MaeraBondLearned(active) ? "Instinto de Retorno: aprendido com Maera" : "Clique nas habilidades para trocar", C_3_Gold, false);
-        SetDialogRow(PT_DialogRows_NoIndent, 18, true, "Nv.50 + evolucao final: poder maximo", C_3_Gold, false);
+        SetDialogRow(PT_DialogRows_NoIndent, 18, true, "Jornada e proximos passos", C_3_Gold, true);
         SetDialogRow(PT_DialogRows_NoIndent, 20, true, "Voltar aos companheiros", C_0_White, true);
         DialogRowsCount = PT_DialogRows_20_SmallDialog_RowsCount;
         return;
@@ -2991,6 +3063,7 @@ void CompanionMenu()
     }
 
     if( active != COMPANION_NONE ) SetDialogRow(PT_DialogRows_NoIndent, 16, true, "Ficha e habilidades", C_1_Blue, true);
+    SetDialogRow(PT_DialogRows_NoIndent, 18, true, "Jornada e proximos passos", C_3_Gold, true);
     if( !CompanionPanelStandalone && active != COMPANION_NONE ) SetDialogRow(PT_DialogRows_NoIndent, PT_DialogRows_30_Companions_Gift, true, "Oferecer petisco favorito (250 ouro)", C_3_Gold, true);
     SetDialogRow(PT_DialogRows_NoIndent, PT_DialogRows_30_Companions_Back, true, "Voltar", C_0_White, true);
     DialogRowsCount = PT_DialogRows_20_SmallDialog_RowsCount;
@@ -3035,7 +3108,7 @@ static int MaeraBondScene = -1;
 static unsigned char MaeraBondTarget()
 {
     const unsigned char id = (unsigned char)AdditionalStateData.unused[MAERA_BOND_TARGET];
-    return id > COMPANION_NONE && id < COMPANION_COUNT && CompanionUnlocked(id) ? id : COMPANION_NONE;
+    return id > COMPANION_NONE && id < COMPANION_COUNT && CompanionUnlocked(id) ? id : (unsigned char)COMPANION_NONE;
 }
 static bool MaeraBondCompanionPresent()
 {
@@ -3490,7 +3563,10 @@ void PrevTownerDialog()
             ChangeTownerDialog(MemoryCaller);
             break;
 		case PD_30_Companions:
-            if( CompanionPanelDetails ){
+            if( CompanionPanelJourney ){
+                CompanionPanelJourney = false;
+                ChangeTownerDialog(PD_30_Companions);
+            }else if( CompanionPanelDetails ){
                 CompanionPanelDetails = false;
                 ChangeTownerDialog(PD_30_Companions);
             }else if( CompanionPanelStandalone ){
@@ -4811,6 +4887,7 @@ void HandleFarnhamMainMenu ()
     }else if( SelectedDialogRow == PT_DialogRows_22_FarnhamMain_Companions ){
         CompanionPanelStandalone = false;
         CompanionPanelDetails = false;
+        CompanionPanelJourney = false;
         ChangeTownerDialog(PD_30_Companions);
     }else if( SelectedDialogRow == PT_DialogRows_22_FarnhamMain_Leave ){
         CurrentDialogIndex = PD_0_None;
@@ -4820,6 +4897,19 @@ void HandleFarnhamMainMenu ()
 void HandleCompanionMenu()
 {
     const unsigned char active = ActiveCompanion();
+    if( CompanionPanelJourney ){
+        if( SelectedDialogRow == 18 || SelectedDialogRow == 20 ){
+            CompanionPanelJourney = false;
+            if( SelectedDialogRow == 20 ) CompanionPanelDetails = false;
+            ChangeTownerDialog(PD_30_Companions);
+        }
+        return;
+    }
+    if( SelectedDialogRow == 18 ){
+        CompanionPanelJourney = true;
+        ChangeTownerDialog(PD_30_Companions);
+        return;
+    }
     if( CompanionPanelDetails && active != COMPANION_NONE ){
         if( SelectedDialogRow == 9 ) CompanionToggleSummoned();
         else if( SelectedDialogRow == 11 || SelectedDialogRow == 13 || SelectedDialogRow == 15 ){

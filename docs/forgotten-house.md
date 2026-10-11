@@ -85,3 +85,13 @@ Bytes 116..121 guardam os seis aprendizados; o slot especial existente passa a a
 O teste isolado `tools/check_maera_echo.py` agora cobre também nível/afinidade/pré-requisitos, ouro insuficiente, cobrança única para os seis companheiros, dano de cada caminho especial real, conservação do dano básico e alternância para Agilidade. Compilação no Windows, salvamento dentro do jogo e efeitos visuais continuam pendentes para esta etapa.
 
 Teste manual: com um companheiro elegível, Maera → Treinamento → Segundo ensinamento → aprender; confirmar o débito único de 15000, alternar a especial na ficha, salvar/carregar e comparar dano/recarga contra inimigos. A especial deve ganhar dano com Convergência e frequência com Agilidade.
+
+## Guia da jornada dentro do painel dos companheiros
+
+O botão **Jornada e próximos passos**, na lista e na ficha do companheiro, abre uma página do mesmo painel. Mostra o estado da casa, relatos/pistas registrados, companheiro escolhido para a jornada, lembranças restantes, retorno à Maera, aprendizados de Instinto/Eco/Convergência, requisitos do próximo treinamento, evolução e XP para o nível seguinte. Permite consultar o início da investigação mesmo sem companheiro ativo. Não inicia quests, não transporta, não entrega recompensas e não cobra ouro.
+
+A identidade da sobrevivente não é revelada pelo objetivo inicial. Os nomes e custos dos treinamentos ficam disponíveis conforme a progressão. A jornada distingue o companheiro escolhido daquele atualmente ativo e informa quando selecionar o correto. Os valores são lidos do save atual; preços usam as mesmas constantes do treinamento.
+
+A janela dos companheiros usa agora o formato largo nativo, para acomodar nomes de habilidades e requisitos. Esc ou Voltar retorna à página anterior; a página da jornada oferece voltar à ficha quando veio dela, ou à lista dos companheiros. Não foi criado um novo formato de save nem atalho de teclado.
+
+Validação isolada do guia: todas as cinco etapas da casa, seis companheiros ou nenhum, e as oito máscaras de relatos/lembranças; limites dos textos e preservação integral dos bytes salvos e ouro. O teste também continua cobrindo os ataques e treinamentos anteriores. A aparência, o clique e a navegação ainda precisam ser conferidos no Windows/jogo.
