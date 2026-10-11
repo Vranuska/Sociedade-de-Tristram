@@ -47,3 +47,15 @@ Pendente no Windows: compilar e testar colisões/renderização, combate, retorn
 ## Roteiro de teste manual
 
 Adria → aceitar → registrar os três relatos → Adria → responder → seguir canção. Ler e devolver as três lembranças, combater, ler o nome central e escolher. Voltar pela saída e falar com Maera perto de Gillian. Salvar/carregar e conferir que ela permanece. Alimentar um companheiro duas vezes no mesmo nível: apenas a primeira deve cobrar e dar afinidade. Após subir um nível, uma nova porção deve ser permitida.
+
+## Jornada de vínculo: Quem fica esperando
+
+Após o resgate, Maera oferece uma missão para cada companheiro a partir do nível 5. Uma jornada fica ativa por vez. O companheiro escolhido deve estar selecionado, chamado e próximo do personagem ao compartilhar as lembranças do espelho, da tigela e da cadeira na casa já libertada. A ordem é livre; cada cena tem um comportamento próprio para Jason, Kuroko, Mizuki, Thor, Lord ou Pitty. Não há exigência de mortes nem itens consumidos.
+
+As três lembranças liberam a conclusão com Maera na cidade. Recompensa por companheiro, uma única vez: +15 afinidade e Instinto de Retorno. Com esse companheiro ativo, o personagem recebe +10 armadura e sua habilidade básica recebe -10% de recarga, respeitando os limites mínimos existentes. Jason recebe +20 armadura para o personagem, pois suas habilidades básica/especial ainda não estão implementadas. O aprendizado aparece na ficha de habilidades e acompanha o personagem entre partidas.
+
+Persistência adicional: byte 102 guarda o companheiro da jornada; 103 guarda a máscara das três lembranças; 104..109 guardam os seis aprendizados permanentes. Sem aumento da estrutura de save. A recompensa pertence ao companheiro escolhido, mesmo se outro estiver ativo ao retornar.
+
+Verificações isoladas executadas com as funções reais e dependências simuladas: nível mínimo, companheiro escolhido, chamado e próximo, relatos dos seis companheiros, ordem livre, repetição das pistas sem duplicação, recompensa restrita à cidade, conclusão única por companheiro, redução real da recarga básica sem mudar a especial e preservação dos dados do resgate. Compilação no Windows e teste dentro do jogo ficam pendentes para esta etapa.
+
+Teste manual: Maera → Quem fica esperando → aceitar com companheiro nível 5 → voltar à casa → compartilhar as três lembranças com ele por perto → voltar à cidade → concluir com Maera → conferir afinidade e Instinto na ficha. Salvar/carregar durante a missão, trocar de companheiro antes de uma pista e repetir após concluir devem preservar ou bloquear o progresso conforme as regras acima.

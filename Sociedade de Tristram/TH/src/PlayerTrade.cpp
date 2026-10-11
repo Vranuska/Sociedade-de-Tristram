@@ -205,6 +205,7 @@ bool MemoryOperateObject(int playerIndex, int objectIndex)
     if( objectIndex < 0 || objectIndex >= MaxObjects_127 ) return false;
     const Object& object = Objects[objectIndex];
     if( object.BaseObjectIndex != BO_52_BOOK1 ) return false;
+    if( MaeraBondOperateObject(playerIndex, objectIndex) ) return true;
     for( int i = 0; i < 4; ++i ){
         if( object.Row != MemoryObjectRows[i] || object.Col != MemoryObjectCols[i] ) continue;
         if( playerIndex == CurrentPlayerIndex ){
@@ -444,6 +445,16 @@ static constexpr int COMPANION_SAVE_SUMMON_DISABLED = 58; // 0 = automatic, 1 = 
 static constexpr int COMPANION_SAVE_UNLOCK_FLAGS = 60; // one byte per pet; avoids old quest-bit collisions
 static constexpr int COMPANION_MAX_LEVEL = 50;
 
+// Maera's first bond quest: one learned instinct per companion.
+static constexpr int MAERA_BOND_TARGET = 102;
+static constexpr int MAERA_BOND_MEMORIES = 103;
+static constexpr int MAERA_BOND_LEARNED = 104; // six completion bytes, 104..109
+static bool MaeraBondLearned(unsigned char id)
+{
+    return id > COMPANION_NONE && id < COMPANION_COUNT
+        && AdditionalStateData.unused[MAERA_BOND_LEARNED + id - 1] == 1;
+}
+
 static bool CompanionPanelStandalone = false;
 static bool CompanionPanelDetails = false;
 
@@ -469,6 +480,7 @@ static int CompanionAbilityDelay(unsigned char id, int slot, int seconds)
     if( level >= COMPANION_MAX_LEVEL && CompanionEvolutionStage(id) == 3 ) percent = 15;
     int delay = seconds * 10 * percent;
     if( CompanionTraining(id, slot) == 1 ) delay = delay * 80 / 100;
+    if( slot == 0 && MaeraBondLearned(id) ) delay = delay * 90 / 100;
     const int minimum = slot == 0 ? 350 : 2000;
     return delay < minimum ? minimum : delay;
 }
@@ -641,6 +653,7 @@ void CompanionApplyOwnerBonuses(int playerIndex)
     Player& owner = Players[playerIndex];
     const int stage = CompanionEvolutionStage(companionId);
     const int affinity = CompanionAffinity(companionId);
+    if( MaeraBondLearned(companionId) ) owner.ACFromClass += companionId == COMPANION_JASON ? 20 : 10;
     if( CompanionLevel(companionId) >= 10 && CompanionTraining(companionId, 2) == 1 ) owner.lifeRegen += 15;
     if( CompanionLevel(companionId) >= 10 && CompanionTraining(companionId, 2) == 2 ) owner.elementToHit[ET_0_PHYSICAL] += 8;
     if( companionId == COMPANION_THOR ){
@@ -2887,7 +2900,7 @@ void CompanionMenu()
         const int passive = CompanionTraining(active, 2);
         sprintf_s(line, "Passiva extra: %s", CompanionLevel(active) < 10 ? "Desbloqueia no nivel 10" : passive == 1 ? "Vigor (regeneracao)" : passive == 2 ? "Precisao (+8 fisica)" : "Nenhuma");
         SetDialogRow(PT_DialogRows_NoIndent, 15, true, line, C_1_Blue, CompanionLevel(active) >= 10);
-        SetDialogRow(PT_DialogRows_NoIndent, 17, true, active == COMPANION_JASON ? "Jason: basica e especial em preparo" : "Clique nas habilidades para trocar", C_3_Gold, false);
+        SetDialogRow(PT_DialogRows_NoIndent, 17, true, MaeraBondLearned(active) ? "Instinto de Retorno: aprendido com Maera" : active == COMPANION_JASON ? "Jason: basica e especial em preparo" : "Clique nas habilidades para trocar", C_3_Gold, false);
         SetDialogRow(PT_DialogRows_NoIndent, 18, true, "Nv.50 + evolucao final: poder maximo", C_3_Gold, false);
         SetDialogRow(PT_DialogRows_NoIndent, 20, true, "Voltar aos companheiros", C_0_White, true);
         DialogRowsCount = PT_DialogRows_20_SmallDialog_RowsCount;
@@ -2950,6 +2963,146 @@ void ColiseumDifficultyMenu()
     DialogRowsCount = PT_DialogRows_20_SmallDialog_RowsCount;
 }
 
+// Scene is UI-only. The chosen companion, clues and reward are saved per hero.
+static int MaeraBondScene = -1;
+static unsigned char MaeraBondTarget()
+{
+    const unsigned char id = (unsigned char)AdditionalStateData.unused[MAERA_BOND_TARGET];
+    return id > COMPANION_NONE && id < COMPANION_COUNT && CompanionUnlocked(id) ? id : COMPANION_NONE;
+}
+static bool MaeraBondCompanionPresent()
+{
+    if( ActiveCompanion() != MaeraBondTarget() || !CompanionIsSummoned()
+        || AdditionalStateData.unused[COMPANION_SAVE_SUMMON_DISABLED] ) return false;
+    const Monster& pet = Monsters[CompanionMonsterSlot(CurrentPlayerIndex)];
+    const Player& owner = Players[CurrentPlayerIndex];
+    return abs(pet.Row-owner.Row) <= 5 && abs(pet.Col-owner.Col) <= 5;
+}
+bool MaeraBondOperateObject(int playerIndex, int objectIndex)
+{
+    if( !MemoryCaretakerRescued() || Dungeon != DUN_115_FORGOTTEN_HOUSE || MaeraBondTarget() == COMPANION_NONE ) return false;
+    const Object& object = Objects[objectIndex];
+    for( int scene = 0; scene < 3; ++scene ){
+        if( object.Row != MemoryObjectRows[scene] || object.Col != MemoryObjectCols[scene] ) continue;
+        if( playerIndex != CurrentPlayerIndex ) return true;
+        const Player& owner = Players[CurrentPlayerIndex];
+        if( !MaeraBondCompanionPresent() || abs(owner.Row-object.Row) > 2 || abs(owner.Col-object.Col) > 2 ){
+            ErrorPlrMsg("A lembranca precisa de voces dois. Aproxime o companheiro escolhido.");
+            return true;
+        }
+        MaeraBondScene = scene;
+        ChangeTownerDialog(PD_33_MaeraBond);
+        return true;
+    }
+    return false;
+}
+void MaeraBondMenu()
+{
+    IsBigMenuBox = true;
+    DialogHasScroolBox = false;
+    SetDialogRow(PT_DialogRows_NoIndent, 2, true, "QUEM FICA ESPERANDO", C_3_Gold, false);
+    const unsigned char target = MaeraBondTarget();
+    const unsigned char active = ActiveCompanion();
+    const unsigned char memories = (unsigned char)AdditionalStateData.unused[MAERA_BOND_MEMORIES] & 7;
+    if( target != COMPANION_NONE && MaeraBondScene >= 0 && MaeraBondScene < 3 ){
+        static const char* stories[6][3] = {
+            { "Jason procura uma saida atras do proprio reflexo.", "Jason nao come antes de olhar se voce ficou.", "Jason encosta na cadeira. Desta vez, ha alguem." },
+            { "Kuroko observa a sombra que demora a segui-lo.", "Kuroko empurra a tigela para perto de voce.", "Kuroko encontra a saida, mas escolhe esperar." },
+            { "Mizuki se esconde do reflexo. Voce se abaixa.", "Mizuki toca a agua e procura sua mao.", "Mizuki sobe na cadeira sem perder voce de vista." },
+            { "Thor encara o espelho como um adversario.", "Thor espera. Nem toda urgencia pede uma luta.", "Thor deita junto da cadeira. O vigia descansa." },
+            { "Lord ve no espelho um posto que nunca abandonou.", "Lord aceita a agua. Servir nao exige se esquecer.", "Lord deixa a cadeira vazia. Voce nao e uma ordem." },
+            { "Pitty procura no espelho quem lhe deu correntes.", "Pitty recua da tigela. Voce nao a empurra.", "Pitty volta por vontade propria. Ninguem o chama." }
+        };
+        const char* lines[7] = {
+            stories[target-1][MaeraBondScene],
+            MaeraBondScene == 0 ? "O espelho nao mostra inimigos. Mostra a espera." : MaeraBondScene == 1 ? "A tigela conserva o calor de quem se importa." : "A cadeira nao pertence a um dono. E um lugar.",
+            MaeraBondScene == 0 ? "Voce fica ao lado dele, sem puxar nem ordenar." : MaeraBondScene == 1 ? "Voce deixa que ele escolha quando se aproximar." : "Voce se senta ao lado. A casa permanece em silencio.",
+            "Maera pediu que voce observasse, nao que vencesse.",
+            "Uma lembranca tambem pode ensinar um instinto.",
+            memories & (1 << MaeraBondScene) ? "Voces ja guardaram esta lembranca." : "Esta lembranca agora pertence a voces dois.", "" };
+        MemoryLines(lines);
+        if( !(memories & (1 << MaeraBondScene)) ) SetDialogRow(PT_DialogRows_NoIndent, 14, true, "Ficar ao lado e guardar a lembranca", C_1_Blue, true);
+    }else if( target != COMPANION_NONE ){
+        char name[128];
+        sprintf_s(name, "Maera: Esta viagem pertence a %s.", CompanionName(target));
+        const char* lines[7] = { name, "Voltem a casa juntos. A sombra ja nao mora la.",
+            memories & 1 ? "Espelho: lembranca compartilhada." : "Espelho: observe o que ele procura no reflexo.",
+            memories & 2 ? "Tigela: lembranca compartilhada." : "Tigela: deixe que ele escolha se aproximar.",
+            memories & 4 ? "Cadeira: lembranca compartilhada." : "Cadeira: mostre que esperar nao e obedecer.",
+            "Mantenha o companheiro chamado e perto de voce.",
+            memories == 7 ? "Voces voltaram. Agora posso ensinar o instinto." : "Traga as tres lembrancas. Nao preciso de trofeus." };
+        MemoryLines(lines);
+        if( memories == 7 ) SetDialogRow(PT_DialogRows_NoIndent, 14, true, "Voltamos juntos. Quero aprender com isso.", C_1_Blue, true);
+        else SetDialogRow(PT_DialogRows_NoIndent, 14, true, "Voltar a casa com meu companheiro", C_1_Blue, true);
+    }else{
+        const bool learned = MaeraBondLearned(active);
+        const char* lines[7] = { "Maera: Alguns esperam porque nao sabem partir.", "Outros, porque sabem que alguem vai voltar.",
+            "Leve seu companheiro a casa que voce libertou.", "Escute o espelho, a tigela e a cadeira com ele.",
+            "Nao quero monstros mortos. Quero que voltem juntos.",
+            learned ? "Este companheiro ja aprendeu o Instinto de Retorno." : "A viagem ensina Instinto de Retorno e +15 afinidade.",
+            "O primeiro vinculo exige companheiro de nivel 5." };
+        MemoryLines(lines);
+        if( active != COMPANION_NONE && CompanionLevel(active) >= 5 && !learned )
+            SetDialogRow(PT_DialogRows_NoIndent, 14, true, "Vou fazer esta viagem com ele.", C_1_Blue, true);
+    }
+    SetDialogRow(PT_DialogRows_NoIndent, 18, true, "Voltar", C_0_White, true);
+    DialogRowsCount = PT_DialogRows_20_SmallDialog_RowsCount;
+}
+static void CloseMaeraBond()
+{
+    if( MaeraBondScene >= 0 ) CurrentDialogIndex = PD_0_None;
+    else ChangeTownerDialog(PD_32_Maera);
+}
+static void HandleMaeraBond()
+{
+    if( !MemoryCaretakerRescued() ){ CurrentDialogIndex = PD_0_None; return; }
+    if( SelectedDialogRow == 18 ){ CloseMaeraBond(); return; }
+    if( SelectedDialogRow != 14 ) return;
+    const unsigned char target = MaeraBondTarget();
+    if( MaeraBondScene >= 0 ){
+        if( target == COMPANION_NONE || Dungeon != DUN_115_FORGOTTEN_HOUSE || MaeraBondScene >= 3 ) return;
+        const Player& owner = Players[CurrentPlayerIndex];
+        if( !MaeraBondCompanionPresent() || abs(owner.Row-MemoryObjectRows[MaeraBondScene]) > 2
+            || abs(owner.Col-MemoryObjectCols[MaeraBondScene]) > 2 ){
+            ErrorPlrMsg("Espere seu companheiro se aproximar para compartilhar a lembranca."); return;
+        }
+        AdditionalStateData.unused[MAERA_BOND_MEMORIES] |= (char)(1 << MaeraBondScene);
+        CurrentDialogIndex = PD_0_None;
+        if( ((unsigned char)AdditionalStateData.unused[MAERA_BOND_MEMORIES] & 7) == 7 )
+            ErrorPlrMsg("Voces guardaram as tres lembrancas. Voltem a Maera.");
+        return;
+    }
+    if( Dungeon != DUN_0_TOWN ) return; // Rewards and departure belong to Maera, not a remote object.
+    if( target == COMPANION_NONE ){
+        const unsigned char active = ActiveCompanion();
+        if( active == COMPANION_NONE || CompanionLevel(active) < 5 || MaeraBondLearned(active) ) return;
+        AdditionalStateData.unused[MAERA_BOND_TARGET] = (char)active;
+        AdditionalStateData.unused[MAERA_BOND_MEMORIES] = 0;
+        ChangeTownerDialog(PD_33_MaeraBond);
+    }else if( ((unsigned char)AdditionalStateData.unused[MAERA_BOND_MEMORIES] & 7) == 7 ){
+        if( !MaeraBondLearned(target) ){
+            AdditionalStateData.unused[MAERA_BOND_LEARNED + target - 1] = 1;
+            AddCompanionAffinity(target, 15);
+        }
+        AdditionalStateData.unused[MAERA_BOND_TARGET] = 0;
+        AdditionalStateData.unused[MAERA_BOND_MEMORIES] = 0;
+        RecalcPlayer(CurrentPlayerIndex, true);
+        char reward[128];
+        strcpy_s(reward, target == COMPANION_JASON ? "Instinto de Retorno: +20 armadura com Jason ativo, e +15 afinidade." : "Instinto de Retorno: +10 armadura e -10% recarga basica com ele ativo, e +15 afinidade.");
+        ErrorPlrMsg(reward);
+        ChangeTownerDialog(PD_32_Maera);
+    }else{
+        if( ActiveCompanion() != target ){
+            ErrorPlrMsg("Selecione o companheiro desta viagem no painel antes de partir."); return;
+        }
+        if( AdditionalStateData.unused[COMPANION_SAVE_SUMMON_DISABLED] ){
+            ErrorPlrMsg("Chame seu companheiro pelo painel antes de partir."); return;
+        }
+        CurrentDialogIndex = PD_0_None;
+        StartNewLvl(CurrentPlayerIndex, WM_1029_GOTO_QUEST_DUNGEON, DUN_115_FORGOTTEN_HOUSE);
+    }
+}
+
 void MaeraMenu()
 {
     IsBigMenuBox = true;
@@ -2972,6 +3125,7 @@ void MaeraMenu()
         sprintf_s(label, "Petisco de %s: %d ouro", CompanionName(active), CompanionLevel(active)*300);
         SetDialogRow(PT_DialogRows_NoIndent, 14, true, label, C_0_White, true);
     }
+    SetDialogRow(PT_DialogRows_NoIndent, 16, true, "Quem fica esperando: jornada de vinculo", C_3_Gold, true);
     SetDialogRow(PT_DialogRows_NoIndent, 18, true, "Voltar", C_0_White, true);
     DialogRowsCount = PT_DialogRows_20_SmallDialog_RowsCount;
 }
@@ -2983,6 +3137,11 @@ static void HandleMaera()
 {
     if( !MemoryCaretakerRescued() || SelectedDialogRow == 18 ){
         CurrentDialogIndex = PD_0_None;
+        return;
+    }
+    if( SelectedDialogRow == 16 ){
+        MaeraBondScene = -1;
+        ChangeTownerDialog(PD_33_MaeraBond);
         return;
     }
     if( SelectedDialogRow == 12 ){
@@ -3064,6 +3223,7 @@ void __fastcall ChangeTownerDialog(PLAYER_DIALOG dialogIndex)
 	case PD_29_ColiseumDiff            : ColiseumDifficultyMenu();                       break;
 	case PD_30_Companions              : CompanionMenu();                                break;
 	case PD_31_ForgottenHouse           : ForgottenHouseMenu();                            break;
+	case PD_33_MaeraBond                : MaeraBondMenu();                                   break;
 	case PD_32_Maera                    : MaeraMenu();                                     break;
     }
 
@@ -3149,6 +3309,9 @@ void PrevTownerDialog()
         case PD_22_FarnhamMain:
 			CurrentDialogIndex = PD_0_None;
 			break;
+		case PD_33_MaeraBond:
+            CloseMaeraBond();
+            break;
 		case PD_32_Maera:
             CurrentDialogIndex = PD_0_None;
             break;
@@ -4606,6 +4769,7 @@ void HandleTownersMenu()
     if( OpenMemoryTopic() ) return;
     switch( CurrentDialogIndex ) {
         case PD_31_ForgottenHouse: HandleForgottenHouse(); return;
+        case PD_33_MaeraBond: HandleMaeraBond(); return;
         case PD_32_Maera: HandleMaera(); return;
         //Griswold the Blacksmith
         case PD_1_BlacksmithMain:		HandleGriswoldMainMenu();				return;

@@ -2545,3 +2545,5 @@ void MemoryUpdateGuardian();
 bool MemoryCaretakerRescued();
 void MemoryCaretakerOpen();
 const char* MemoryObjectLabel(int objectIndex);
+
+bool MaeraBondOperateObject(int playerIndex, int objectIndex);
