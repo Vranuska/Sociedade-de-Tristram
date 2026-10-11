@@ -463,6 +463,14 @@ static bool MaeraEchoLearned(unsigned char id)
         && AdditionalStateData.unused[MAERA_ECHO_LEARNED + id - 1] == 1;
 }
 
+static constexpr int MAERA_CONVERGENCE_LEARNED = 116; // six bytes, 116..121
+static constexpr int MAERA_CONVERGENCE_PRICE = 15000;
+static bool MaeraConvergenceLearned(unsigned char id)
+{
+    return id > COMPANION_NONE && id < COMPANION_COUNT
+        && AdditionalStateData.unused[MAERA_CONVERGENCE_LEARNED + id - 1] == 1;
+}
+
 static bool CompanionPanelStandalone = false;
 static bool CompanionPanelDetails = false;
 
@@ -471,7 +479,7 @@ static int CompanionTraining(unsigned char id, int slot)
 {
     if( id <= COMPANION_NONE || id >= COMPANION_COUNT || slot < 0 || slot >= 3 ) return 0;
     const int value = (unsigned char)AdditionalStateData.unused[COMPANION_SAVE_GEMS + (id - 1) * 3 + slot];
-    const int maximum = slot == 2 || (slot == 0 && MaeraEchoLearned(id)) ? 2 : 1;
+    const int maximum = slot == 2 || (slot == 0 && MaeraEchoLearned(id)) || (slot == 1 && MaeraConvergenceLearned(id)) ? 2 : 1;
     return value <= maximum ? value : 0;
 }
 
@@ -828,7 +836,7 @@ static int CompanionMonsterSlot(int ownerIndex)
 }
 
 static int CompanionCastPureMissile(int casterRow, int casterCol, int targetRow, int targetCol, int direction,
-    int missileType, int ownerIndex, int damageScale, int spellLevel, int spellIndex, bool allowEcho = false)
+    int missileType, int ownerIndex, int damageScale, int spellLevel, int spellIndex, bool isBasic = false)
 {
     const int missileIndex = CastMissile(casterRow, casterCol, targetRow, targetCol, direction, missileType,
         CT_0_PLAYER, ownerIndex, 1, spellLevel, spellIndex);
@@ -838,7 +846,9 @@ static int CompanionCastPureMissile(int casterRow, int casterCol, int targetRow,
         const int ownerLevel = Players[ownerIndex].CharLevel;
         missile.flag |= MSF_COMPANION;
         missile.Damage = (20 + ownerLevel * 4 + companionLevel * 6) * damageScale * 64;
-        if( allowEcho && companionLevel >= 15 && CompanionTraining(ActiveCompanion(), 0) == 2 ){
+        if( !isBasic && companionLevel >= 25 && CompanionTraining(ActiveCompanion(), 1) == 2 )
+            missile.Damage = missile.Damage * 140 / 100;
+        if( isBasic && companionLevel >= 15 && CompanionTraining(ActiveCompanion(), 0) == 2 ){
             const int echoDamage = missile.Damage * 60 / 100;
             const int echoIndex = CastMissile(casterRow, casterCol, targetRow, targetCol, direction, missileType,
                 CT_0_PLAYER, ownerIndex, 1, spellLevel, spellIndex);
@@ -2952,7 +2962,7 @@ void CompanionMenu()
         SetDialogRow(PT_DialogRows_NoIndent, 9, true, CompanionIsSummoned() ? "Dispensar companheiro" : "Chamar companheiro", C_1_Blue, true);
         sprintf_s(line, "%s: %s", CompanionPrimaryName(active), CompanionTraining(active, 0) == 2 ? "Eco (+60% disparo)" : CompanionTraining(active, 0) == 1 ? "Agilidade (-20% recarga)" : "Original");
         SetDialogRow(PT_DialogRows_NoIndent, 11, true, line, C_1_Blue, true);
-        sprintf_s(line, "%s: %s", CompanionSpecialName(active), CompanionLevel(active) < 15 ? "Desbloqueia no nivel 15" : CompanionTraining(active, 1) ? "Agilidade (-20% recarga)" : "Original");
+        sprintf_s(line, "%s: %s", CompanionSpecialName(active), CompanionLevel(active) < 15 ? "Desbloqueia no nivel 15" : CompanionTraining(active, 1) == 2 ? "Convergencia (+40% dano)" : CompanionTraining(active, 1) == 1 ? "Agilidade (-20% recarga)" : "Original");
         SetDialogRow(PT_DialogRows_NoIndent, 13, true, line, C_1_Blue, CompanionLevel(active) >= 15);
         const int passive = CompanionTraining(active, 2);
         sprintf_s(line, "Passiva extra: %s", CompanionLevel(active) < 10 ? "Desbloqueia no nivel 10" : passive == 1 ? "Vigor (regeneracao)" : passive == 2 ? "Precisao (+8 fisica)" : "Nenhuma");
@@ -3160,6 +3170,50 @@ static void HandleMaeraBond()
     }
 }
 
+static bool MaeraConvergenceEligible(unsigned char id)
+{
+    return id > COMPANION_NONE && id < COMPANION_COUNT && CompanionLevel(id) >= 25 && CompanionAffinity(id) >= 50
+        && MaeraBondLearned(id) && MaeraEchoLearned(id);
+}
+void MaeraConvergenceMenu()
+{
+    IsBigMenuBox = true;
+    DialogHasScroolBox = false;
+    SetDialogRow(PT_DialogRows_NoIndent, 2, true, "MAERA: CONVERGENCIA", C_3_Gold, false);
+    const unsigned char active = ActiveCompanion();
+    char status[128];
+    sprintf_s(status, "%s: nivel %d, afinidade %d/100", CompanionName(active), CompanionLevel(active), CompanionAffinity(active));
+    const char* lines[7] = { "Maera: A primeira licao ensinou a responder.", "A segunda ensina quando reunir todas as vozes.",
+        "Convergencia aumenta em 40% o dano da especial.", "Exige nivel 25, afinidade 50 e Eco aprendido.",
+        "Aprendizado: 15000 ouro por companheiro, uma vez.", "Escolha Convergencia ou Agilidade na ficha.", status };
+    MemoryLines(lines);
+    if( MaeraConvergenceEligible(active) ) SetDialogRow(PT_DialogRows_NoIndent, 14, true,
+        MaeraConvergenceLearned(active) ? "Equipar Convergencia" : "Aprender e equipar: 15000 ouro", C_1_Blue, true);
+    SetDialogRow(PT_DialogRows_NoIndent, 16, true, "Abrir ficha dos companheiros", C_0_White, true);
+    SetDialogRow(PT_DialogRows_NoIndent, 18, true, "Voltar", C_0_White, true);
+    DialogRowsCount = PT_DialogRows_20_SmallDialog_RowsCount;
+}
+static void HandleMaeraConvergence()
+{
+    if( !MemoryCaretakerRescued() || Dungeon != DUN_0_TOWN ){ CurrentDialogIndex = PD_0_None; return; }
+    if( SelectedDialogRow == 18 ){ ChangeTownerDialog(PD_34_MaeraTraining); return; }
+    if( SelectedDialogRow == 16 ){ CompanionOpenPanel(); return; }
+    if( SelectedDialogRow != 14 ) return;
+    const unsigned char active = ActiveCompanion();
+    if( !MaeraConvergenceEligible(active) ) return;
+    if( !MaeraConvergenceLearned(active) ){
+        if( Players[CurrentPlayerIndex].TotalGold < MAERA_CONVERGENCE_PRICE ){
+            ErrorPlrMsg("Maera: faltam moedas para o segundo ensinamento."); return;
+        }
+        ClearGoldByInventoryAsPrice(MAERA_CONVERGENCE_PRICE);
+        AdditionalStateData.unused[MAERA_CONVERGENCE_LEARNED + active - 1] = 1;
+    }
+    AdditionalStateData.unused[COMPANION_SAVE_GEMS + (active-1)*3 + 1] = 2;
+    RecalcPlayer(CurrentPlayerIndex, true);
+    ErrorPlrMsg("Convergencia equipada: +40% de dano na especial deste companheiro.");
+    ChangeTownerDialog(PD_35_MaeraConvergence);
+}
+
 void MaeraTrainingMenu()
 {
     IsBigMenuBox = true;
@@ -3177,6 +3231,7 @@ void MaeraTrainingMenu()
         else if( CompanionLevel(active) >= 15 && MaeraBondLearned(active) )
             SetDialogRow(PT_DialogRows_NoIndent, 14, true, "Aprender e equipar Eco: 5000 ouro", C_1_Blue, true);
     }
+    SetDialogRow(PT_DialogRows_NoIndent, 12, true, "Segundo ensinamento: Convergencia", C_3_Gold, true);
     SetDialogRow(PT_DialogRows_NoIndent, 16, true, "Abrir ficha dos companheiros", C_0_White, true);
     SetDialogRow(PT_DialogRows_NoIndent, 18, true, "Voltar", C_0_White, true);
     DialogRowsCount = PT_DialogRows_20_SmallDialog_RowsCount;
@@ -3187,6 +3242,7 @@ static void HandleMaeraTraining()
         CurrentDialogIndex = PD_0_None; return;
     }
     if( SelectedDialogRow == 18 ){ ChangeTownerDialog(PD_32_Maera); return; }
+    if( SelectedDialogRow == 12 ){ ChangeTownerDialog(PD_35_MaeraConvergence); return; }
     if( SelectedDialogRow == 16 ){ CompanionOpenPanel(); return; }
     if( SelectedDialogRow != 14 ) return;
     const unsigned char active = ActiveCompanion();
@@ -3330,6 +3386,7 @@ void __fastcall ChangeTownerDialog(PLAYER_DIALOG dialogIndex)
 	case PD_29_ColiseumDiff            : ColiseumDifficultyMenu();                       break;
 	case PD_30_Companions              : CompanionMenu();                                break;
 	case PD_31_ForgottenHouse           : ForgottenHouseMenu();                            break;
+	case PD_35_MaeraConvergence         : MaeraConvergenceMenu();                            break;
 	case PD_34_MaeraTraining            : MaeraTrainingMenu();                               break;
 	case PD_33_MaeraBond                : MaeraBondMenu();                                   break;
 	case PD_32_Maera                    : MaeraMenu();                                     break;
@@ -3417,6 +3474,9 @@ void PrevTownerDialog()
         case PD_22_FarnhamMain:
 			CurrentDialogIndex = PD_0_None;
 			break;
+		case PD_35_MaeraConvergence:
+            ChangeTownerDialog(PD_34_MaeraTraining);
+            break;
 		case PD_34_MaeraTraining:
             ChangeTownerDialog(PD_32_Maera);
             break;
@@ -4765,7 +4825,8 @@ void HandleCompanionMenu()
         else if( SelectedDialogRow == 11 || SelectedDialogRow == 13 || SelectedDialogRow == 15 ){
             const int slot = (SelectedDialogRow - 11) / 2;
             if( (slot == 1 && CompanionLevel(active) < 15) || (slot == 2 && CompanionLevel(active) < 10) ) return;
-            const int variants = slot == 2 || (slot == 0 && MaeraEchoLearned(active) && CompanionLevel(active) >= 15) ? 3 : 2;
+            const int variants = slot == 2 || (slot == 0 && MaeraEchoLearned(active) && CompanionLevel(active) >= 15)
+                || (slot == 1 && MaeraConvergenceLearned(active) && CompanionLevel(active) >= 25) ? 3 : 2;
             AdditionalStateData.unused[COMPANION_SAVE_GEMS + (active - 1) * 3 + slot] = (char)((CompanionTraining(active, slot) + 1) % variants);
             RecalcPlayer(CurrentPlayerIndex, true);
         }else if( SelectedDialogRow == 20 ) CompanionPanelDetails = false;
@@ -4881,6 +4942,7 @@ void HandleTownersMenu()
     if( OpenMemoryTopic() ) return;
     switch( CurrentDialogIndex ) {
         case PD_31_ForgottenHouse: HandleForgottenHouse(); return;
+        case PD_35_MaeraConvergence: HandleMaeraConvergence(); return;
         case PD_34_MaeraTraining: HandleMaeraTraining(); return;
         case PD_33_MaeraBond: HandleMaeraBond(); return;
         case PD_32_Maera: HandleMaera(); return;

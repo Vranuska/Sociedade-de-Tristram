@@ -15,7 +15,7 @@ training = section('static int CompanionTraining(', 'static int CompanionLevel(u
 delay = section('static int CompanionAbilityDelay(', 'void CompanionOpenPanel()')
 missile = section('static int CompanionCastPureMissile(', 'bool CompanionIsSummoned()')
 abilities = section('void CompanionProcessAbilities()', '//----- (0046C43D)')
-menu = section('void MaeraTrainingMenu()', 'void MaeraMenu()')
+menu = section('static bool MaeraConvergenceEligible(', 'void MaeraMenu()')
 prefix = r'''
 #include <cassert>
 #include <cstring>
@@ -26,7 +26,7 @@ prefix = r'''
 using i64=long long;
 enum {COMPANION_NONE,COMPANION_JASON,COMPANION_KUROKO,COMPANION_MIZUKI,COMPANION_THOR,COMPANION_LORD,COMPANION_PITTY,COMPANION_COUNT};
 const int COMPANION_SAVE_GEMS=40,COMPANION_MAX_LEVEL=50,DUN_0_TOWN=0;
-const int PD_0_None=0,PD_32_Maera=32,PD_34_MaeraTraining=34;
+const int PD_0_None=0,PD_32_Maera=32,PD_34_MaeraTraining=34,PD_35_MaeraConvergence=35;
 const int PT_DialogRows_NoIndent=0,PT_DialogRows_20_SmallDialog_RowsCount=20,C_3_Gold=3,C_1_Blue=1,C_0_White=0;
 const int CT_0_PLAYER=0,MSF_COMPANION=16,MF_6_FRIENDLY=64,MF_15_KILLED=32768,CF_2_VISIBLE_BY_PLAYER=2;
 const int SummonMonsters_Count=16;
@@ -36,7 +36,7 @@ struct Monster {int Row=20,Col=20,NextRow=20,NextCol=20,CurrentLife=100,flag=0;v
 struct Missile {int flag=0,Damage=0;} Missiles[200];
 int FlagMap[112][112]={},MonstersCount=1,MonsterIndexes[200]={20};
 int MaxCountOfPlayersInGame=1,Dungeon=0,CurrentPlayerIndex=0,CurrentDialogIndex=0,SelectedDialogRow=14,DialogRowsCount=0;
-int levels[7]={1,15,15,15,15,15,15},stage=1;unsigned char active=1;
+int levels[7]={1,15,15,15,15,15,15},affinities[7]={},stage=1;unsigned char active=1;
 i64 CompanionPrimaryReadyAt[4]={},CompanionUltimateReadyAt[4]={},clockNow=10000;
 bool CompanionAiUseSkills=true,CompanionAiShowSkillMessages=true,IsBigMenuBox=false,DialogHasScroolBox=false,rescued=true;
 int castCount=0,castLimit=200,castsByType[200]={},charges=0,recalcs=0;
@@ -44,6 +44,7 @@ std::string error;bool selectable[32]={};
 static int CompanionLevel(unsigned char id){return levels[id];}
 static int CompanionEvolutionStage(unsigned char){return stage;}
 unsigned char ActiveCompanion(){return active;}
+int CompanionAffinity(unsigned char id){return affinities[id];}
 const char* CompanionName(unsigned char){return "Jason";}
 bool MemoryCaretakerRescued(){return rescued;}
 void CompanionOpenPanel(){CurrentDialogIndex=30;}
@@ -90,6 +91,20 @@ int main(){
  }
  assert(charges==6&&Players[0].TotalGold==25000);active=1;
 
+
+ // Advanced special: all prerequisites, insufficient gold and one-time charge per companion.
+ active=1;levels[1]=24;affinities[1]=50;HandleMaeraConvergence();assert(!MaeraConvergenceLearned(1));
+ levels[1]=25;affinities[1]=49;HandleMaeraConvergence();assert(!MaeraConvergenceLearned(1));
+ affinities[1]=50;Players[0].TotalGold=14999;HandleMaeraConvergence();assert(!MaeraConvergenceLearned(1));
+ Players[0].TotalGold=90000;
+ for(unsigned char id=1;id<7;id++){
+  active=id;levels[id]=25;affinities[id]=50;HandleMaeraConvergence();assert(MaeraConvergenceLearned(id));HandleMaeraConvergence();
+ }
+ assert(Players[0].TotalGold==0&&charges==12);active=1;
+ resetCasting();CompanionCastPureMissile(20,20,21,21,0,1,0,2,1,1);assert(Missiles[0].Damage==250*2*64*140/100);
+ resetCasting();CompanionCastPureMissile(20,20,21,21,0,1,0,2,1,1,true);assert(Missiles[0].Damage==250*2*64&&castCount==2);
+ AdditionalStateData.unused[41]=1;resetCasting();CompanionCastPureMissile(20,20,21,21,0,1,0,2,1,1);assert(Missiles[0].Damage==250*2*64);
+ AdditionalStateData.unused[41]=2;levels[1]=15;
  // Primary echo uses player authority, has 60% damage, and is not recursive.
  resetCasting();CompanionCastPureMissile(20,20,21,21,0,1,0,2,1,1,true);
  assert(castCount==2&&Missiles[1].Damage==Missiles[0].Damage*60/100);
@@ -114,9 +129,17 @@ int main(){
   active=id;levels[id]=15;AdditionalStateData.unused[110+id-1]=1;AdditionalStateData.unused[40+(id-1)*3]=2;
   resetCasting();CompanionUltimateReadyAt[0]=clockNow+1000;CompanionProcessAbilities();assert(castCount==2);
  }
+
+ // Each actual special path receives the boost; primary echoes are not multiplied by it.
+ const int specialScales[7]={0,4,5,4,3,4,5};
+ for(unsigned char id=1;id<7;id++){
+  active=id;levels[id]=25;AdditionalStateData.unused[40+(id-1)*3]=0;AdditionalStateData.unused[41+(id-1)*3]=2;
+  resetCasting();CompanionPrimaryReadyAt[0]=clockNow+1000;CompanionProcessAbilities();assert(castCount>0);
+  assert(Missiles[castCount-1].Damage==250*specialScales[id]*64*140/100);
+ }
  assert(Players[0].CurMana==100&&Players[0].BaseMana==100);
  active=1;Dungeon=0;MaeraTrainingMenu();assert(selectable[14]);
- puts("PASS: training gates/price, independent unlocks, equipment validation, echo damage/authority/capacity, Jason level/timers, target gates, six companion basic paths");
+ puts("PASS: training gates/price, independent unlocks, equipment validation, echo damage/authority/capacity, Jason level/timers, target gates, six basic/special paths, Convergence prerequisites/price/damage");
 }
 '''
 with tempfile.TemporaryDirectory() as tmp:

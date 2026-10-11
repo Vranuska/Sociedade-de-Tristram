@@ -73,3 +73,15 @@ Bytes 110..115 de `AdditionalSaveInfo.unused` guardam os seis aprendizados de Ec
 Verificação reproduzível: `python tools/check_maera_echo.py` requer Python e g++. Compila as funções reais de treinamento/ataques contra APIs simuladas e verifica requisitos, ouro insuficiente, cobrança única, isolamento entre companheiros, dano do Eco, marca/autoridade dos projéteis, limite de projéteis, progressão e timers do Jason, filtros de alvos e caminho básico dos seis companheiros. Não substitui a compilação MSVC nem execução dentro do jogo.
 
 Teste no jogo: conferir Jason antes e depois do nível 15; concluir sua jornada ou a de outro companheiro, aprender Eco com Maera, conferir débito de 5000 ouro uma vez, alternar as três variantes na ficha e salvar/carregar. Comparar Agilidade e Eco contra inimigos e confirmar que os ataques especiais não são duplicados pelo Eco.
+
+## Segundo ensinamento: Convergência
+
+No menu de treinamento da Maera, o segundo ensinamento libera a variante Convergência para a habilidade especial. Exige nível 25, afinidade 50, jornada de vínculo concluída e Eco aprendido daquele companheiro. O aprendizado custa 15000 ouro uma única vez; equipar novamente não cobra. A ficha permite alternar Original, Agilidade (-20% recarga) e Convergência (+40% dano da especial).
+
+O bônus afeta a nova do Jason, a nova e os projéteis especiais do Kuroko, a nova da Mizuki, a tempestade do Thor, a nova do Lord e a nova da Pitty. Os disparos básicos e seus Ecos conservam o dano anterior. A opção não reduz a recarga; o Instinto de Retorno e a evolução continuam funcionando. Usa os efeitos nativos existentes, sem novas artes.
+
+Bytes 116..121 guardam os seis aprendizados; o slot especial existente passa a aceitar a variante 2 apenas quando aprendida. Saves antigos seguem usando as variantes anteriores e nenhum campo muda de tamanho.
+
+O teste isolado `tools/check_maera_echo.py` agora cobre também nível/afinidade/pré-requisitos, ouro insuficiente, cobrança única para os seis companheiros, dano de cada caminho especial real, conservação do dano básico e alternância para Agilidade. Compilação no Windows, salvamento dentro do jogo e efeitos visuais continuam pendentes para esta etapa.
+
+Teste manual: com um companheiro elegível, Maera → Treinamento → Segundo ensinamento → aprender; confirmar o débito único de 15000, alternar a especial na ficha, salvar/carregar e comparar dano/recarga contra inimigos. A especial deve ganhar dano com Convergência e frequência com Agilidade.

@@ -7546,6 +7546,7 @@ enum PLAYER_DIALOG
 	PD_32_Maera = 32,
 	PD_33_MaeraBond = 33,
 	PD_34_MaeraTraining = 34,
+	PD_35_MaeraConvergence = 35,
 	PD_Count,
 };
 
