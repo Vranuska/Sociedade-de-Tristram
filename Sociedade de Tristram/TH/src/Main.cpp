@@ -1733,6 +1733,8 @@ LABEL_44:
 //----- (00408BD8) --------------------------------------------------------
 void InitDead()
 {
+	// Corpse IDs restored from a map must never reuse another map's animations.
+	memset(dead, 0, sizeof(dead));
 	int mtypes[ BM_COUNT ];
 
     for( int& mtype : mtypes ){

@@ -11075,6 +11075,8 @@ void ProcessMonsters() // ProcessMonsters
 //----- (00443B98) --------------------------------------------------------
 void FreeMonsterResources()
 {
+	// Corpse directions borrow the monster animation buffers freed below.
+	memset(dead, 0, sizeof(dead));
 	for( int monsterSpriteIndex = 0; monsterSpriteIndex < MonsterSpritesCount; monsterSpriteIndex++ ){
 		MonsterSprite& monsterSprite = MonsterSprites[monsterSpriteIndex];
 		int baseMonsterIndex = monsterSprite.baseMonsterIndex;
@@ -11083,6 +11085,8 @@ void FreeMonsterResources()
 			MonsterAnim& monsterAnim = monsterSprite.animation[animationIndex];
 			if( TypeOfAnimation[animationIndex] != 's' || baseMonster.HasSecondAttack ){
 				FreeMemZero(monsterAnim.animPtr);
+				memset(monsterAnim.oriented, 0, sizeof(monsterAnim.oriented));
+				monsterAnim.frameCount = 0;
 			}
 		}
 	}
