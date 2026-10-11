@@ -195,7 +195,11 @@ static bool InventoryBuildOrganizedLayout(const vector<int>& order,
 void InventoryPanel_AutoOrganize()
 {
     Player& player = Players[CurrentPlayerIndex];
-    if( player.ItemOnCursor.ItemCode != IC_M1_NONE || player.InvItemCount < 2 ) return;
+    if( player.ItemOnCursor.ItemCode != IC_M1_NONE ){
+        ErrorPlrMsg("Guarde o item do cursor antes de organizar.");
+        return;
+    }
+    if( player.InvItemCount < 2 ) return;
     const int mode = InventoryOrganizeMode;
     InventoryOrganizeMode = (InventoryOrganizeMode + 1) % 4;
     const bool grouped = mode >= 2, vertical = (mode & 1) != 0;

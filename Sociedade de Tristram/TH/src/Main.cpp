@@ -3554,6 +3554,14 @@ int __stdcall GameWindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	if( CurrentDialogIndex ){ // Если болтаем с неписями, проверяем куда попали в их диалоге
 		if( CheckDialogMouseClick() ) return 0;
 	}
+	// Inventory labels overlap the lower panel; use their raw mouse rectangle first.
+	if( IsINVPanelVisible && InventoryPanel_CursorOnControls() ){
+		if( !IsGoldSplitPanelVisible && !(HasTrait(CurrentPlayerIndex, TraitId::Psychotic)
+		 && (Players[CurrentPlayerIndex].activeBuffFlag & BF_2_FURY_ACTIVE) && Dungeon != DUN_0_TOWN) ){
+			Inventory_LButtonClick();
+		}
+		return 0;
+	}
 	if( CursorInMainPanel() ){
 		if( /*Berserk*/HasTrait(CurrentPlayerIndex, TraitId::Psychotic) && (Players[CurrentPlayerIndex].activeBuffFlag & BF_2_FURY_ACTIVE) && Dungeon != DUN_0_TOWN ){
 			return 0;
