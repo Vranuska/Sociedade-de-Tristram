@@ -52,10 +52,24 @@ Adria → aceitar → registrar os três relatos → Adria → responder → seg
 
 Após o resgate, Maera oferece uma missão para cada companheiro a partir do nível 5. Uma jornada fica ativa por vez. O companheiro escolhido deve estar selecionado, chamado e próximo do personagem ao compartilhar as lembranças do espelho, da tigela e da cadeira na casa já libertada. A ordem é livre; cada cena tem um comportamento próprio para Jason, Kuroko, Mizuki, Thor, Lord ou Pitty. Não há exigência de mortes nem itens consumidos.
 
-As três lembranças liberam a conclusão com Maera na cidade. Recompensa por companheiro, uma única vez: +15 afinidade e Instinto de Retorno. Com esse companheiro ativo, o personagem recebe +10 armadura e sua habilidade básica recebe -10% de recarga, respeitando os limites mínimos existentes. Jason recebe +20 armadura para o personagem, pois suas habilidades básica/especial ainda não estão implementadas. O aprendizado aparece na ficha de habilidades e acompanha o personagem entre partidas.
+As três lembranças liberam a conclusão com Maera na cidade. Recompensa por companheiro, uma única vez: +15 afinidade e Instinto de Retorno. Com esse companheiro ativo, o personagem recebe +10 armadura e sua habilidade básica recebe -10% de recarga, respeitando os limites mínimos existentes. Jason recebe +20 armadura para o personagem e a mesma redução de recarga básica. O aprendizado aparece na ficha de habilidades e acompanha o personagem entre partidas.
 
 Persistência adicional: byte 102 guarda o companheiro da jornada; 103 guarda a máscara das três lembranças; 104..109 guardam os seis aprendizados permanentes. Sem aumento da estrutura de save. A recompensa pertence ao companheiro escolhido, mesmo se outro estiver ativo ao retornar.
 
 Verificações isoladas executadas com as funções reais e dependências simuladas: nível mínimo, companheiro escolhido, chamado e próximo, relatos dos seis companheiros, ordem livre, repetição das pistas sem duplicação, recompensa restrita à cidade, conclusão única por companheiro, redução real da recarga básica sem mudar a especial e preservação dos dados do resgate. Compilação no Windows e teste dentro do jogo ficam pendentes para esta etapa.
 
 Teste manual: Maera → Quem fica esperando → aceitar com companheiro nível 5 → voltar à casa → compartilhar as três lembranças com ele por perto → voltar à cidade → concluir com Maera → conferir afinidade e Instinto na ficha. Salvar/carregar durante a missão, trocar de companheiro antes de uma pista e repetir após concluir devem preservar ou bloquear o progresso conforme as regras acima.
+
+## Treinamento avançado: Eco do Vínculo
+
+Após concluir a jornada de vínculo daquele companheiro, e a partir do nível 15, Maera ensina Eco por 5000 ouro. O aprendizado é permanente, individual e cobrado uma única vez. A compra equipa o Eco; reaplicar o treinamento aprendido não cobra novamente. A ficha permite alternar entre Original, Agilidade (-20% recarga) e Eco (segundo disparo com 60% do dano do básico). A especial e a passiva mantêm suas opções anteriores.
+
+O Eco acompanha os projéteis básicos dos seis companheiros, com a mesma autoridade do personagem e a marca de dano dos companheiros. Não cria ecos recursivos nem duplica as novas/afterimages especiais. Thor conserva sua tempestade original, sem Eco na rajada especial. Falta de espaço na lista nativa de projéteis apenas impede o disparo extra; não invalida o básico já criado. O Instinto de Retorno continua aplicável junto com a opção escolhida.
+
+Jason agora tem Estalo do Brejo (projéteis arcanos em 1/2/3 alvos conforme a evolução) e Coro do Brejo (nova arcana, a partir do nível 15). Usa efeitos nativos provisórios e as mesmas regras de custo gratuito e progressão de recarga dos demais companheiros. Sua ficha já permite equipar as variantes básicas e especiais. Os nomes das habilidades de todos os companheiros aparecem na ficha.
+
+Bytes 110..115 de `AdditionalSaveInfo.unused` guardam os seis aprendizados de Eco. O modo equipado usa os bytes de habilidades já existentes, com valor 2 autorizado apenas após o aprendizado. Não há expansão do save.
+
+Verificação reproduzível: `python tools/check_maera_echo.py` requer Python e g++. Compila as funções reais de treinamento/ataques contra APIs simuladas e verifica requisitos, ouro insuficiente, cobrança única, isolamento entre companheiros, dano do Eco, marca/autoridade dos projéteis, limite de projéteis, progressão e timers do Jason, filtros de alvos e caminho básico dos seis companheiros. Não substitui a compilação MSVC nem execução dentro do jogo.
+
+Teste no jogo: conferir Jason antes e depois do nível 15; concluir sua jornada ou a de outro companheiro, aprender Eco com Maera, conferir débito de 5000 ouro uma vez, alternar as três variantes na ficha e salvar/carregar. Comparar Agilidade e Eco contra inimigos e confirmar que os ataques especiais não são duplicados pelo Eco.

@@ -455,6 +455,14 @@ static bool MaeraBondLearned(unsigned char id)
         && AdditionalStateData.unused[MAERA_BOND_LEARNED + id - 1] == 1;
 }
 
+static constexpr int MAERA_ECHO_LEARNED = 110; // six bytes, 110..115
+static constexpr int MAERA_ECHO_PRICE = 5000;
+static bool MaeraEchoLearned(unsigned char id)
+{
+    return id > COMPANION_NONE && id < COMPANION_COUNT
+        && AdditionalStateData.unused[MAERA_ECHO_LEARNED + id - 1] == 1;
+}
+
 static bool CompanionPanelStandalone = false;
 static bool CompanionPanelDetails = false;
 
@@ -463,7 +471,8 @@ static int CompanionTraining(unsigned char id, int slot)
 {
     if( id <= COMPANION_NONE || id >= COMPANION_COUNT || slot < 0 || slot >= 3 ) return 0;
     const int value = (unsigned char)AdditionalStateData.unused[COMPANION_SAVE_GEMS + (id - 1) * 3 + slot];
-    return value <= (slot == 2 ? 2 : 1) ? value : 0;
+    const int maximum = slot == 2 || (slot == 0 && MaeraEchoLearned(id)) ? 2 : 1;
+    return value <= maximum ? value : 0;
 }
 
 static int CompanionLevel(unsigned char companionId);
@@ -819,7 +828,7 @@ static int CompanionMonsterSlot(int ownerIndex)
 }
 
 static int CompanionCastPureMissile(int casterRow, int casterCol, int targetRow, int targetCol, int direction,
-    int missileType, int ownerIndex, int damageScale, int spellLevel, int spellIndex)
+    int missileType, int ownerIndex, int damageScale, int spellLevel, int spellIndex, bool allowEcho = false)
 {
     const int missileIndex = CastMissile(casterRow, casterCol, targetRow, targetCol, direction, missileType,
         CT_0_PLAYER, ownerIndex, 1, spellLevel, spellIndex);
@@ -829,6 +838,15 @@ static int CompanionCastPureMissile(int casterRow, int casterCol, int targetRow,
         const int ownerLevel = Players[ownerIndex].CharLevel;
         missile.flag |= MSF_COMPANION;
         missile.Damage = (20 + ownerLevel * 4 + companionLevel * 6) * damageScale * 64;
+        if( allowEcho && companionLevel >= 15 && CompanionTraining(ActiveCompanion(), 0) == 2 ){
+            const int echoDamage = missile.Damage * 60 / 100;
+            const int echoIndex = CastMissile(casterRow, casterCol, targetRow, targetCol, direction, missileType,
+                CT_0_PLAYER, ownerIndex, 1, spellLevel, spellIndex);
+            if( echoIndex >= 0 ){
+                Missiles[echoIndex].flag |= MSF_COMPANION;
+                Missiles[echoIndex].Damage = echoDamage;
+            }
+        }
     }
     return missileIndex;
 }
@@ -999,13 +1017,13 @@ void CompanionProcessAbilities()
 	CompanionEnsureSummoned();
 
     const unsigned char companionId = ActiveCompanion();
-    if( companionId != COMPANION_THOR && companionId != COMPANION_KUROKO && companionId != COMPANION_LORD
+    if( companionId != COMPANION_JASON && companionId != COMPANION_THOR && companionId != COMPANION_KUROKO && companionId != COMPANION_LORD
      && companionId != COMPANION_MIZUKI && companionId != COMPANION_PITTY ) return;
 
     const int ownerIndex = CurrentPlayerIndex;
     const int slot = CompanionMonsterSlot(ownerIndex);
     Monster& companion = Monsters[slot];
-    if( companion.Row == 1 && companion.Col == 0 || !companion.SpritePtr || companion.CurrentLife <= 0 ) return;
+    if( (companion.Row == 1 && companion.Col == 0) || !companion.SpritePtr || companion.CurrentLife <= 0 ) return;
 
     Player& abilityOwner = Players[ownerIndex];
     // Repair saves/runtime state damaged by the previous companion build.
@@ -1021,6 +1039,34 @@ void CompanionProcessAbilities()
     const bool castStorm = CompanionLevel(companionId) >= 15 && now >= CompanionUltimateReadyAt[ownerIndex];
     const bool castPrimary = now >= CompanionPrimaryReadyAt[ownerIndex];
     if( !castStorm && !castPrimary ) return;
+
+    if( companionId == COMPANION_JASON ){
+        // Estalo do Brejo and Coro do Brejo use native arcane effects, with
+        // their own target progression. Jason's attacks no longer lag behind.
+        const int targetLimit = evolutionStage == 3 ? 3 : evolutionStage == 2 ? 2 : 1;
+        int targets = 0;
+        for( int i = 0; i < MonstersCount && targets < targetLimit; ++i ){
+            const int monsterIndex = MonsterIndexes[i];
+            if( monsterIndex < SummonMonsters_Count || monsterIndex == slot ) continue;
+            const Monster& target = Monsters[monsterIndex];
+            if( target.CurrentLife <= 0 || target.flag & (MF_6_FRIENDLY | MF_15_KILLED) ) continue;
+            if( !In112(target.Row, target.Col) || !(FlagMap[target.Row][target.Col] & CF_2_VISIBLE_BY_PLAYER) ) continue;
+            if( !CheckCastInSight(companion.Row, companion.Col, target.Row, target.Col) ) continue;
+            const int direction = OrientationToTarget(companion.Row, companion.Col, target.Row, target.Col);
+            if( castPrimary ) CompanionCastPureMissile(companion.Row, companion.Col, target.Row, target.Col, direction,
+                MI_24_ARCANE_STAR, ownerIndex, 2, evolutionStage + 1, PS_43_ARCANE_NOVA, true);
+            ++targets;
+        }
+        if( targets == 0 ) return;
+        if( castPrimary ) CompanionPrimaryReadyAt[ownerIndex] = now + CompanionAbilityDelay(companionId, 0, 4);
+        if( castStorm ){
+            CompanionCastPureMissile(companion.Row, companion.Col, companion.Row, companion.Col, 0,
+                MI_15_ARCANE_NOVA, ownerIndex, 4, evolutionStage + 2, PS_43_ARCANE_NOVA);
+            CompanionUltimateReadyAt[ownerIndex] = now + CompanionAbilityDelay(companionId, 1, 20);
+            if( CompanionAiShowSkillMessages ) ErrorPlrMsg("Jason: Coro do Brejo!");
+        }
+        return;
+    }
 
     if( companionId == COMPANION_KUROKO ){
         // Garra da Sombra fires precise arcane claws. Labirinto das Sombras
@@ -1044,7 +1090,7 @@ void CompanionProcessAbilities()
             const int predictedCol = In112(target.NextRow, target.NextCol) ? target.NextCol : target.Col;
             const int direction = OrientationToTarget(companion.Row, companion.Col, predictedRow, predictedCol);
             CompanionCastPureMissile(companion.Row, companion.Col, predictedRow, predictedCol, direction,
-                MI_24_ARCANE_STAR, ownerIndex, 2, evolutionStage + 1, PS_43_ARCANE_NOVA);
+                MI_24_ARCANE_STAR, ownerIndex, 2, evolutionStage + 1, PS_43_ARCANE_NOVA, true);
             if( castStorm ){
                 CompanionCastPureMissile(companion.Row, companion.Col, target.Row, target.Col, direction,
                     MI_24_ARCANE_STAR, ownerIndex, 3, evolutionStage, PS_43_ARCANE_NOVA);
@@ -1080,7 +1126,7 @@ void CompanionProcessAbilities()
 
             const int direction = OrientationToTarget(companion.Row, companion.Col, target.Row, target.Col);
             CompanionCastPureMissile(companion.Row, companion.Col, target.Row, target.Col, direction,
-                MI_53_HOLY_BOLT, ownerIndex, 2, evolutionStage + 2, PS_31_HOLY_BOLT);
+                MI_53_HOLY_BOLT, ownerIndex, 2, evolutionStage + 2, PS_31_HOLY_BOLT, true);
             ++targets;
         }
 
@@ -1110,7 +1156,7 @@ void CompanionProcessAbilities()
             if( !CheckCastInSight(companion.Row, companion.Col, target.Row, target.Col) ) continue;
             const int direction = OrientationToTarget(companion.Row, companion.Col, target.Row, target.Col);
             CompanionCastPureMissile(companion.Row, companion.Col, target.Row, target.Col, direction,
-                MI_129_SNOW_BOLT, ownerIndex, 2, evolutionStage + 2, PS_56_ICE_BOLT);
+                MI_129_SNOW_BOLT, ownerIndex, 2, evolutionStage + 2, PS_56_ICE_BOLT, true);
             ++targets;
         }
         if( targets == 0 ) return;
@@ -1139,7 +1185,7 @@ void CompanionProcessAbilities()
             if( !CheckCastInSight(companion.Row, companion.Col, target.Row, target.Col) ) continue;
             const int direction = OrientationToTarget(companion.Row, companion.Col, target.Row, target.Col);
             CompanionCastPureMissile(companion.Row, companion.Col, target.Row, target.Col, direction,
-                MI_1_FIREBOLT, ownerIndex, 3, evolutionStage + 3, PS_1_FIREBOLT);
+                MI_1_FIREBOLT, ownerIndex, 3, evolutionStage + 3, PS_1_FIREBOLT, true);
             ++targets;
         }
         if( targets == 0 ) return;
@@ -1168,7 +1214,7 @@ void CompanionProcessAbilities()
 
         const int direction = OrientationToTarget(companion.Row, companion.Col, target.Row, target.Col);
         CompanionCastPureMissile(companion.Row, companion.Col, target.Row, target.Col, direction,
-            MI_7_LIGHTNING, ownerIndex, castStorm ? 3 : 2, 4, PS_3_LIGHTNING);
+            MI_7_LIGHTNING, ownerIndex, castStorm ? 3 : 2, 4, PS_3_LIGHTNING, !castStorm);
         ++targets;
     }
 
@@ -2872,6 +2918,17 @@ void FarnhamMainMenu()
     MemoryTopic(PD_22_FarnhamMain);
 }
 
+static const char* CompanionPrimaryName(unsigned char id)
+{
+    static const char* names[COMPANION_COUNT] = { "Nenhuma", "Estalo do Brejo", "Garra da Sombra", "Luz Invernal", "Centelha", "Lanca Sagrada", "Faisca Voraz" };
+    return id < COMPANION_COUNT ? names[id] : names[0];
+}
+static const char* CompanionSpecialName(unsigned char id)
+{
+    static const char* names[COMPANION_COUNT] = { "Nenhuma", "Coro do Brejo", "Labirinto das Sombras", "Coroa Invernal", "Tempestade", "Julgamento do Guardiao", "Furia Resoluta" };
+    return id < COMPANION_COUNT ? names[id] : names[0];
+}
+
 void CompanionMenu()
 {
     IsBigMenuBox = false;
@@ -2893,14 +2950,14 @@ void CompanionMenu()
         else sprintf_s(line, "Experiencia: %u / %u", (unsigned int)CompanionExperience(active), (unsigned int)CompanionExperienceForNextLevel(CompanionLevel(active)));
         SetDialogRow(PT_DialogRows_NoIndent, 7, true, line, C_0_White, false);
         SetDialogRow(PT_DialogRows_NoIndent, 9, true, CompanionIsSummoned() ? "Dispensar companheiro" : "Chamar companheiro", C_1_Blue, true);
-        sprintf_s(line, "Basica: %s", CompanionTraining(active, 0) ? "Agilidade (-20% recarga)" : "Original");
-        SetDialogRow(PT_DialogRows_NoIndent, 11, true, line, C_1_Blue, active != COMPANION_JASON);
-        sprintf_s(line, "Especial: %s", CompanionLevel(active) < 15 ? "Desbloqueia no nivel 15" : CompanionTraining(active, 1) ? "Agilidade (-20% recarga)" : "Original");
-        SetDialogRow(PT_DialogRows_NoIndent, 13, true, line, C_1_Blue, active != COMPANION_JASON && CompanionLevel(active) >= 15);
+        sprintf_s(line, "%s: %s", CompanionPrimaryName(active), CompanionTraining(active, 0) == 2 ? "Eco (+60% disparo)" : CompanionTraining(active, 0) == 1 ? "Agilidade (-20% recarga)" : "Original");
+        SetDialogRow(PT_DialogRows_NoIndent, 11, true, line, C_1_Blue, true);
+        sprintf_s(line, "%s: %s", CompanionSpecialName(active), CompanionLevel(active) < 15 ? "Desbloqueia no nivel 15" : CompanionTraining(active, 1) ? "Agilidade (-20% recarga)" : "Original");
+        SetDialogRow(PT_DialogRows_NoIndent, 13, true, line, C_1_Blue, CompanionLevel(active) >= 15);
         const int passive = CompanionTraining(active, 2);
         sprintf_s(line, "Passiva extra: %s", CompanionLevel(active) < 10 ? "Desbloqueia no nivel 10" : passive == 1 ? "Vigor (regeneracao)" : passive == 2 ? "Precisao (+8 fisica)" : "Nenhuma");
         SetDialogRow(PT_DialogRows_NoIndent, 15, true, line, C_1_Blue, CompanionLevel(active) >= 10);
-        SetDialogRow(PT_DialogRows_NoIndent, 17, true, MaeraBondLearned(active) ? "Instinto de Retorno: aprendido com Maera" : active == COMPANION_JASON ? "Jason: basica e especial em preparo" : "Clique nas habilidades para trocar", C_3_Gold, false);
+        SetDialogRow(PT_DialogRows_NoIndent, 17, true, MaeraBondLearned(active) ? "Instinto de Retorno: aprendido com Maera" : "Clique nas habilidades para trocar", C_3_Gold, false);
         SetDialogRow(PT_DialogRows_NoIndent, 18, true, "Nv.50 + evolucao final: poder maximo", C_3_Gold, false);
         SetDialogRow(PT_DialogRows_NoIndent, 20, true, "Voltar aos companheiros", C_0_White, true);
         DialogRowsCount = PT_DialogRows_20_SmallDialog_RowsCount;
@@ -3088,7 +3145,7 @@ static void HandleMaeraBond()
         AdditionalStateData.unused[MAERA_BOND_MEMORIES] = 0;
         RecalcPlayer(CurrentPlayerIndex, true);
         char reward[128];
-        strcpy_s(reward, target == COMPANION_JASON ? "Instinto de Retorno: +20 armadura com Jason ativo, e +15 afinidade." : "Instinto de Retorno: +10 armadura e -10% recarga basica com ele ativo, e +15 afinidade.");
+        strcpy_s(reward, target == COMPANION_JASON ? "Instinto de Retorno: +20 armadura e -10% recarga basica com Jason ativo, e +15 afinidade." : "Instinto de Retorno: +10 armadura e -10% recarga basica com ele ativo, e +15 afinidade.");
         ErrorPlrMsg(reward);
         ChangeTownerDialog(PD_32_Maera);
     }else{
@@ -3101,6 +3158,50 @@ static void HandleMaeraBond()
         CurrentDialogIndex = PD_0_None;
         StartNewLvl(CurrentPlayerIndex, WM_1029_GOTO_QUEST_DUNGEON, DUN_115_FORGOTTEN_HOUSE);
     }
+}
+
+void MaeraTrainingMenu()
+{
+    IsBigMenuBox = true;
+    DialogHasScroolBox = false;
+    SetDialogRow(PT_DialogRows_NoIndent, 2, true, "MAERA: ECO DO VINCULO", C_3_Gold, false);
+    const unsigned char active = ActiveCompanion();
+    char title[128];
+    sprintf_s(title, "Companheiro: %s", active == COMPANION_NONE ? "selecione um na ficha" : CompanionName(active));
+    const char* lines[7] = { title, "Maera: A casa ensinou voces a escutar.", "Agora ele pode responder antes do silencio.",
+        "Eco repete o disparo basico com 60% de dano.", "Exige nivel 15 e a jornada Quem fica esperando.",
+        "Aprendizado: 5000 ouro, uma vez por companheiro.", "Na ficha, escolha Original, Agilidade ou Eco." };
+    MemoryLines(lines);
+    if( active != COMPANION_NONE && CompanionLevel(active) >= 15 && MaeraBondLearned(active) ){
+        if( MaeraEchoLearned(active) ) SetDialogRow(PT_DialogRows_NoIndent, 14, true, "Equipar Eco do Vinculo", C_1_Blue, true);
+        else if( CompanionLevel(active) >= 15 && MaeraBondLearned(active) )
+            SetDialogRow(PT_DialogRows_NoIndent, 14, true, "Aprender e equipar Eco: 5000 ouro", C_1_Blue, true);
+    }
+    SetDialogRow(PT_DialogRows_NoIndent, 16, true, "Abrir ficha dos companheiros", C_0_White, true);
+    SetDialogRow(PT_DialogRows_NoIndent, 18, true, "Voltar", C_0_White, true);
+    DialogRowsCount = PT_DialogRows_20_SmallDialog_RowsCount;
+}
+static void HandleMaeraTraining()
+{
+    if( !MemoryCaretakerRescued() || Dungeon != DUN_0_TOWN ){
+        CurrentDialogIndex = PD_0_None; return;
+    }
+    if( SelectedDialogRow == 18 ){ ChangeTownerDialog(PD_32_Maera); return; }
+    if( SelectedDialogRow == 16 ){ CompanionOpenPanel(); return; }
+    if( SelectedDialogRow != 14 ) return;
+    const unsigned char active = ActiveCompanion();
+    if( active == COMPANION_NONE || CompanionLevel(active) < 15 || !MaeraBondLearned(active) ) return;
+    if( !MaeraEchoLearned(active) ){
+        if( Players[CurrentPlayerIndex].TotalGold < MAERA_ECHO_PRICE ){
+            ErrorPlrMsg("Maera: faltam moedas para preparar este treinamento."); return;
+        }
+        ClearGoldByInventoryAsPrice(MAERA_ECHO_PRICE);
+        AdditionalStateData.unused[MAERA_ECHO_LEARNED + active - 1] = 1;
+    }
+    AdditionalStateData.unused[COMPANION_SAVE_GEMS + (active - 1)*3] = 2;
+    RecalcPlayer(CurrentPlayerIndex, true);
+    ErrorPlrMsg("Eco do Vinculo equipado. O disparo basico agora tem um segundo ataque.");
+    ChangeTownerDialog(PD_34_MaeraTraining);
 }
 
 void MaeraMenu()
@@ -3118,6 +3219,8 @@ void MaeraMenu()
         "Uma porcao por nivel de cada companheiro.",
         "E nao deixe que chamem seu amigo apenas de arma." };
     MemoryLines(lines);
+    ClearRowsInInterval(9, 11);
+    SetDialogRow(PT_DialogRows_NoIndent, 10, true, "Treinamento: Eco do Vinculo", C_3_Gold, true);
     SetDialogRow(PT_DialogRows_NoIndent, 12, true, "Cuidar dos companheiros", C_1_Blue, true);
     const unsigned char active = ActiveCompanion();
     if( active != COMPANION_NONE ){
@@ -3137,6 +3240,10 @@ static void HandleMaera()
 {
     if( !MemoryCaretakerRescued() || SelectedDialogRow == 18 ){
         CurrentDialogIndex = PD_0_None;
+        return;
+    }
+    if( SelectedDialogRow == 10 ){
+        ChangeTownerDialog(PD_34_MaeraTraining);
         return;
     }
     if( SelectedDialogRow == 16 ){
@@ -3223,6 +3330,7 @@ void __fastcall ChangeTownerDialog(PLAYER_DIALOG dialogIndex)
 	case PD_29_ColiseumDiff            : ColiseumDifficultyMenu();                       break;
 	case PD_30_Companions              : CompanionMenu();                                break;
 	case PD_31_ForgottenHouse           : ForgottenHouseMenu();                            break;
+	case PD_34_MaeraTraining            : MaeraTrainingMenu();                               break;
 	case PD_33_MaeraBond                : MaeraBondMenu();                                   break;
 	case PD_32_Maera                    : MaeraMenu();                                     break;
     }
@@ -3309,6 +3417,9 @@ void PrevTownerDialog()
         case PD_22_FarnhamMain:
 			CurrentDialogIndex = PD_0_None;
 			break;
+		case PD_34_MaeraTraining:
+            ChangeTownerDialog(PD_32_Maera);
+            break;
 		case PD_33_MaeraBond:
             CloseMaeraBond();
             break;
@@ -4654,7 +4765,8 @@ void HandleCompanionMenu()
         else if( SelectedDialogRow == 11 || SelectedDialogRow == 13 || SelectedDialogRow == 15 ){
             const int slot = (SelectedDialogRow - 11) / 2;
             if( (slot == 1 && CompanionLevel(active) < 15) || (slot == 2 && CompanionLevel(active) < 10) ) return;
-            AdditionalStateData.unused[COMPANION_SAVE_GEMS + (active - 1) * 3 + slot] = (char)((CompanionTraining(active, slot) + 1) % (slot == 2 ? 3 : 2));
+            const int variants = slot == 2 || (slot == 0 && MaeraEchoLearned(active) && CompanionLevel(active) >= 15) ? 3 : 2;
+            AdditionalStateData.unused[COMPANION_SAVE_GEMS + (active - 1) * 3 + slot] = (char)((CompanionTraining(active, slot) + 1) % variants);
             RecalcPlayer(CurrentPlayerIndex, true);
         }else if( SelectedDialogRow == 20 ) CompanionPanelDetails = false;
         ChangeTownerDialog(PD_30_Companions);
@@ -4769,6 +4881,7 @@ void HandleTownersMenu()
     if( OpenMemoryTopic() ) return;
     switch( CurrentDialogIndex ) {
         case PD_31_ForgottenHouse: HandleForgottenHouse(); return;
+        case PD_34_MaeraTraining: HandleMaeraTraining(); return;
         case PD_33_MaeraBond: HandleMaeraBond(); return;
         case PD_32_Maera: HandleMaera(); return;
         //Griswold the Blacksmith

@@ -7545,6 +7545,7 @@ enum PLAYER_DIALOG
 	PD_31_ForgottenHouse = 31,
 	PD_32_Maera = 32,
 	PD_33_MaeraBond = 33,
+	PD_34_MaeraTraining = 34,
 	PD_Count,
 };
 
