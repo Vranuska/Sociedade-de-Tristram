@@ -8411,8 +8411,7 @@ void __fastcall Ai_8_Fallen(uint monsterIndex)
 				ac = curAc;
 			}
 		LABEL_47:
-			MonsterSprite monstersprite = *Monsters[monsterIndex_3].SpritePtr;
-			int baseMonsterIndex = monstersprite.baseMonsterIndex; 
+			const int baseMonsterIndex = Monsters[monsterIndex_3].SpritePtr->baseMonsterIndex; 
 			minLife = (ac << 6) + Monsters[ monsterIndex_3 ].CurrentLife;
 			if (baseMonsterIndex == BM_245_BLUNDERER) {  // Warden of Anger gets 3x life from warcries!
 				minLife += (ac * 3) << 6;
