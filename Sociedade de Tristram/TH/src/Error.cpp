@@ -1,4 +1,5 @@
 ﻿#include "stdafx.h"
+#include "../include/Diagnostics.h"
 
 #undef strcat_s
 #define SW_IMPL
@@ -492,6 +493,8 @@ void __fastcall SetErrorDialogTitle(HWND hDlg, LPCSTR lpString)
 //----- (00401C51) --------------------------------------------------------
 void __fastcall FileErrDlg(LPARAM dwInitParam)
 {
+	Diagnostics::Record("ERROR", "FileErrDlg: resource failure");
+	Diagnostics::Snapshot();
 	ErrorExitGame();
 	if( !dwInitParam ){
 		dwInitParam = (LPARAM)&ZeroString;
