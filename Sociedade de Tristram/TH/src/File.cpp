@@ -1,4 +1,5 @@
 ﻿#include "stdafx.h"
+#include "../include/Diagnostics.h"
 
 HANDLE diabdatMPQPtr;
 HANDLE CurSpeechHandle;
@@ -54,6 +55,10 @@ int __fastcall File_Open(const char* fileName, HANDLE* fileHandle, int oneTry)
 	int tryes = 10;
 	while( tryes-- ){
 		int opened = SFileOpenFile(fileName, fileHandle);
+		if( !opened ) {
+			Diagnostics::RecordFile("open failed", fileName);
+			Diagnostics::Snapshot();
+		}
 		if( opened )
 			return 1;
 		if( oneTry != opened && GetLastError() == 2 )
