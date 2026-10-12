@@ -57,7 +57,6 @@ int __fastcall File_Open(const char* fileName, HANDLE* fileHandle, int oneTry)
 		int opened = SFileOpenFile(fileName, fileHandle);
 		if( !opened ) {
 			Diagnostics::RecordFile("open failed", fileName);
-			Diagnostics::Snapshot();
 		}
 		if( opened )
 			return 1;
