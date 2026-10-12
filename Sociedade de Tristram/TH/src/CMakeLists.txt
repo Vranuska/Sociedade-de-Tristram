@@ -14,6 +14,7 @@ set (th_sources
     Draw.cpp
     Engine.cpp
     Entry.cpp
+    Diagnostics.cpp
     Error.cpp
     Exception.cpp
     File.cpp
