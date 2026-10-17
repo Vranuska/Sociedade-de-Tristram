@@ -138,10 +138,10 @@ These tracks are localization plans/work in progress; **no completed standalone 
 The C++ solution and original upstream documentation are inside [`Sociedade de Tristram/TH/`](Sociedade%20de%20Tristram/TH). The original [The Heaven README](Sociedade%20de%20Tristram/TH/README.md), [build notes](Sociedade%20de%20Tristram/TH/docs/BUILD.md), and [upstream changelog](Sociedade%20de%20Tristram/TH/docs/CHANGELOG.md) are retained for technical reference; **they describe the upstream project and must not be mistaken for a tested Sociedade de Tristram release**.
 
 Selected working branches:
-- [`feature/diagnostics-foundation`](../../tree/feature/diagnostics-foundation) — lightweight diagnostic events and snapshots.
-- [`feature/configurable-rates`](../../tree/feature/configurable-rates) — experiments including the Forgotten House map asset.
-- [`feature/quenching-safety-20261017`](../../tree/feature/quenching-safety-20261017) — crafting/refinement safety work.
-- [`feature/unique-refinement-20261017`](../../tree/feature/unique-refinement-20261017) — unique-item refinement work.
+- [`feature/diagnostics-foundation`](https://github.com/Vranuska/Sociedade-de-Tristram/tree/feature/diagnostics-foundation) — lightweight diagnostic events and snapshots.
+- [`feature/configurable-rates`](https://github.com/Vranuska/Sociedade-de-Tristram/tree/feature/configurable-rates) — experiments including the Forgotten House map asset.
+- [`feature/quenching-safety-20261017`](https://github.com/Vranuska/Sociedade-de-Tristram/tree/feature/quenching-safety-20261017) — crafting/refinement safety work.
+- [`feature/unique-refinement-20261017`](https://github.com/Vranuska/Sociedade-de-Tristram/tree/feature/unique-refinement-20261017) — unique-item refinement work.
 
 There is currently **no claim of a ready-to-install public release**. Please treat the repository as source and experimental development material.
 
