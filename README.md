@@ -6,35 +6,11 @@
 **Fan-made expansion · Experimental C++ game modding · Brazilian Portuguese**
 
 **Status: Active development / work in progress**  
-[Português (Brasil)](README.pt-BR.md) · [Why I mod](#why-i-mod-games) · [Development roadmap](#development-roadmap) · [Credits](#credits--original-projects)
+[Português (Brasil)](README.pt-BR.md) · [Development roadmap](#development-roadmap) · [Credits](#credits--original-projects)
 
 </div>
 
 > **A personal project, not an official release.** I have played Diablo since 1998. After all these years, I still love its world, atmosphere, and the possibilities hidden in its systems. Sociedade de Tristram is my small, ongoing attempt to build some of the things I always wished I could experience there. I am learning as I go, and I care more about making something thoughtful than claiming it is finished.
-
-## Why I mod games
-
-I've played modded versions of **Conan Exiles, ARK: Survival Evolved, Minecraft, and Diablo I**, including mods like **The Hell 3, The Hell 4, and The Heaven**.
-
-What I love most about mods is how much additional content they can bring to a game. New creatures, weapons, equipment, building pieces, quests, locations, and entirely new mechanics can make even a game you've played for hundreds of hours feel fresh again.
-
-In games like Conan Exiles, ARK, and Minecraft, I particularly enjoy mods that expand building possibilities, introduce new creatures, improve existing systems, and give players more freedom to experiment. Sometimes it's the smallest additions that make the biggest difference, especially when they let you do something you've always wanted to do in the original game.
-
-I actually love this kind of content so much that I've started developing my own Diablo I mod, called **Sociedade de Tristram**.
-
-**I've been playing Diablo since 1998**, so this game has been part of my life for a very long time. I'm working on adding new quests, gameplay mechanics, quality-of-life improvements, and even features that never existed in the original game, like a companion system I'm building from scratch, with character progression and abilities.
-
-It's a small project, still in its early stages, and I have a lot to learn. I'm not a professional developer, and I'm certainly not trying to reinvent Diablo. I'm just someone who genuinely loves this old game and wants to give it a little more life. There are so many things I've wished I could experience in it over the years, and now I'm slowly trying to make some of them possible.
-
-If anyone's curious, here's my little project: **[Sociedade de Tristram on GitHub](https://github.com/Vranuska/Sociedade-de-Tristram)**.
-
-It's nothing impressive yet, but it's made with a lot of love, and it's only the beginning.
-
-I think that's what makes modding so special. People spend countless hours creating content for games they love, often without expecting anything in return. They just want to share their ideas, improve the experience, or give other players something new to enjoy.
-
-That's also why I'd love to see official mod support in **Once Human**. The game already has so much potential with its building system, open world, creatures, and survival mechanics. Imagine what the community could create with proper modding tools! More building materials, decorative pieces, creatures, quests, exploration content, and entirely new gameplay possibilities.
-
-For me, mods aren't just about fixing problems or adding more stuff. They're about giving a game room to grow beyond what its original developers imagined, and letting the people who love it become part of that creative process.
 
 ## What is this project?
 
