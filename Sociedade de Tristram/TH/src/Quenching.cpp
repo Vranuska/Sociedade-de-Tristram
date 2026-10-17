@@ -172,13 +172,40 @@ void __fastcall Quench_Close()
     }
 }
 
+// Quenching is an equipment service: refuse consumables, quest objects, and
+// unidentified magical items before they can be moved into the service slot.
+static bool QuenchIsEligibleEquipment(const Item& item)
+{
+    if( is(item.ItemCode, IC_M1_NONE, IC_11_GOLD, IC_0_OTHER) ) return false;
+    if( item.MagicLevel != ML_0_USUAL && !item.Identified ) return false;
+    return item.TypeID == ITEM_1_WEAPON || item.TypeID == ITEM_2_ARMOR
+        || is(item.ItemCode, IC_12_RING, IC_13_AMULET);
+}
+
+// Only charge after item recreation has produced the effect for this tier.
+// Some generated items already use all their effect slots.
+static bool QuenchHasExpectedEffect(const Item& item)
+{
+    const Effect expected = GetQuenchEffect(const_cast<Item&>(item), item.quenchAffix, item.quenchLevel);
+    if( expected.id == AE_NO ) return false;
+    for( const auto& effect : item.effect ){
+        if( effect.origin == AO_QUENCH && effect.id == expected.id
+            && effect.type == expected.type && effect.minVal == expected.minVal
+            && effect.maxVal == expected.maxVal ){
+            return true;
+        }
+    }
+    return false;
+}
+
 //----- (th3) -------------------------------------------------------------
 int QuenchButtonPicNumber(bool isUpgradeButton, int buttonIndex)
 {
 	if( ! isUpgradeButton ){
 		return IsQuenchPressed && CursorIntoDisplayObject(QuenchLeaveButton) ? N_ENCH_PRESS : N_ENCH;
 	}else{
-		if( QuenchItem.ItemCode == IC_M1_NONE 
+		if( !QuenchIsEligibleEquipment(QuenchItem)
+         || GetQuenchAffix(Players[CurrentPlayerIndex], QuenchItem) == QA_NO
 		 || QuenchItem.quenchLevel >= QuenchMaxLevel()
 		 || (uint)BuyPrice(QuenchPrice(QuenchItem.quenchLevel + 1)) > CalcTotalGold(CurrentPlayerIndex) ){
 			return ENCH_INACTIVE;
@@ -219,7 +246,7 @@ void __fastcall Quench_DrawItemBacklight()
 		backlightColor = QuenchItem.quenchLevel >= QuenchMaxLevel() ? blColor.cooked : blColor.main;
 	}else if( Cur.GraphicsID >= CM_12_ITEMS_PICS_START ){
 		Item& curItem = Players[CurrentPlayerIndex].ItemOnCursor;
-		bool improper = is(curItem.ItemCode, IC_M1_NONE, IC_11_GOLD, IC_0_OTHER) || QuenchItem.quenchLevel >= QuenchMaxLevel();
+		bool improper = !QuenchIsEligibleEquipment(curItem);
 		if( QuenchItem.ItemCode == IC_M1_NONE ){
 			backlightColor = improper ? BLC_NONE : blColor.overcells;
 		}else{
@@ -286,7 +313,7 @@ void Quench_DrawItem(const DisplayObject& rect, const Item& item)
 bool QuenchIsItemSuitableForQuenching()
 {
 	Item& cur = Players[CurrentPlayerIndex].ItemOnCursor;
-	return not(cur.ItemCode, IC_11_GOLD, IC_0_OTHER) && (cur.Identified || cur.MagicLevel == ML_0_USUAL);
+	return QuenchIsEligibleEquipment(cur);
 }
 
 //----- (th3) -------------------------------------------------------------
@@ -333,14 +360,30 @@ void __fastcall Quench_MouseClick()
     }else{
         for( int buttonIndex = 0; buttonIndex < QuenchesMax_1; buttonIndex++ ){
             if( CursorIntoDisplayObject(QuenchButtons[buttonIndex]) && QuenchButtonPicNumber(1, buttonIndex) != ENCH_INACTIVE ){
-				if( QuenchItem.quenchLevel < QuenchMaxLevel()){
-					QuenchItem.quenchLevel++;
-					QuenchItem.dropType |= D_QUENCHED;
-					QuenchItem.quenchAffix = GetQuenchAffix(player, QuenchItem, buttonIndex);
-					UpdateItem(QuenchItem);
-					PlayGlobalSound(S_1516_adria_enchant_sfx);
-					ClearGoldByInventoryAsPrice(BuyPrice(QuenchPrice(QuenchItem.quenchLevel)));
-				}
+                const int nextLevel = QuenchItem.quenchLevel + 1;
+                const int price = BuyPrice(QuenchPrice(nextLevel));
+                if( !QuenchIsEligibleEquipment(QuenchItem)
+                    || nextLevel > QuenchMaxLevel()
+                    || price < 0 || (uint)price > CalcTotalGold(CurrentPlayerIndex) ){
+                    break;
+                }
+                const QUENCH_AFFIX affix = GetQuenchAffix(player, QuenchItem, buttonIndex);
+                if( affix == QA_NO ) break;
+
+                // Keep gold and item unchanged if this item cannot fit the new affix.
+                const Item previousItem = QuenchItem;
+                QuenchItem.quenchLevel = static_cast<uchar>(nextLevel);
+                QuenchItem.dropType |= D_QUENCHED;
+                QuenchItem.quenchAffix = affix;
+                UpdateItem(QuenchItem);
+                if( !QuenchHasExpectedEffect(QuenchItem) ){
+                    QuenchItem = previousItem;
+                    break;
+                }
+
+                ClearGoldByInventoryAsPrice(price);
+                PlayGlobalSound(S_1516_adria_enchant_sfx);
+                break;
             }
         }
     }
