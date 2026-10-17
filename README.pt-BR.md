@@ -40,7 +40,7 @@ A ideia é oferecer mais do que lutas e recompensas: pequenos mistérios que inc
 
 ### Ferramentas de desenvolvimento e diagnóstico
 
-Há um protótipo de **registro leve de eventos de diagnóstico** na branch [`feature/diagnostics-foundation`](../../tree/feature/diagnostics-foundation), com buffer limitado e geração de registro `Diagnostics/Session.log` quando solicitado.
+Há um protótipo de **registro leve de eventos de diagnóstico** na branch [`feature/diagnostics-foundation`](https://github.com/Vranuska/Sociedade-de-Tristram/tree/feature/diagnostics-foundation), com buffer limitado e geração de registro `Diagnostics/Session.log` quando solicitado.
 
 Também usamos compilação Win32/MSBuild, testes e captura de logs durante o trabalho. Alguns scripts BAT/PowerShell de diagnóstico foram utilizados localmente e **não devem ser considerados publicados ou prontos no repositório**.
 
@@ -109,10 +109,10 @@ Esses dois esforços **não incluirão nossas alterações de gameplay**. A inte
 O projeto C++ está em [`Sociedade de Tristram/TH/`](Sociedade%20de%20Tristram/TH). Conservamos o [README de The Heaven](Sociedade%20de%20Tristram/TH/README.md), as [notas técnicas](Sociedade%20de%20Tristram/TH/docs/BUILD.md) e os [registros originais de alterações](Sociedade%20de%20Tristram/TH/docs/CHANGELOG.md) como documentação da origem do código — **não como histórico de releases testados da Sociedade de Tristram**.
 
 Branches de desenvolvimento:
-- [Diagnóstico](../../tree/feature/diagnostics-foundation)
-- [Taxas configuráveis e protótipo Forgotten House](../../tree/feature/configurable-rates)
-- [Segurança de melhorias](../../tree/feature/quenching-safety-20261017)
-- [Refinamento de itens únicos](../../tree/feature/unique-refinement-20261017)
+- [Diagnóstico](https://github.com/Vranuska/Sociedade-de-Tristram/tree/feature/diagnostics-foundation)
+- [Taxas configuráveis e protótipo Forgotten House](https://github.com/Vranuska/Sociedade-de-Tristram/tree/feature/configurable-rates)
+- [Segurança de melhorias](https://github.com/Vranuska/Sociedade-de-Tristram/tree/feature/quenching-safety-20261017)
+- [Refinamento de itens únicos](https://github.com/Vranuska/Sociedade-de-Tristram/tree/feature/unique-refinement-20261017)
 
 ## Créditos e origens
 
