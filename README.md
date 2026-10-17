@@ -10,7 +10,7 @@
 
 </div>
 
-> **A personal project, not an official release.** I have played Diablo since 1996. After all these years, I still love its world, atmosphere, and the possibilities hidden in its systems. Sociedade de Tristram is my small, ongoing attempt to build some of the things I always wished I could experience there. I am learning as I go, and I care more about making something thoughtful than claiming it is finished.
+> **A personal project, not an official release.** I have played Diablo since 1998. After all these years, I still love its world, atmosphere, and the possibilities hidden in its systems. Sociedade de Tristram is my small, ongoing attempt to build some of the things I always wished I could experience there. I am learning as I go, and I care more about making something thoughtful than claiming it is finished.
 
 ## What is this project?
 
