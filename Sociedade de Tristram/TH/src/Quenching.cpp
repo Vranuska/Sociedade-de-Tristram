@@ -184,9 +184,9 @@ static bool QuenchIsEligibleEquipment(const Item& item)
 
 // Only charge after item recreation has produced the effect for this tier.
 // Some generated items already use all their effect slots.
-static bool QuenchHasExpectedEffect(const Item& item)
+static bool QuenchHasExpectedEffect(Item& item)
 {
-    const Effect expected = GetQuenchEffect(const_cast<Item&>(item), item.quenchAffix, item.quenchLevel);
+    const Effect expected = GetQuenchEffect(item, item.quenchAffix, item.quenchLevel);
     if( expected.id == AE_NO ) return false;
     for( const auto& effect : item.effect ){
         if( effect.origin == AO_QUENCH && effect.id == expected.id
