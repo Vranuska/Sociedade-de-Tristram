@@ -4,7 +4,7 @@
 
 [Read in English](README.md) · [Código-fonte](Sociedade%20de%20Tristram/TH) · [Créditos](#créditos-e-origens)
 
-Jogo Diablo desde **1996**. Mesmo depois de tantos anos, continuo apaixonada por Tristram. Este repositório é uma tentativa pessoal de dar vida a ideias que sempre quis experimentar no jogo. Estou aprendendo durante o processo: é um projeto modesto, não um produto acabado.
+Jogo Diablo desde **1998**. Mesmo depois de tantos anos, continuo apaixonada por Tristram. Este repositório é uma tentativa pessoal de dar vida a ideias que sempre quis experimentar no jogo. Estou aprendendo durante o processo: é um projeto modesto, não um produto acabado.
 
 > **Importante:** este repositório está em desenvolvimento. Existem funcionalidades integradas ao código, protótipos em branches e ideias ainda não implementadas. Compilar não significa que tudo esteja testado ou pronto para jogar.
 
