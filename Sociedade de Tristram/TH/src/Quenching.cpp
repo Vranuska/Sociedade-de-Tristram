@@ -227,7 +227,10 @@ void __fastcall Quench_DrawQuenchButtons()
 	for( int i = 0; i < QuenchesMax_1; i++ ){
 		Surface_DrawCEL(QuenchPanel.Left + Screen_LeftBorder + 15, QuenchPanel.Top + Screen_TopBorder - 1 + 238 + 21 * i, LongButtonCEL, QuenchButtonPicNumber(1, i), 292);
 		SetupDisplayObject(QuenchButtons[i], QuenchPanel.Left + 15, QuenchPanel.Top - 1 + 238 - 20 + 21 * i, 292, 20);
-		if( QuenchItem.ItemCode != IC_M1_NONE && QuenchButtonPicNumber(1, i) != ENCH_INACTIVE ){
+		// Show the next tier and its cost even when the player cannot afford it.
+		if( QuenchIsEligibleEquipment(QuenchItem)
+            && QuenchItem.quenchLevel < QuenchMaxLevel()
+            && GetQuenchAffix(player, QuenchItem, i) != QA_NO ){
 			int nextLevel = QuenchItem.quenchLevel + 1;
 			Effect e = GetQuenchEffect(QuenchItem, GetQuenchAffix(player, QuenchItem, i), nextLevel);
 			InfoPanelBuffer[0] = 0;
