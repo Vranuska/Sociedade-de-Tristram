@@ -177,9 +177,26 @@ void __fastcall Quench_Close()
 static bool QuenchIsEligibleEquipment(const Item& item)
 {
     if( is(item.ItemCode, IC_M1_NONE, IC_11_GOLD, IC_0_OTHER) ) return false;
+    if( IsQuestItem(item.baseItemIndex) ) return false;
     if( item.MagicLevel != ML_0_USUAL && !item.Identified ) return false;
     return item.TypeID == ITEM_1_WEAPON || item.TypeID == ITEM_2_ARMOR
         || is(item.ItemCode, IC_12_RING, IC_13_AMULET);
+}
+
+// A genuine named unique is distinct from a rare or a set piece.
+static bool QuenchIsNamedUnique(const Item& item)
+{
+    return item.MagicLevel == ML_2_UNIQUE && !(item.dropType & D_RARE);
+}
+
+// A unique item may already have every affix slot occupied. In that case
+// never offer a paid upgrade that cannot hold the quenching effect.
+static bool QuenchHasEffectCapacity(const Item& item)
+{
+    for( const auto& effect : item.effect ){
+        if( effect.id == AE_NO || effect.origin == AO_QUENCH ) return true;
+    }
+    return false;
 }
 
 // Only charge after item recreation has produced the effect for this tier.
@@ -206,6 +223,7 @@ int QuenchButtonPicNumber(bool isUpgradeButton, int buttonIndex)
 	}else{
 		if( !QuenchIsEligibleEquipment(QuenchItem)
          || GetQuenchAffix(Players[CurrentPlayerIndex], QuenchItem) == QA_NO
+         || !QuenchHasEffectCapacity(QuenchItem)
 		 || QuenchItem.quenchLevel >= QuenchMaxLevel()
 		 || (uint)BuyPrice(QuenchPrice(QuenchItem.quenchLevel + 1)) > CalcTotalGold(CurrentPlayerIndex) ){
 			return ENCH_INACTIVE;
@@ -224,12 +242,19 @@ int QuenchButtonPicNumber(bool isUpgradeButton, int buttonIndex)
 void __fastcall Quench_DrawQuenchButtons()
 {
 	Player& player = Players[CurrentPlayerIndex];
+    if( QuenchIsNamedUnique(QuenchItem) ){
+        sprintf(QuenchString, "UNICO: aprimoramento %i/%i",
+            QuenchItem.quenchLevel, QuenchMaxLevel());
+        DrawText(QuenchPanel.Left + 17, QuenchPanel.Top + 205,
+            QuenchPanel.Left + 305, QuenchString, C_3_Gold);
+    }
 	for( int i = 0; i < QuenchesMax_1; i++ ){
 		Surface_DrawCEL(QuenchPanel.Left + Screen_LeftBorder + 15, QuenchPanel.Top + Screen_TopBorder - 1 + 238 + 21 * i, LongButtonCEL, QuenchButtonPicNumber(1, i), 292);
 		SetupDisplayObject(QuenchButtons[i], QuenchPanel.Left + 15, QuenchPanel.Top - 1 + 238 - 20 + 21 * i, 292, 20);
 		// Show the next tier and its cost even when the player cannot afford it.
 		if( QuenchIsEligibleEquipment(QuenchItem)
             && QuenchItem.quenchLevel < QuenchMaxLevel()
+            && QuenchHasEffectCapacity(QuenchItem)
             && GetQuenchAffix(player, QuenchItem, i) != QA_NO ){
 			int nextLevel = QuenchItem.quenchLevel + 1;
 			Effect e = GetQuenchEffect(QuenchItem, GetQuenchAffix(player, QuenchItem, i), nextLevel);
@@ -366,6 +391,7 @@ void __fastcall Quench_MouseClick()
                 const int nextLevel = QuenchItem.quenchLevel + 1;
                 const int price = BuyPrice(QuenchPrice(nextLevel));
                 if( !QuenchIsEligibleEquipment(QuenchItem)
+                    || !QuenchHasEffectCapacity(QuenchItem)
                     || nextLevel > QuenchMaxLevel()
                     || price < 0 || (uint)price > CalcTotalGold(CurrentPlayerIndex) ){
                     break;
@@ -379,7 +405,13 @@ void __fastcall Quench_MouseClick()
                 QuenchItem.dropType |= D_QUENCHED;
                 QuenchItem.quenchAffix = affix;
                 UpdateItem(QuenchItem);
-                if( !QuenchHasExpectedEffect(QuenchItem) ){
+                // A named unique must retain its original identity and title.
+                const bool uniqueChanged = QuenchIsNamedUnique(previousItem)
+                    && (!QuenchIsNamedUnique(QuenchItem)
+                        || QuenchItem.UniqueItemIndex != previousItem.UniqueItemIndex
+                        || strcmp(QuenchItem.FullMagicalItemName,
+                            previousItem.FullMagicalItemName) != 0);
+                if( !QuenchHasExpectedEffect(QuenchItem) || uniqueChanged ){
                     QuenchItem = previousItem;
                     break;
                 }
