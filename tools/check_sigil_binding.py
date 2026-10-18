@@ -26,6 +26,9 @@ checks = {
     "item transfer to reserved slot": "bound = cursor;" in INV,
     "inventory bag hit-testing": "SocietySigilCursorOverBackpack()" in INV,
     "separate Sigil page drawing": "SocietySigilsDrawPage(player);" in INV,
+    "GetItemSprites accepts mutable sprite index":
+        "int sprite = item.GraphicValue + CM_12_ITEMS_PICS_START;" in INV
+        and "const int sprite = item.GraphicValue + CM_12_ITEMS_PICS_START;" not in INV,
     "new characters initialize empty slots":
         "for( auto& item : player.TalismanSlots ) item.ItemCode = IC_M1_NONE;" in PLAYER,
     "existing Player struct remains serialized": "WriteSaveData( &Players[playerIndex], sizeof(Player) );" in SAVE,
