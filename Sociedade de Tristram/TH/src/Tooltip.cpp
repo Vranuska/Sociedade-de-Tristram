@@ -1,5 +1,19 @@
 ﻿#include "stdafx.h"
 
+// Reserved artifact definitions use stable base-item IDs instead of MC_GEM.
+// They are deliberately inert until safe equipping and save support exist.
+static const char* SocietySigilAspect(int baseItemIndex)
+{
+    switch( baseItemIndex ){
+    case BI_2504_SIGIL_VEIL:   return "Afinidade: protecao e equilibrio";
+    case BI_2505_SIGIL_STEEL:  return "Afinidade: combate";
+    case BI_2506_SIGIL_ARCANE: return "Afinidade: magia";
+    case BI_2507_SIGIL_PACT:   return "Afinidade: invocacoes";
+    case BI_2508_SIGIL_EMBERS: return "Afinidade: elementos";
+    default:                   return nullptr;
+    }
+}
+
 enum Tooltip_Param
 {
 	TOOLTIP_TEXT_MAX = 256,
@@ -342,6 +356,11 @@ void __fastcall Tooltip_ShowItemInfo_2(int slot)
     }
 
     Tooltip_AddLine_2(namePtr, nameColor);
+    if( const char* aspect = SocietySigilAspect(item.baseItemIndex) ){
+        Tooltip_AddLine_2("Artefato arcano: Sigilo", C_3_Gold);
+        Tooltip_AddLine_2(aspect);
+        Tooltip_AddLine_2("Adormecido: aguarda vinculacao", C_5_Yellow);
+    }
 
     if (rare) {
         Tooltip_AddLine_2("Item Raro", nameColor);
@@ -1203,6 +1222,11 @@ void __fastcall Tooltip_ShowItemInfo_3(int slot)
     }
 
     Tooltip_AddLine_3(namePtr, nameColor);
+    if( const char* aspect = SocietySigilAspect(item.baseItemIndex) ){
+        Tooltip_AddLine_3("Artefato arcano: Sigilo", C_3_Gold);
+        Tooltip_AddLine_3(aspect);
+        Tooltip_AddLine_3("Adormecido: aguarda vinculacao", C_5_Yellow);
+    }
 
     if (rare) {
         Tooltip_AddLine_3("Item Raro", nameColor);
@@ -2183,6 +2207,11 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
     }
 
     Tooltip_AddLine(namePtr, nameColor);
+    if( const char* aspect = SocietySigilAspect(item.baseItemIndex) ){
+        Tooltip_AddLine("Artefato arcano: Sigilo", C_3_Gold);
+        Tooltip_AddLine(aspect);
+        Tooltip_AddLine("Adormecido: aguarda vinculacao", C_5_Yellow);
+    }
     
     if( rare ){
         Tooltip_AddLine("Item Raro", nameColor);
