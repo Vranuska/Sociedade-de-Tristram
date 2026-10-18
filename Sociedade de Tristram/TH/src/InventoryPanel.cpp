@@ -59,6 +59,9 @@ void SetupInvPanel(int playerIndex)
 	ItemCells.clear();
 
 	for( BaseSlot base: BaseSlots ){
+        // Disabled until Sigils have an independent, versioned save format.
+        // Never expose this slot, even before the Players array is initialized.
+        if( base.id == IS_Talisman ) continue;
 		if( GameMode == GM_CLASSIC ){
 			switch(base.id){
 			case IS_Head       : base.x = 133; base.y =   2; base.c = 2; base.r = 2; break;
@@ -579,7 +582,7 @@ void __fastcall PutCursorItemToInv( int playerIndex, int mX, int mY )
 	BaseSlot& slot = BaseSlots[cell.slot.id];
     // Reserved Sigil inventory has no safe item mapping until serialization
     // and transfer logic are implemented. Do not treat it as belt/storage.
-    if( slot.id == IS_Talisman ) return ;
+    if( slot.id == IS_Talisman ) return;
 	if( slot.slotType == SL_ARMOR && player.gameChanger & BIT(GC_2_BT_STRIP) && IsSomeMonstersActivated() ){
 		return; //No items change during battle
 	}
