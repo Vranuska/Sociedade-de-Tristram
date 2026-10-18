@@ -139,6 +139,34 @@ static void SpawnMemoryGuardian()
     monster.CurrentLife = monster.BaseLife;
     MemoryCombatTicks = 0;
 }
+// Check loose/archived quest resources BEFORE starting a level transition.
+// Missing loose files previously reached LoadFile with an invalid handle,
+// which surfaced as a misleading DIABDAT.MPQ / insert-disc error.
+static bool ForgottenHouseAssetsAvailable()
+{
+    struct RequiredAsset { const char* path; const char* missingMessage; };
+    static const RequiredAsset assets[] = {
+        { "Levels\\L1Data\\ForgottenHouse.DUN",
+          "Casa Esquecida: falta Levels\\L1Data\\ForgottenHouse.DUN na pasta do jogo." },
+        { "Levels\\L1Data\\zContrastique.pal",
+          "Casa Esquecida: falta a paleta zContrastique.pal nos dados do jogo." }
+    };
+    for( const RequiredAsset& asset : assets ){
+        HANDLE handle = nullptr;
+        if( !SFileOpenFile(asset.path, &handle) ){
+            ErrorPlrMsg((char*)asset.missingMessage);
+            return false;
+        }
+        const DWORD fileSize = SFileGetFileSize(handle, nullptr);
+        SFileCloseFile(handle);
+        if( fileSize == 0 || fileSize == 0xFFFFFFFF ){
+            ErrorPlrMsg((char*)"Casa Esquecida: recurso encontrado, mas vazio ou ilegivel.");
+            return false;
+        }
+    }
+    return true;
+}
+
 void MemoryGenerateHouse()
 {
     LoadQuestDungeonMainMapChurch("Levels\\L1Data\\ForgottenHouse.DUN", 40, 34);
@@ -439,6 +467,7 @@ void ForgottenHouseMenu()
 static void HandleForgottenHouse()
 {
     if( MemorySpeaker == 0 && MemoryState() >= 2 && MemoryState() < 4 && SelectedDialogRow == 16 ){
+        if( !ForgottenHouseAssetsAvailable() ) return;
         CurrentDialogIndex = PD_0_None;
         StartNewLvl(CurrentPlayerIndex, WM_1029_GOTO_QUEST_DUNGEON, DUN_115_FORGOTTEN_HOUSE);
         return;
@@ -3460,6 +3489,7 @@ static void HandleMaeraBond()
         if( AdditionalStateData.unused[COMPANION_SAVE_SUMMON_DISABLED] ){
             ErrorPlrMsg("Chame seu companheiro pelo painel antes de partir."); return;
         }
+        if( !ForgottenHouseAssetsAvailable() ) return;
         CurrentDialogIndex = PD_0_None;
         StartNewLvl(CurrentPlayerIndex, WM_1029_GOTO_QUEST_DUNGEON, DUN_115_FORGOTTEN_HOUSE);
     }
