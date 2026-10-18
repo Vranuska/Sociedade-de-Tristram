@@ -1271,7 +1271,9 @@ void Craft_ButtonsMouseClick()
 //----- (th2) -------------------------------------------------------------
 bool Craft_Gems_IsItemAllowedToBeConsumable( Item* itemPtr )
 {
-    if( itemPtr->MagicCode != MC_GEM ){
+    if( itemPtr->MagicCode != MC_GEM
+        || !FindGemInfoByBaseItemIndex(itemPtr->baseItemIndex) ){
+        // Reserved Sigils and other non-gems must not enter gem crafting.
         return false;
     }
     
@@ -1572,7 +1574,8 @@ bool __fastcall Craft_Socketing_TryToPlaceItemIntoCraftSlot()
             return true;
         }
     }else if( dstSlotId != -1 ){ // socket slot
-        if( item.ItemCode != IC_M1_NONE && item.MagicCode == MC_GEM ){
+        if( item.ItemCode != IC_M1_NONE && item.MagicCode == MC_GEM
+            && FindGemInfoByBaseItemIndex(item.baseItemIndex) ){
             Item& socketedItem = SocketingItems.at( SocketingItemSlotIndex );
             if( socketedItem.ItemCode != IC_M1_NONE && dstSlotId < socketedItem.socketsAmount ){
                 if( socketedItem.sockets.at( dstSlotId ) == 0 ){ // Socket slot should be empty
