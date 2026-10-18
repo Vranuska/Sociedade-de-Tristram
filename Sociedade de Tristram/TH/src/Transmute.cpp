@@ -181,10 +181,12 @@ Recipe Recipes[TR_count] = {
 						 IR( return 100 * player.CharLevel; ),
 						 Do<TR_WHITE_TO_MAGIC>, false, BIT(GC_14_CLEAN_HANDS) },
 	{ TR_GEM           , { "2 same type & grade gems", "To a different random gem", "of the same grade" },
-	                     { IR( return item.MagicCode == MC_GEM; ),
+	                     { IR( return item.MagicCode == MC_GEM
+                            && FindGemInfoByBaseItemIndex(item.baseItemIndex); ),
 						   IR( Item& _2 = TransmuteSlots.items[transmuteIndexes[0]];
 						       return item.MagicCode == MC_GEM
-								   && item.subType == _2.subType && item.grade == _2.grade; ) },
+                               && FindGemInfoByBaseItemIndex(item.baseItemIndex)
+                               && item.subType == _2.subType && item.grade == _2.grade; ) },
 						 IR( return item.grade * item.grade * item.grade * 100; ),
 						 Do<TR_GEM>, true },
 	{ TR_BOOK          , { "2 books + Morganite", "To other random book", "of average level" },
