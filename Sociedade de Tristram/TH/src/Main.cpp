@@ -3257,38 +3257,6 @@ int __stdcall GameWindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					case VK_71_G_KEY: // Alt + G, disable/enable immortality
 						SwitchGodMode();
 						break;
-					case VK_83_S_KEY: { // Alt+S: spells; Alt+Shift+S: next Sigil test item
-                        // Dev-only and solo-only: a ground drop uses the normal
-                        // deterministic item creation path, never direct save edits.
-                        if( IsShiftPressed ){
-                            if( !DevelopMode || MaxCountOfPlayersInGame != 1 ) break;
-                            // Ignore held-key autorepeat to avoid flooding the ground.
-                            if( (lParam & (1L << 30)) != 0 ) break;
-                            static int nextTestSigil = 0;
-                            const int baseId = BI_2504_SIGIL_VEIL + nextTestSigil;
-                            const Player& player = Players[CurrentPlayerIndex];
-                            const int offsets[8][2] = {
-                                { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 },
-                                { 1, 1 }, { -1, 1 }, { 1, -1 }, { -1, -1 }
-                            };
-                            int createdIndex = -1;
-                            for( int n = 0; n < 8 && createdIndex < 0; ++n ){
-                                createdIndex = SpawnSomething(baseId,
-                                    player.Row + offsets[n][0],
-                                    player.Col + offsets[n][1]);
-                            }
-                            if( createdIndex < 0 ){
-                                ErrorPlrMsg((char*)"ADM: sem espaco para soltar o Sigilo.");
-                            }else{
-                                Items[createdIndex].Identified = 1;
-                                nextTestSigil = (nextTestSigil + 1) % 5;
-                                ErrorPlrMsg((char*)"ADM: Sigilo de teste criado no chao.");
-                            }
-                            break;
-                        }
-                        SwitchFreeSpell();
-                        break;
-                    }
 					case VK_70_F_KEY: // Alt + F, Disabling/enabling FPS increase
 						//Players[0].OnBodySlots[4].affixFlag = Players[0].itemAffixFlag ? 0 : AF_21_FAST_ATTACK_SPEED_4;
 						//Players[0].itemAffixFlag = Players[0].itemAffixFlag ? 0 : AF_21_FAST_ATTACK_SPEED_4;
@@ -3330,6 +3298,45 @@ int __stdcall GameWindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 						break; }
 						//free key to bind
 #endif
+					case VK_83_S_KEY: { // Alt+S: spells; Alt+Shift+S: next Sigil test item
+                        // Dev-only and solo-only: a ground drop uses the normal
+                        // deterministic item creation path, never direct save edits.
+#ifdef _DEBUG
+                        if( IsShiftPressed ){
+                            if( MaxCountOfPlayersInGame != 1 ) break;
+#if CHEATS
+                            if( !DevelopMode ) break;
+#endif
+                            // Ignore held-key autorepeat to avoid flooding the ground.
+                            if( (lParam & (1L << 30)) != 0 ) break;
+                            static int nextTestSigil = 0;
+                            const int baseId = BI_2504_SIGIL_VEIL + nextTestSigil;
+                            const Player& player = Players[CurrentPlayerIndex];
+                            const int offsets[8][2] = {
+                                { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 },
+                                { 1, 1 }, { -1, 1 }, { 1, -1 }, { -1, -1 }
+                            };
+                            int createdIndex = -1;
+                            for( int n = 0; n < 8 && createdIndex < 0; ++n ){
+                                createdIndex = SpawnSomething(baseId,
+                                    player.Row + offsets[n][0],
+                                    player.Col + offsets[n][1]);
+                            }
+                            if( createdIndex < 0 ){
+                                ErrorPlrMsg((char*)"ADM: sem espaco para soltar o Sigilo.");
+                            }else{
+                                Items[createdIndex].Identified = 1;
+                                nextTestSigil = (nextTestSigil + 1) % 5;
+                                ErrorPlrMsg((char*)"ADM: Sigilo de teste criado no chao.");
+                            }
+                            break;
+                        }
+#endif
+#if CHEATS
+                        SwitchFreeSpell();
+#endif
+                        break;
+                    }
 					case VK_90_Z_KEY: // Alt + Z, переключение zoom
 						if( !ForceZoom ) IsZoomDisable = !IsZoomDisable;
 						break;
