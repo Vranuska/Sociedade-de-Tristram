@@ -152,6 +152,16 @@ static int SocietySigilIndex(const Item& item)
     return index >= 0 && index < SocietySigilSlots ? index : -1;
 }
 
+// Older version-26 saves can contain completely zeroed reserved slots.
+// Treat only this exact empty sentinel as available; never overwrite a
+// nonempty, unknown item in the otherwise unused Talisman storage.
+static bool SocietySigilSlotEmpty(const Item& item)
+{
+    return item.ItemCode == IC_M1_NONE
+        || (item.ItemCode == IC_0_OTHER && item.baseItemIndex == 0
+            && item.Name[0] == '\0' && item.FullMagicalItemName[0] == '\0');
+}
+
 static bool SocietySigilIsBound(const Player& player, int slotIndex)
 {
     return slotIndex >= 0 && slotIndex < SocietySigilSlots
@@ -201,6 +211,7 @@ static void SocietySigilSlotClick(Player& player, int index)
         cursor = bound;
         bound.ItemCode = IC_M1_NONE;
         SocietySigilRefreshCount(player);
+        RecalcPlayer(CurrentPlayerIndex, 1);
         SetCursorGraphics(cursor.GraphicValue + CM_12_ITEMS_PICS_START);
         FixItemCursor(-1);
         PlayGlobalSound(S_56_I_INVGRAB);
@@ -210,14 +221,14 @@ static void SocietySigilSlotClick(Player& player, int index)
         ErrorPlrMsg((char*)"Este espaco aceita somente seu sigilo correspondente.");
         return;
     }
-    if( SocietySigilIsBound(player, index)
-        || (bound.ItemCode != IC_M1_NONE && bound.baseItemIndex != 0) ){
+    if( !SocietySigilSlotEmpty(bound) ){
         ErrorPlrMsg((char*)"Este sigilo ja esta vinculado.");
         return;
     }
     bound = cursor;
     cursor.ItemCode = IC_M1_NONE;
     SocietySigilRefreshCount(player);
+    RecalcPlayer(CurrentPlayerIndex, 1);
     FixItemCursor(1);
     SetCursorGraphics(CM_1_NORMAL_HAND);
     PlayGlobalSound(S_56_I_INVGRAB);
