@@ -586,12 +586,30 @@ void __fastcall Tooltip_ShowItemInfo_2(int slot)
 			Effect& e = item.effect[i];
 			if( e.id != AE_NO && e.origin == AO_QUENCH ){
 				if( PrintItemEffectToStringBuffer(e.id, &item, i) ){
-					char temp[256]; sprintf(temp, "Quenched: %s", InfoPanelBuffer);
+					char temp[256]; sprintf(temp, "Refinado: %s", InfoPanelBuffer);
 					Tooltip_AddLine_2(temp, C_1_Blue);
 				}
 			}
 		}
 	}
+
+    // Show permanent named-unique refinement progression in all tooltip routes.
+    if( identified && item.MagicLevel == ML_2_UNIQUE && !(item.dropType & D_RARE)
+        && (item.dropType & D_QUENCHED) && item.quenchLevel > 0 ){
+        char refinementLabel[64];
+        sprintf(refinementLabel, "Refinamento unico: nivel %u",
+            static_cast<unsigned int>(item.quenchLevel));
+        Tooltip_AddLine_2(refinementLabel, C_3_Gold);
+    }
+
+    // Show permanent named-unique refinement progression in all tooltip routes.
+    if( identified && item.MagicLevel == ML_2_UNIQUE && !(item.dropType & D_RARE)
+        && (item.dropType & D_QUENCHED) && item.quenchLevel > 0 ){
+        char refinementLabel[64];
+        sprintf(refinementLabel, "Refinamento unico: nivel %u",
+            static_cast<unsigned int>(item.quenchLevel));
+        Tooltip_AddLine_3(refinementLabel, C_3_Gold);
+    }
 
     for (int i = 0; i < baseItem.EffectCount; ++i) {
         int effectIndex = 20 + i;
@@ -1438,7 +1456,7 @@ void __fastcall Tooltip_ShowItemInfo_3(int slot)
 			Effect& e = item.effect[i];
 			if( e.id != AE_NO && e.origin == AO_QUENCH ){
 				if( PrintItemEffectToStringBuffer(e.id, &item, i) ){
-					char temp[256]; sprintf(temp, "Quenched: %s", InfoPanelBuffer);
+					char temp[256]; sprintf(temp, "Refinado: %s", InfoPanelBuffer);
 					Tooltip_AddLine_3(temp, C_1_Blue);
 				}
 			}
@@ -2398,12 +2416,21 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
 			Effect& e = item.effect[i];
 			if( e.id != AE_NO && e.origin == AO_QUENCH ){
 				if( PrintItemEffectToStringBuffer(e.id, &item, i) ){
-					char temp[256]; sprintf(temp, "Quenched: %s", InfoPanelBuffer);
+					char temp[256]; sprintf(temp, "Refinado: %s", InfoPanelBuffer);
 					Tooltip_AddLine(temp, C_1_Blue);
 				}
 			}
 		}
 	}
+
+    // Show permanent named-unique refinement progression in all tooltip routes.
+    if( identified && item.MagicLevel == ML_2_UNIQUE && !(item.dropType & D_RARE)
+        && (item.dropType & D_QUENCHED) && item.quenchLevel > 0 ){
+        char refinementLabel[64];
+        sprintf(refinementLabel, "Refinamento unico: nivel %u",
+            static_cast<unsigned int>(item.quenchLevel));
+        Tooltip_AddLine(refinementLabel, C_3_Gold);
+    }
 
     for( int i = 0; i < baseItem.EffectCount; ++i ){
         const int effectIndex = 20 + i;
