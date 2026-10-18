@@ -243,10 +243,18 @@ void __fastcall Quench_DrawQuenchButtons()
 {
 	Player& player = Players[CurrentPlayerIndex];
     if( QuenchIsNamedUnique(QuenchItem) ){
-        sprintf(QuenchString, "UNICO: aprimoramento %i/%i",
-            QuenchItem.quenchLevel, QuenchMaxLevel());
+        const bool noSpace = !QuenchHasEffectCapacity(QuenchItem);
+        if( noSpace ){
+            strcpy(QuenchString, "UNICO: SEM ESPACO PARA REFINAR");
+        }else if( QuenchItem.quenchLevel >= QuenchMaxLevel() ){
+            strcpy(QuenchString, "UNICO: REFINAMENTO MAXIMO");
+        }else{
+            sprintf(QuenchString, "UNICO: aprimoramento %i/%i",
+                QuenchItem.quenchLevel, QuenchMaxLevel());
+        }
         DrawText(QuenchPanel.Left + 17, QuenchPanel.Top + 205,
-            QuenchPanel.Left + 305, QuenchString, C_3_Gold);
+            QuenchPanel.Left + 305, QuenchString,
+            noSpace ? C_2_Red : C_3_Gold);
     }
 	for( int i = 0; i < QuenchesMax_1; i++ ){
 		Surface_DrawCEL(QuenchPanel.Left + Screen_LeftBorder + 15, QuenchPanel.Top + Screen_TopBorder - 1 + 238 + 21 * i, LongButtonCEL, QuenchButtonPicNumber(1, i), 292);
