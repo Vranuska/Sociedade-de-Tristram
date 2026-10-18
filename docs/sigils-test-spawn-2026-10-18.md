@@ -16,8 +16,21 @@ avança se o item foi criado com sucesso; do contrário aparece mensagem
 de falta de espaço. Não injeta itens no inventário, nem altera diretamente
 a estrutura ou o formato dos saves.
 
-Se a build definir `CHEATS`, é necessário habilitar a configuração
-`devmode`; o antigo Alt+S sem Shift continua alternando magias livres.
+**Correção de acionamento:** a versão inicial dependia da variável
+`IsShiftPressed`, que não era atualizada quando a tecla Shift chegava como
+`WM_SYSKEYDOWN` depois do Alt. O teste agora consulta `GetKeyState` e
+é tratado em `WM_KEYDOWN` e `WM_SYSKEYDOWN`, independentemente da ordem
+em que Alt e Shift foram pressionados.
+
+Não é necessário habilitar `devmode` para **Alt+Shift+S** na build Debug,
+mesmo que `CHEATS` esteja definido. A função antiga de **Alt+S** continua
+exigindo as condições originais do modo de desenvolvimento quando disponível.
+
+Ao funcionar, aparece uma mensagem começando com **TESTE SIGILOS:**.
+Se ela não aparecer, confira se o executável executado é a nova build Debug,
+se o jogo está em primeiro plano e se há uma partida carregada. A presença
+do botão **S** no inventário indica que o código da interface de Sigilos está
+carregado, embora não prove que o atalho esteja funcionando.
 
 ## Como experimentar
 1. Faça backup dos saves e use um personagem de teste.
@@ -35,6 +48,6 @@ Se a build definir `CHEATS`, é necessário habilitar a configuração
 7. Multiplayer não permite gerar itens com o novo atalho nem vincular
    Sigilos; nenhum bônus passivo dos Sigilos deve funcionar nesse modo.
 
-**Estado:** fonte publicada e verificação estática disponível. Ainda
-aguarda compilação no Windows e validação em execução. A taxa normal de
-drops permanece zero para os cinco protótipos.
+**Estado:** correção do atalho publicada e verificação estática disponível.
+Ainda aguarda compilação no Windows e validação em execução. A taxa normal
+de drops permanece zero para os cinco protótipos.
