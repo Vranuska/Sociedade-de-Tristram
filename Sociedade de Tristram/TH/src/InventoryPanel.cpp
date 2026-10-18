@@ -8,6 +8,8 @@ DisplayObject InventoryStoreFilterButton;
 DisplayObject InventoryStoreAllButton;
 DisplayObject InventoryCompanionButton;
 DisplayObject InventoryCompanionSummonButton;
+DisplayObject InventorySigilsButton;
+static bool InventorySigilsPageOpen = false;
 static int InventoryStoreFilter = 0;
 static int InventoryOrganizeMode = 0;
 int HowMuchGoldYouWantToRemove;// 004D1108
@@ -127,6 +129,8 @@ void SetupInventoryQoLButtons()
 	SetupDisplayObject(InventoryStoreAllButton, InventoryPanelRect.Left + 220, InventoryPanelRect.Top + 429, 82, 18);
 	SetupDisplayObject(InventoryCompanionButton, InventoryPanelRect.Left + 102, InventoryPanelRect.Top + 429, 116, 18);
 	SetupDisplayObject(InventoryCompanionSummonButton, InventoryPanelRect.Left + 220, InventoryPanelRect.Top + 429, 82, 18);
+    // A narrow tab outside the existing organization and companion controls.
+    SetupDisplayObject(InventorySigilsButton, InventoryPanelRect.Left + 305, InventoryPanelRect.Top + 429, 14, 18);
 }
 
 static bool CursorInInventoryQoLButton(const DisplayObject& button)
@@ -137,9 +141,115 @@ static bool CursorInInventoryQoLButton(const DisplayObject& button)
         && CursorY >= button.Top - 16 && CursorY <= button.Down + 2;
 }
 
+// The five reserved Sigils already have stable base IDs and are serialized
+// inside Player::TalismanSlots. We use one fixed slot per aspect, not the
+// unfinished 70-cell Talisman backpack or any of the regular inventory cells.
+static constexpr int SocietySigilSlots = 5;
+static int SocietySigilIndex(const Item& item)
+{
+    if( item.ItemCode == IC_M1_NONE ) return -1;
+    const int index = item.baseItemIndex - BI_2504_SIGIL_VEIL;
+    return index >= 0 && index < SocietySigilSlots ? index : -1;
+}
+
+static bool SocietySigilIsBound(const Player& player, int slotIndex)
+{
+    return slotIndex >= 0 && slotIndex < SocietySigilSlots
+        && SocietySigilIndex(player.TalismanSlots[slotIndex]) == slotIndex;
+}
+
+static void SocietySigilRefreshCount(Player& player)
+{
+    player.TalItemCount = 0;
+    for( int i = 0; i < SocietySigilSlots; ++i ){
+        if( SocietySigilIsBound(player, i) ) ++player.TalItemCount;
+    }
+}
+
+static int SocietySigilRowUnderCursor()
+{
+    const int left = InventoryPanelRect.Left + 18;
+    const int top = InventoryPanelRect.Top + 235;
+    if( CursorX < left || CursorX >= left + 285
+        || CursorY < top || CursorY >= top + SocietySigilSlots * 36 ){
+        return -1;
+    }
+    return (CursorY - top) / 36;
+}
+
+static void SocietySigilSlotClick(Player& player, int index)
+{
+    if( index < 0 || index >= SocietySigilSlots ) return;
+    // The network sync for equipped Sigils is not implemented. Never allow
+    // transfers in multiplayer until server ownership is integrated.
+    if( MaxCountOfPlayersInGame > 1 ){
+        ErrorPlrMsg((char*)"Vinculacao de sigilos: apenas um jogador por enquanto.");
+        return;
+    }
+    Item& bound = player.TalismanSlots[index];
+    Item& cursor = player.ItemOnCursor;
+    if( cursor.ItemCode == IC_M1_NONE ){
+        if( !SocietySigilIsBound(player, index) ) return;
+        cursor = bound;
+        bound.ItemCode = IC_M1_NONE;
+        SocietySigilRefreshCount(player);
+        SetCursorGraphics(cursor.GraphicValue + CM_12_ITEMS_PICS_START);
+        FixItemCursor(-1);
+        PlayGlobalSound(S_56_I_INVGRAB);
+        return;
+    }
+    if( SocietySigilIndex(cursor) != index ){
+        ErrorPlrMsg((char*)"Este espaco aceita somente seu sigilo correspondente.");
+        return;
+    }
+    if( SocietySigilIsBound(player, index)
+        || (bound.ItemCode != IC_M1_NONE && bound.baseItemIndex != 0) ){
+        ErrorPlrMsg((char*)"Este sigilo ja esta vinculado.");
+        return;
+    }
+    bound = cursor;
+    cursor.ItemCode = IC_M1_NONE;
+    SocietySigilRefreshCount(player);
+    FixItemCursor(1);
+    SetCursorGraphics(CM_1_NORMAL_HAND);
+    PlayGlobalSound(S_56_I_INVGRAB);
+}
+
+static void SocietySigilsDrawPage(const Player& player)
+{
+    static const char* names[SocietySigilSlots] = {
+        "Veu", "Ferro", "Arcano", "Pacto", "Brasas"
+    };
+    DrawText(InventoryPanelRect.Left + 18, InventoryPanelRect.Top + 223,
+        InventoryPanelRect.Right - 12, "SIGILOS - vincular e retirar", C_3_Gold);
+    for( int i = 0; i < SocietySigilSlots; ++i ){
+        const int rowTop = InventoryPanelRect.Top + 235 + i * 36;
+        const int x = InventoryPanelRect.Left + 20;
+        const bool bound = SocietySigilIsBound(player, i);
+        ShadowItemSlot(x, rowTop + CELL_SIZE, CELL_SIZE, CELL_SIZE,
+            bound ? blColor.main : blColor.notavailable);
+        if( bound ){
+            const Item& item = player.TalismanSlots[i];
+            const int sprite = item.GraphicValue + CM_12_ITEMS_PICS_START;
+            const int width = ItemWidthTable[sprite];
+            if( width > 0 ){
+                CEL_Draw(x, rowTop + CELL_SIZE, GetItemSprites(sprite), sprite,
+                    width, 0, 8, item.mirrorImage << 1, -1);
+            }
+        }
+        char label[80];
+        sprintf(label, "%s: %s", names[i], bound ? "vinculado" : "vazio");
+        DrawText(x + 38, rowTop + 19, InventoryPanelRect.Right - 10,
+            label, bound ? C_3_Gold : C_0_White);
+    }
+    DrawText(InventoryPanelRect.Left + 20, InventoryPanelRect.Top + 422,
+        InventoryPanelRect.Right - 15, "Sem bonus ativos nesta fase", C_5_Yellow);
+}
+
 bool InventoryPanel_CursorOnControls()
 {
-    return CursorInInventoryQoLButton(InventoryOrganizeButton)
+    return (!IsStashPanelVisible && CursorInInventoryQoLButton(InventorySigilsButton))
+        || CursorInInventoryQoLButton(InventoryOrganizeButton)
         || (IsStashPanelVisible && (CursorInInventoryQoLButton(InventoryStoreFilterButton)
             || CursorInInventoryQoLButton(InventoryStoreAllButton)))
         || (!IsStashPanelVisible && (CursorInInventoryQoLButton(InventoryCompanionButton)
@@ -289,6 +399,15 @@ void Inventory_LButtonClick()
 {
 	int playerIndex = CurrentPlayerIndex;
 	Player& player = Players[playerIndex];
+    if( !IsStashPanelVisible && CursorInInventoryQoLButton(InventorySigilsButton) ){
+        InventorySigilsPageOpen = !InventorySigilsPageOpen;
+        PlayGlobalSound(S_75_I_TITLEMOV);
+        return;
+    }
+    if( InventorySigilsPageOpen && !IsStashPanelVisible ){
+        SocietySigilSlotClick(player, SocietySigilRowUnderCursor());
+        return;
+    }
 	// The complete label rectangle must remain clickable even when an item icon
 	// from the last inventory row is detected below it.
 	if (CursorInInventoryQoLButton(InventoryOrganizeButton)) {
@@ -915,6 +1034,9 @@ void __fastcall PutCursorItemToInv( int playerIndex, int mX, int mY )
 //----- (004228F5) --------------------------------------------------------
 int GetSlotMouseAbove_Inv()
 {
+    // Do not let hover and right-click of a Sigil row resolve a regular
+    // backpack item through the old cell-to-item mapping.
+    if( InventorySigilsPageOpen && !IsStashPanelVisible ) return -1;
 	int playerIndex = CurrentPlayerIndex, mX = CursorX, mY = CursorY;
 	Player& player = Players[playerIndex];
 
@@ -1021,6 +1143,10 @@ void DrawINVPanel()
 	// вместо захардкоденых констант поставлены предвычесленные с учетом разрешения координаты
 
 	Surface_DrawCEL(InventoryPanelRect.Left + Screen_LeftBorder, InventoryPanelRect.Down + Screen_TopBorder, InvPanelCEL, 1, InventoryPanelRect.Width);// Тут рисуется сама картинка инвентаря
+    if( !IsStashPanelVisible ){
+        DrawText(InventorySigilsButton.Left, InventorySigilsButton.Top + 13,
+            InventorySigilsButton.Right, "S", InventorySigilsPageOpen ? C_3_Gold : C_0_White);
+    }
 	DrawText(InventoryOrganizeButton.Left, InventoryOrganizeButton.Top + 13, InventoryOrganizeButton.Right, "ORGANIZAR", C_0_White);
 	if (!IsStashPanelVisible) {
 		if( CompanionHasActive() ) DrawText(InventoryCompanionSummonButton.Left, InventoryCompanionSummonButton.Top + 13, InventoryCompanionSummonButton.Right, CompanionIsSummoned() ? "DISPENSAR" : "CHAMAR", C_3_Gold);
@@ -1170,6 +1296,14 @@ void DrawINVPanel()
 	// в качестве оптимизации вместо координат из массива ItemCellPos
 	// используются предвычисленный на основе разрешения прямоугольник инвентаря
 	// а координаты вычисляются на основе индекса клетки
+
+    if( InventorySigilsPageOpen && !IsStashPanelVisible ){
+        SocietySigilsDrawPage(player);
+        char dest[32];
+        sprintf(dest, "ouro: %i", player.TotalGold);
+        DrawLevelInfoText(InventoryPanelRect.Right - 300, InventoryPanelRect.Top + 448, dest, 3);
+        return;
+    }
 
 	// перемещение "тени" предмета по рюкзаку
 	if (Cur.GraphicsID >= CM_12_ITEMS_PICS_START) {
@@ -1368,6 +1502,7 @@ void OpenGoldSplitPanel()
 //----- (th2) -------------------------------------------------------------
 void OpenInventoryPanel()
 {
+    InventorySigilsPageOpen = false;
 	IsSpellBookVisible = false;
 	IsPerksPanelVisible = false;
 	IsInfoWindowVisible = false;
@@ -1378,6 +1513,7 @@ void OpenInventoryPanel()
 //----- (th2) -------------------------------------------------------------
 void CloseInventoryPanel()
 {
+    InventorySigilsPageOpen = false;
 	IsINVPanelVisible = false;
 	IsGoldSplitPanelVisible = false;
 	StashPanel_Close();
