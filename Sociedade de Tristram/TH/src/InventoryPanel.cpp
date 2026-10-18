@@ -238,7 +238,7 @@ static void SocietySigilsDrawPage(const Player& player)
             bound ? blColor.main : blColor.notavailable);
         if( bound ){
             const Item& item = player.TalismanSlots[i];
-            const int sprite = item.GraphicValue + CM_12_ITEMS_PICS_START;
+            int sprite = item.GraphicValue + CM_12_ITEMS_PICS_START;
             const int width = ItemWidthTable[sprite];
             if( width > 0 ){
                 CEL_Draw(x, rowTop + CELL_SIZE, GetItemSprites(sprite), sprite,
