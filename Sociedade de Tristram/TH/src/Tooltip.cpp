@@ -14,6 +14,18 @@ static const char* SocietySigilAspect(int baseItemIndex)
     }
 }
 
+static const char* SocietySigilBonus(int baseItemIndex)
+{
+    switch( baseItemIndex ){
+    case BI_2504_SIGIL_VEIL:   return "Ao vincular: +2 defesa, +3 resistencias";
+    case BI_2505_SIGIL_STEEL:  return "Ao vincular: +3% dano, +5 precisao";
+    case BI_2506_SIGIL_ARCANE: return "Ao vincular: +4% magias elementais";
+    case BI_2507_SIGIL_PACT:   return "Ao vincular: +5% dano de invocacoes";
+    case BI_2508_SIGIL_EMBERS: return "Ao vincular: +6% magias de fogo";
+    default:                   return nullptr;
+    }
+}
+
 enum Tooltip_Param
 {
 	TOOLTIP_TEXT_MAX = 256,
@@ -359,7 +371,8 @@ void __fastcall Tooltip_ShowItemInfo_2(int slot)
     if( const char* aspect = SocietySigilAspect(item.baseItemIndex) ){
         Tooltip_AddLine_2("Artefato arcano: Sigilo", C_3_Gold);
         Tooltip_AddLine_2(aspect);
-        Tooltip_AddLine_2("Adormecido: aguarda vinculacao", C_5_Yellow);
+        Tooltip_AddLine_2(SocietySigilBonus(item.baseItemIndex), C_3_Gold);
+        Tooltip_AddLine_2("Ativar na aba S do inventario", C_5_Yellow);
     }
 
     if (rare) {
@@ -1225,7 +1238,8 @@ void __fastcall Tooltip_ShowItemInfo_3(int slot)
     if( const char* aspect = SocietySigilAspect(item.baseItemIndex) ){
         Tooltip_AddLine_3("Artefato arcano: Sigilo", C_3_Gold);
         Tooltip_AddLine_3(aspect);
-        Tooltip_AddLine_3("Adormecido: aguarda vinculacao", C_5_Yellow);
+        Tooltip_AddLine_3(SocietySigilBonus(item.baseItemIndex), C_3_Gold);
+        Tooltip_AddLine_3("Ativar na aba S do inventario", C_5_Yellow);
     }
 
     if (rare) {
@@ -2210,7 +2224,8 @@ void __fastcall Tooltip_ShowItemInfo( int slot )
     if( const char* aspect = SocietySigilAspect(item.baseItemIndex) ){
         Tooltip_AddLine("Artefato arcano: Sigilo", C_3_Gold);
         Tooltip_AddLine(aspect);
-        Tooltip_AddLine("Adormecido: aguarda vinculacao", C_5_Yellow);
+        Tooltip_AddLine(SocietySigilBonus(item.baseItemIndex), C_3_Gold);
+        Tooltip_AddLine("Ativar na aba S do inventario", C_5_Yellow);
     }
     
     if( rare ){
