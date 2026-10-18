@@ -3934,6 +3934,53 @@ void __fastcall CalcCharParams(int playerIndex, int canLoadAnimFlag)
 		if( Spells[i].Element != ET_NONE && i != PS_36_BONE_SPIRIT ) player.spellPercent[i] += quenchSpellPercent;
 	}
 
+    // The five dormant Sigil bases already have stable IDs and five binding
+    // slots in Player::TalismanSlots. Apply modest bonuses only while each
+    // matching Sigil is bound, and only in single player until network item
+    // ownership is synchronized. These values are rebuilt every calculation,
+    // not written to the character or accumulated across recalculations.
+    if( MaxCountOfPlayersInGame == 1 ){
+        const int sigilIds[5] = {
+            BI_2504_SIGIL_VEIL, BI_2505_SIGIL_STEEL, BI_2506_SIGIL_ARCANE,
+            BI_2507_SIGIL_PACT, BI_2508_SIGIL_EMBERS
+        };
+        for( int slot = 0; slot < 5; ++slot ){
+            const Item& sigil = player.TalismanSlots[slot];
+            if( sigil.ItemCode == IC_M1_NONE
+                || sigil.baseItemIndex != sigilIds[slot] ){
+                continue;
+            }
+            switch( slot ){
+            case 0: // Veil: defensive ward
+                ACFromItems += 2;
+                for( int e = ET_1_FIRE; e < ET_COUNT; ++e ) player.resist[e] += 3;
+                break;
+            case 1: // Steel: measured combat training
+                damagePercent += 3;
+                accuracy += 5;
+                break;
+            case 2: // Arcane: nonphysical spell potency
+                for( int spell = 0; spell < PS_COUNT; ++spell ){
+                    if( Spells[spell].Element != ET_NONE
+                        && spell != PS_36_BONE_SPIRIT ){
+                        player.spellPercent[spell] += 4;
+                    }
+                }
+                break;
+            case 3: // Pact: summoned allies
+                summonDamagePercent += 5;
+                break;
+            case 4: // Embers: fire spell potency
+                for( int spell = 0; spell < PS_COUNT; ++spell ){
+                    if( Spells[spell].Element == ET_1_FIRE ){
+                        player.spellPercent[spell] += 6;
+                    }
+                }
+                break;
+            }
+        }
+    }
+
 	player.MinDamageFromItem = minDamage;
 	player.MaxDamageFromItem = maxDamage;
 	player.ACFromClass = armorClass;
