@@ -5977,9 +5977,20 @@ void __fastcall RecalcPlayer( int playerIndex, int canLoadAnimFlag, bool forceIt
 void __fastcall SetItemGrade(Item& item)
 {
 	if( item.MagicCode == MC_GEM ){
-		Gem& gem = Gems[item.baseItemIndex - BI_1238_GEM_RUBY_1];
-		item.subType = (char)gem.type;
-		item.grade = gem.grade;
+        // Some old reserved Sigil prototypes were incorrectly tagged as gems.
+        // Never index Gems by subtracting a base item ID: gems are not guaranteed
+        // to be contiguous, and Sigils must never become socketing ingredients.
+        const optional<Gem> gem = FindGemInfoByBaseItemIndex(item.baseItemIndex);
+        if( gem ){
+            item.subType = (char)gem->type;
+            item.grade = gem->grade;
+        }else if( item.baseItemIndex >= BI_2504_SIGIL_VEIL
+               && item.baseItemIndex <= BI_2508_SIGIL_EMBERS ){
+            // Migrate an old loaded Sigil without modifying any save format.
+            item.MagicCode = MC_0_NONE;
+            item.subType = 0;
+            item.grade = 0;
+        }
 	}else if( uint(item.MagicCode - MC_31_OIL_OF_REPAIR_I) < MC_35_OIL_OF_REPAIR_V - MC_31_OIL_OF_REPAIR_I ){
 		item.subType = IST_OIL_REPAIR;
 		item.grade = item.MagicCode - MC_31_OIL_OF_REPAIR_I + 1;
