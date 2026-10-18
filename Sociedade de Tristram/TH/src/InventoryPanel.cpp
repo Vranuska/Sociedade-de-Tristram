@@ -73,8 +73,10 @@ void SetupInvPanel(int playerIndex)
 		if( Players ){
 			Player& player = Players[playerIndex];
 			switch( base.id ){
-			case IS_Inventory: if(   player.activeInv ) continue; break;
-			case IS_Talisman : if( ! player.activeInv ) continue; break;
+			// The Talisman inventory is reserved for Sigils but is not persisted
+			// or connected to inventory operations yet. Never expose a phantom
+			// inventory page that can silently touch the main backpack.
+			case IS_Talisman: continue;
 			case IS_LeftRing2 or IS_LeftRing3 or IS_LeftRing4 or IS_RightRing2 or IS_RightRing3 or IS_RightRing4:
 				if( ! HasTrait(playerIndex, TraitId::LordOfTheRings) ) continue; break;
 			case IS_Neck2: continue; break;
@@ -385,6 +387,9 @@ int __fastcall TakeInvItemToCursor( int playerIndex, int mX, int mY, bool gearSw
 
 	ItemCell& cell = ItemCells[cellIndex];
 	BaseSlot& slot = BaseSlots[cell.slot.id];
+    // Reserved Sigil inventory has no safe item mapping until serialization
+    // and transfer logic are implemented. Do not treat it as belt/storage.
+    if( slot.id == IS_Talisman ) return -1;
 
 	if( slot.slotType == SL_ARMOR && player.gameChanger & BIT(GC_2_BT_STRIP) && IsSomeMonstersActivated() ){
 		return -1; //No items change during battle
@@ -572,6 +577,9 @@ void __fastcall PutCursorItemToInv( int playerIndex, int mX, int mY )
 
 	ItemCell& cell = ItemCells[cellIndex];
 	BaseSlot& slot = BaseSlots[cell.slot.id];
+    // Reserved Sigil inventory has no safe item mapping until serialization
+    // and transfer logic are implemented. Do not treat it as belt/storage.
+    if( slot.id == IS_Talisman ) return ;
 	if( slot.slotType == SL_ARMOR && player.gameChanger & BIT(GC_2_BT_STRIP) && IsSomeMonstersActivated() ){
 		return; //No items change during battle
 	}
@@ -920,6 +928,9 @@ int GetSlotMouseAbove_Inv()
 
 	ItemCell& cell = ItemCells[cellIndex];
 	BaseSlot& slot = BaseSlots[cell.slot.id];
+    // Reserved Sigil inventory has no safe item mapping until serialization
+    // and transfer logic are implemented. Do not treat it as belt/storage.
+    if( slot.id == IS_Talisman ) return -1;
 
 	Item* item = 0;
 	CurFontColor = 0;
