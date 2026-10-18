@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
-"""Static regression checks for the developer-only Sigil test generator.
+"""Static checks for the Debug-only Sigil test generator hotkey.
 
-Run: python tools/check_sigil_test_spawn.py
-Does not compile the game or verify runtime behavior.
+Run from the repository root:
+    python tools/check_sigil_test_spawn.py
+
+This does not replace a Win32 build or in-game checks.
 """
 from pathlib import Path
 import sys
@@ -11,34 +13,40 @@ root = Path(__file__).resolve().parents[1] / "Sociedade de Tristram" / "TH"
 main = (root / "src" / "Main.cpp").read_text(encoding="utf-8-sig")
 catalog = (root / "src" / "BaseItems.cpp").read_text(encoding="utf-8-sig")
 
-section_start = main.find("case VK_83_S_KEY: { // Alt+S: spells; Alt+Shift+S:")
-section_end = main.find("case VK_90_Z_KEY:", section_start)
-section = main[section_start:section_end] if section_start >= 0 and section_end > section_start else ""
+start = main.find("static bool TryCreateTestSigil(")
+end = main.find("int __stdcall GameWindowProc(", start)
+section = main[start:end] if start >= 0 and end > start else ""
 
 checks = {
-    "one test hotkey case": main.count("case VK_83_S_KEY: { // Alt+S: spells; Alt+Shift+S:") == 1,
-    "Debug-only item creation": "#ifdef _DEBUG" in section,
-    "Shift modifier required": "if( IsShiftPressed )" in section,
-    "solo session required": "MaxCountOfPlayersInGame != 1" in section,
-    "legacy cheat mode remains protected": "#if CHEATS" in section and "SwitchFreeSpell();" in section,
-    "no key autorepeat": "(lParam & (1L << 30))" in section,
-    "five item variants": "nextTestSigil = (nextTestSigil + 1) % 5;" in section,
-    "first Sigil base": "BI_2504_SIGIL_VEIL + nextTestSigil" in section,
-    "creates ground drops": "createdIndex = SpawnSomething(baseId," in section,
-    "checks creation failures": "createdIndex < 0" in section,
-    "no multiplayer messaging": "NetSendCmdDItem" not in section,
-    "no player inventory mutation": "InventorySlots" not in section and "TalismanSlots" not in section,
-    "prototype drop rates unchanged": all(
+    "one Sigil debug helper": main.count("static bool TryCreateTestSigil(") == 1,
+    "Debug-only implementation": "#ifdef _DEBUG" in main[max(0, start - 450):start],
+    "actual Shift key state": "GetKeyState(VK_SHIFT) & 0x8000" in section,
+    "actual Alt key state": "GetKeyState(VK_MENU) & 0x8000" in section,
+    "handles ordinary and system key events": "(msg == WM_KEYDOWN || msg == WM_SYSKEYDOWN)" in main
+        and "&& TryCreateTestSigil(wParam, lParam)" in main,
+    "blocks key repeats": "(1L << 30)" in section,
+    "blocks multiplayer": "MaxCountOfPlayersInGame != 1" in section,
+    "does not depend on devmode": "DevelopMode" not in section.split("static bool TryCreateTestSigil(", 1)[-1],
+    "cycles exactly five Sigils": "nextTestSigil = (nextTestSigil + 1) % 5;" in section,
+    "uses correct first base ID": "BI_2504_SIGIL_VEIL + nextTestSigil" in section,
+    "creates items on the ground": "SpawnSomething(baseId," in section,
+    "reports test activation": 'TESTE SIGILOS: artefato criado perto do personagem.' in section,
+    "reports blocked creation": "TESTE SIGILOS: sem espaco livre" in section,
+    "no direct save or inventory modification":
+        "TalismanSlots" not in section and "InventorySlots" not in section,
+    "legacy Alt+S preserved behind CHEATS":
+        "#if CHEATS\n                    case VK_83_S_KEY:" in main
+        and "SwitchFreeSpell();" in main,
+    "normal prototype drop rates unchanged": all(
         any(line.startswith("{\t" + str(i) + ",") and ",\t0,\t0,\tITEM_3" in line
             for line in catalog.splitlines())
         for i in range(2504, 2509)
     ),
 }
-
-failed = [name for name, good in checks.items() if not good]
-for name, good in checks.items():
-    print(("PASS " if good else "FAIL ") + name)
+failed = [name for name, ok in checks.items() if not ok]
+for name, ok in checks.items():
+    print(("PASS " if ok else "FAIL ") + name)
 if failed:
-    print(f"FAILED {len(failed)} static checks")
+    print(f"FAILED {len(failed)} static check(s)")
     sys.exit(1)
-print("PASS: static test generator checks; Windows compilation and gameplay pending.")
+print("PASS: static test-spawn checks only; compilation/gameplay still required.")
