@@ -169,7 +169,7 @@ static void SocietySigilRefreshCount(Player& player)
 static bool SocietySigilCursorOverBackpack()
 {
     return CursorX >= InventoryPanelRect.Left + 17
-        && CursorX < InventoryPanelRect.Left + 305
+        && CursorX < InventoryPanelRect.Right
         && CursorY >= InventoryPanelRect.Top + 222
         && CursorY < InventoryPanelRect.Top + 426;
 }
