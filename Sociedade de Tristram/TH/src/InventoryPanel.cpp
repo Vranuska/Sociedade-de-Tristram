@@ -166,6 +166,14 @@ static void SocietySigilRefreshCount(Player& player)
     }
 }
 
+static bool SocietySigilCursorOverBackpack()
+{
+    return CursorX >= InventoryPanelRect.Left + 17
+        && CursorX < InventoryPanelRect.Left + 305
+        && CursorY >= InventoryPanelRect.Top + 222
+        && CursorY < InventoryPanelRect.Top + 426;
+}
+
 static int SocietySigilRowUnderCursor()
 {
     const int left = InventoryPanelRect.Left + 18;
@@ -404,7 +412,8 @@ void Inventory_LButtonClick()
         PlayGlobalSound(S_75_I_TITLEMOV);
         return;
     }
-    if( InventorySigilsPageOpen && !IsStashPanelVisible ){
+    if( InventorySigilsPageOpen && !IsStashPanelVisible
+        && SocietySigilCursorOverBackpack() ){
         SocietySigilSlotClick(player, SocietySigilRowUnderCursor());
         return;
     }
@@ -1036,7 +1045,8 @@ int GetSlotMouseAbove_Inv()
 {
     // Do not let hover and right-click of a Sigil row resolve a regular
     // backpack item through the old cell-to-item mapping.
-    if( InventorySigilsPageOpen && !IsStashPanelVisible ) return -1;
+    if( InventorySigilsPageOpen && !IsStashPanelVisible
+        && SocietySigilCursorOverBackpack() ) return -1;
 	int playerIndex = CurrentPlayerIndex, mX = CursorX, mY = CursorY;
 	Player& player = Players[playerIndex];
 
