@@ -2014,6 +2014,10 @@ void __fastcall CreatePlayer( int playerIndex, char classId, char subclassId, ch
 {
 	Player& player = Players[playerIndex];
 	memset(&Players[playerIndex], 0, sizeof(Player));
+    // Character creation zeros memory, but empty ItemCode is -1.
+    // Initialize the reserved Sigil slots explicitly before they are used.
+    for( auto& item : player.TalismanSlots ) item.ItemCode = IC_M1_NONE;
+    player.TalItemCount = 0;
 	ClearAuras(player);
 	SetRndSeed(ms(GetTickCountTh())); // перехватываем вызов
 	if( playerIndex >= 4 ){
