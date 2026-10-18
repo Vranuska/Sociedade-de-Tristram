@@ -239,6 +239,13 @@ static void SocietySigilsDrawPage(const Player& player)
     static const char* names[SocietySigilSlots] = {
         "Veu", "Ferro", "Arcano", "Pacto", "Brasas"
     };
+    static const char* bonuses[SocietySigilSlots] = {
+        "+2 defesa, +3 resistencias",
+        "+3% dano, +5 precisao",
+        "+4% magias elementais",
+        "+5% dano de invocacoes",
+        "+6% magias de fogo"
+    };
     DrawText(InventoryPanelRect.Left + 18, InventoryPanelRect.Top + 223,
         InventoryPanelRect.Right - 12, "SIGILOS - vincular e retirar", C_3_Gold);
     for( int i = 0; i < SocietySigilSlots; ++i ){
@@ -260,9 +267,11 @@ static void SocietySigilsDrawPage(const Player& player)
         sprintf(label, "%s: %s", names[i], bound ? "vinculado" : "vazio");
         DrawText(x + 38, rowTop + 19, InventoryPanelRect.Right - 10,
             label, bound ? C_3_Gold : C_0_White);
+        DrawText(x + 38, rowTop + 32, InventoryPanelRect.Right - 10,
+            bonuses[i], bound ? C_3_Gold : C_0_White);
     }
     DrawText(InventoryPanelRect.Left + 20, InventoryPanelRect.Top + 422,
-        InventoryPanelRect.Right - 15, "Sem bonus ativos nesta fase", C_5_Yellow);
+        InventoryPanelRect.Right - 15, "Bonus apenas em jogo solo", C_5_Yellow);
 }
 
 bool InventoryPanel_CursorOnControls()
