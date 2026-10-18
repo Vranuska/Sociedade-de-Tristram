@@ -6329,6 +6329,12 @@ enum BASE_ITEM: int
 	BI_2474_TOOL_CHEST				 = 2474,
 	BI_2475_CRYSTAL_EYEPIECE		 = 2475,
 	BI_2476_THE_STRANGE_BOOK		 = 2476,
+    // Reserved The Heaven Sigil bases. Stable IDs: do not renumber saves.
+    BI_2504_SIGIL_VEIL              = 2504,
+    BI_2505_SIGIL_STEEL             = 2505,
+    BI_2506_SIGIL_ARCANE            = 2506,
+    BI_2507_SIGIL_PACT              = 2507,
+    BI_2508_SIGIL_EMBERS            = 2508,
 	BI_2510_DUSTY_CRATE				 = 2510,
 	BI_2511_MT_CONTAINERS			 = 2511,
 	BI_2512_FULL_CONTAINERS			 = 2512,
