@@ -3087,11 +3087,60 @@ void SwitchGodMode()
 	#endif
 }
 
+#ifdef _DEBUG
+// A test-only Sigil generator. Check the actual keyboard state, not the
+// cached IsShiftPressed flag: Shift can arrive as WM_SYSKEYDOWN when Alt
+// was pressed first, and that message does not update the cached flag.
+static bool TryCreateTestSigil(WPARAM key, LPARAM keyFlags)
+{
+    if( key != VK_83_S_KEY
+        || !(GetKeyState(VK_MENU) & 0x8000)
+        || !(GetKeyState(VK_SHIFT) & 0x8000) ) return false;
+
+    // Consume auto-repeated S without generating extra items.
+    if( keyFlags & (1L << 30) ) return true;
+
+    if( MaxCountOfPlayersInGame != 1 ){
+        ErrorPlrMsg((char*)"TESTE SIGILOS: apenas em jogo solo.");
+        return true;
+    }
+
+    // No extra configuration or CHEATS setting is required for Debug builds.
+    static int nextTestSigil = 0;
+    const int baseId = BI_2504_SIGIL_VEIL + nextTestSigil;
+    const Player& player = Players[CurrentPlayerIndex];
+    const int offsets[8][2] = {
+        { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 },
+        { 1, 1 }, { -1, 1 }, { 1, -1 }, { -1, -1 }
+    };
+    int createdIndex = -1;
+    for( int n = 0; n < 8 && createdIndex < 0; ++n ){
+        createdIndex = SpawnSomething(baseId,
+            player.Row + offsets[n][0],
+            player.Col + offsets[n][1]);
+    }
+    if( createdIndex < 0 ){
+        ErrorPlrMsg((char*)"TESTE SIGILOS: sem espaco livre perto do personagem.");
+    }else{
+        Items[createdIndex].Identified = 1;
+        nextTestSigil = (nextTestSigil + 1) % 5;
+        ErrorPlrMsg((char*)"TESTE SIGILOS: artefato criado perto do personagem.");
+    }
+    return true;
+}
+#endif
+
 //int CurShrine;
 // main window proc, используется в игровом процессе, вызывается как Handler1 в CallHandler1IfExists
 //----- (00409A1A) --------------------------------------------------------
 int __stdcall GameWindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+#ifdef _DEBUG
+    // Catch both regular and system key events. Some keyboard layouts
+    // deliver Alt+Shift+S as WM_KEYDOWN instead of WM_SYSKEYDOWN.
+    if( (msg == WM_KEYDOWN || msg == WM_SYSKEYDOWN)
+        && TryCreateTestSigil(wParam, lParam) ) return 0;
+#endif
 	//if( SyncTH && ! Th2InMessageQueue ){
 	//	PostMessageA( hWnd, msg, wParam, lParam );
 	//	return 0;
@@ -3298,46 +3347,12 @@ int __stdcall GameWindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 						break; }
 						//free key to bind
 #endif
-					case VK_83_S_KEY: { // Alt+S: spells; Alt+Shift+S: next Sigil test item
-                        // Dev-only and solo-only: a ground drop uses the normal
-                        // deterministic item creation path, never direct save edits.
-#ifdef _DEBUG
-                        if( IsShiftPressed ){
-                            if( MaxCountOfPlayersInGame != 1 ) break;
-#if CHEATS
-                            if( !DevelopMode ) break;
-#endif
-                            // Ignore held-key autorepeat to avoid flooding the ground.
-                            if( (lParam & (1L << 30)) != 0 ) break;
-                            static int nextTestSigil = 0;
-                            const int baseId = BI_2504_SIGIL_VEIL + nextTestSigil;
-                            const Player& player = Players[CurrentPlayerIndex];
-                            const int offsets[8][2] = {
-                                { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 },
-                                { 1, 1 }, { -1, 1 }, { 1, -1 }, { -1, -1 }
-                            };
-                            int createdIndex = -1;
-                            for( int n = 0; n < 8 && createdIndex < 0; ++n ){
-                                createdIndex = SpawnSomething(baseId,
-                                    player.Row + offsets[n][0],
-                                    player.Col + offsets[n][1]);
-                            }
-                            if( createdIndex < 0 ){
-                                ErrorPlrMsg((char*)"ADM: sem espaco para soltar o Sigilo.");
-                            }else{
-                                Items[createdIndex].Identified = 1;
-                                nextTestSigil = (nextTestSigil + 1) % 5;
-                                ErrorPlrMsg((char*)"ADM: Sigilo de teste criado no chao.");
-                            }
-                            break;
-                        }
-#endif
-#if CHEATS
+					#if CHEATS
+                    case VK_83_S_KEY: // Original Alt+S behavior in cheat builds
                         SwitchFreeSpell();
-#endif
                         break;
-                    }
-					case VK_90_Z_KEY: // Alt + Z, переключение zoom
+#endif
+                    case VK_90_Z_KEY: // Alt + Z, переключение zoom
 						if( !ForceZoom ) IsZoomDisable = !IsZoomDisable;
 						break;
 					//case VK_82_R_KEY: // Alt + Shift + R, Resetting the image output window //mor: under cheats, this gives an error and doesn't compile!
