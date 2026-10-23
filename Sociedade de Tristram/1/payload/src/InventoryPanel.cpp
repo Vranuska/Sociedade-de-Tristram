@@ -894,7 +894,7 @@ int GetSlotMouseAbove_Inv()
 	}
 	if( item->ItemCode == IC_11_GOLD ){
 		char* currency = formatGoldAmount(item->amount);
-		sprintf(InfoPanelHeader, "%i gold %s", item->amount, currency);
+		sprintf(InfoPanelHeader, "%i ouro %s", item->amount, currency);
 		return invIndex;
 	}
 	CurFontColor = ItemColor(*item);
@@ -1171,11 +1171,11 @@ void __fastcall SplitGoldPile(int currentAmount)
 	
 	int textLeft = xOffset + 17;
 	int textRight = xOffset + 251;
-	sprintf(InfoPanelHeader, "You have %u gold", GoldYouHave);
+	sprintf(InfoPanelHeader, "Ouro disponivel: %u", GoldYouHave);
 	DrawText(textLeft, yOffset + 44, textRight, InfoPanelHeader, 3);
-	sprintf(InfoPanelHeader, "%s.  How many do", formatGoldAmount(GoldYouHave));
+	sprintf(InfoPanelHeader, "Total: %s", formatGoldAmount(GoldYouHave));
 	DrawText(textLeft, yOffset + 60, textRight, InfoPanelHeader, 3);
-	DrawText(textLeft, yOffset + 78, textRight, "you want to remove?", 3);
+	DrawText(textLeft, yOffset + 78, textRight, "Quanto deseja retirar?", 3);
 	sprintf(InfoPanelHeader, "%u", currentAmount);
 	DrawLevelInfoText(xOffset + 39, yOffset + 97, InfoPanelHeader, 0);
 	
