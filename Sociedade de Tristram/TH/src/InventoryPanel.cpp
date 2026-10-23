@@ -1237,11 +1237,11 @@ void __fastcall SplitGoldPile(int currentAmount)
 	
 	int textLeft = xOffset + 17;
 	int textRight = xOffset + 251;
-	sprintf(InfoPanelHeader, "Voce tem %u ouro", GoldYouHave);
+	sprintf(InfoPanelHeader, "Ouro disponivel: %u", GoldYouHave);
 	DrawText(textLeft, yOffset + 44, textRight, InfoPanelHeader, 3);
-	sprintf(InfoPanelHeader, "%s. Quanto deseja", formatGoldAmount(GoldYouHave));
+	sprintf(InfoPanelHeader, "Total: %s", formatGoldAmount(GoldYouHave));
 	DrawText(textLeft, yOffset + 60, textRight, InfoPanelHeader, 3);
-	DrawText(textLeft, yOffset + 78, textRight, "retirar?", 3);
+	DrawText(textLeft, yOffset + 78, textRight, "Quanto deseja retirar?", 3);
 	sprintf(InfoPanelHeader, "%u", currentAmount);
 	DrawLevelInfoText(xOffset + 39, yOffset + 97, InfoPanelHeader, 0);
 	
