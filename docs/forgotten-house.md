@@ -2,7 +2,13 @@
 
 História original da Sociedade de Tristram; não atribuída ao Patreon/TH4.
 
-## Primeira versão jogável
+## Versão ampliada
+
+A expansão atual é descrita em [Roteiro de Vespera](forgotten-house-vespera.md): cinco áreas conectadas, dez inimigos comuns, dois minibosses opcionais e O Hóspede sem Rosto com três fases. Os quatro objetos originais e as escolhas finais foram preservados. O byte 86 registra os minibosses e bloqueia suas recompensas adicionais repetidas. Artes e comportamentos-base continuam nativos.
+
+Alt+D abre um seletor de 116 destinos, incluindo todos os mapas especiais e a Casa Esquecida. Lista em português, seleção por clique/setas, Viajar/Enter e Esc. Exclusivo de Alt, disponível no solo em Debug e Release. O seletor não avança quests; encontros e serviços respeitam o progresso do personagem.
+
+## Histórico da primeira versão jogável
 
 Adria abre a investigação. Cain, Gillian e Farnham guardam relatos incompatíveis, que o jogador registra em qualquer ordem. Depois dos três relatos, duas respostas à Adria ficam salvas. A opção **Seguir a canção até a casa** abre uma instância própria, sem mudar as quests originais.
 
@@ -113,3 +119,6 @@ Volte a Maera e escolha entre refazer a rota discretamente ou alimentar os anima
 Persistência: bytes reservados 122 (estado), 123 (máscara dos três rastros), 124 (decisão final). Não altera o formato do save. Esta primeira versão apresenta pistas por cenas de texto no painel; não adiciona objetos, sprites ou encontros físicos às masmorras.
 
 Validação isolada cobre aceitação, proximidade, companheiro dispensado, pisos incorretos, ordem livre, entrega apenas com Maera na cidade, ambas as decisões e bloqueio de recompensa repetida. Compilação Windows e teste no jogo ainda são necessários para esta atualização.
+
+
+Verificação da expansão: `python tools/check_forgotten_house.py` compila as funções reais do encontro com APIs simuladas. O gerador do DUN valida conectividade e posições antes de gravar. A compilação MSVC, aparência e colisões continuam pendentes.

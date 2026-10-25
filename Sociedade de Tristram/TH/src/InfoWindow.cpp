@@ -8,11 +8,132 @@ constexpr int IW_height = 462;
 bool IsInfoWindowVisible = false;
 bool IsLeftButtonDown = false;
 bool IsAdmItemWindow = false;
+static bool IsAdmDungeonWindow = false;
 int AdmItemJumpId = 0;
 char AdmItemSearch[64] = {};
 bool AdmItemSearchMode = false;
 bool AdmIgnoreNumericItemRequirements = false;
 bool AdmIgnoreItemClassRequirements = false;
+
+static const char* const AdmDungeonNames[] = {
+	"Tristram",
+	"Igreja - andar 1",
+	"Igreja - andar 2",
+	"Igreja - andar 3",
+	"Igreja - andar 4",
+	"Catacumbas - andar 1",
+	"Catacumbas - andar 2",
+	"Catacumbas - andar 3",
+	"Catacumbas - andar 4",
+	"Cavernas - andar 1",
+	"Cavernas - andar 2",
+	"Cavernas - andar 3",
+	"Cavernas - andar 4",
+	"Inferno - andar 1",
+	"Inferno - andar 2",
+	"Inferno - andar 3",
+	"Inferno - andar 4",
+	"Abismo - andar 1",
+	"Abismo - andar 2",
+	"Abismo - andar 3",
+	"Abismo - andar 4",
+	"Cripta - andar 1",
+	"Cripta - andar 2",
+	"Cripta - andar 3",
+	"Cripta - andar 4",
+	"Tumba do Rei Leoric",
+	"Camara dos Ossos",
+	"Porao Infestado",
+	"Agua Envenenada",
+	"Covil de Lazarus",
+	"Saloes da Angustia",
+	"Trono de Andariel",
+	"Refugio de Horazon",
+	"Salas de Invocacao",
+	"O Poco",
+	"Passagem de Fogo",
+	"Vale do Desespero",
+	"Relicario Abandonado",
+	"Cavernas Glaciais",
+	"Lago Congelado",
+	"A Ilha",
+	"Fleshdoom",
+	"O Portador",
+	"Forja de Hephasto",
+	"Ravenholm",
+	"O Covil",
+	"Coliseu",
+	"Ninho Sombrio",
+	"Colmeia de Sangue",
+	"Porao dos Aldeoes Doentes",
+	"Templo do Crepusculo",
+	"Caverna Fetida",
+	"Gruta Musgosa",
+	"Fortaleza do Cofre",
+	"Santuario Abandonado",
+	"Abismo Profundo",
+	"Tuneis de Teias",
+	"Covil Aracnideo",
+	"Portal de Sangue",
+	"Sala de Fogo",
+	"Labirinto Assombrado",
+	"Santuario Amaldicoado",
+	"Cripta Sombria",
+	"Ossuario Esquecido",
+	"Mausoleu",
+	"Templo em Ruinas",
+	"Esgotos",
+	"Sepulcro",
+	"Calabouco Esquecido",
+	"Patibulo",
+	"Cidadela",
+	"Cofres Sombrios",
+	"Necropole",
+	"Fossos de Lava",
+	"Cratera",
+	"Rio de Fogo",
+	"Covil do Mal",
+	"Tuneis Vis",
+	"A Ponte",
+	"Colunata",
+	"Portao do Inferno",
+	"Submundo",
+	"Saloes do Sofrimento",
+	"Fortaleza de Sangue",
+	"Arsenais do Inferno",
+	"Fortaleza Demoniaca",
+	"Vale da Ira",
+	"Pandemonio",
+	"Reino do Terror",
+	"Manicomio",
+	"Campos da Loucura",
+	"Passagem Estigia",
+	"Fosso de Carne",
+	"Caminho das Veias Sangrentas",
+	"Camaras da Putrefacao",
+	"Jardim de Medula",
+	"Pantano de Ossos",
+	"Profundezas Sombrias",
+	"Abismo de Ebano",
+	"Criptas Antigas",
+	"Tesouro dos Horadrim",
+	"Camaras do Vazio",
+	"Trilha do Esquecimento",
+	"Altar da Imolacao",
+	"Portoes do Submundo",
+	"Descida Sombria",
+	"Bastiao da Noite",
+	"Santuario do Pavor",
+	"Prisao Arcana",
+	"Sala dos Herois",
+	"Capela Negra",
+	"Sacristia da Igreja",
+	"Fontes Serenas",
+	"O Labirinto",
+	"Escritorio Inferior",
+	"A Casa Esquecida",
+};
+static_assert(countof(AdmDungeonNames) == DungeonCount, "ADM destination names must match dungeon IDs");
 
 DisplayObject InfoWindowRect;
 constexpr const char* IW_headTexts[] = {
@@ -156,6 +277,7 @@ void InfoWindow_Init()
 // ---- th2 -------------------------------------------------------------------------------
 void InfoWindow_Free()
 {
+	IsAdmDungeonWindow = false;
 	gc_listIndexes.clear();
 	FreeMemZero(IW_IMG_background);
 	FreeMemZero(IW_IMG_icons);
@@ -302,9 +424,53 @@ void __fastcall InfoWindow_DrawRect(int xPosition, int yPosition, int width, int
 	}
 }
 
+static void AdmDungeonWindow_Travel()
+{
+	if (!IsAdmDungeonWindow || !IsInfoWindowVisible || MaxCountOfPlayersInGame != 1
+		|| IsPlayerDead || Players[CurrentPlayerIndex].CurAction == PCA_10_NEW_LEVEL) return;
+	size_t selected = listStartFromIndex + lastSelectedInListIndex;
+	if (selected >= gc_listIndexes.size()) return;
+	int destination = gc_listIndexes[selected];
+	if (destination < 0 || destination >= int(countof(AdmDungeonNames))) return;
+	if (Dungeon == (DUNGEON)destination) return;
+	if (StartNewLvl(CurrentPlayerIndex, destination > DUN_24_CRYPT_4 ? WM_1029_GOTO_QUEST_DUNGEON : WM_1031_GOTO_DUNGEON, (DUNGEON)destination))
+		InfoWindow_Close();
+}
+
+static void AdmDungeonWindow_Draw()
+{
+	IW_TransparentBackground(InfoWindowRect.Left + Screen_LeftBorder + 16, InfoWindowRect.Top + Screen_TopBorder + 16, IW_width - 32, IW_height - 32);
+	IW_DrawRegularCel(Screen_LeftBorder + InfoWindowRect.Left, Screen_TopBorder + InfoWindowRect.Top + IW_height, IW_IMG_background, 1, 640);
+	DrawLevelInfoText(InfoWindowRect.Left + 65, InfoWindowRect.Top + 44, "Viagem ADM", C_3_Gold);
+	DrawLevelInfoText(InfoWindowRect.Left + 395, InfoWindowRect.Top + 44, "Escolha o destino", C_3_Gold);
+	IW_DrawRegularCel(Screen_LeftBorder + closeButton.Left, Screen_TopBorder + closeButton.Top + closeButton.Heigth, IW_IMG_buttons, closeButtonState ? 20 : 19, closeButton.Width);
+	if (gc_listIndexes.empty()) return;
+	size_t selected = listStartFromIndex + lastSelectedInListIndex;
+	if (selected >= gc_listIndexes.size()) return;
+	int destination = gc_listIndexes[selected];
+	char description[512];
+	sprintf(description, "Destino: %s\n\nSelecione um andar.\nEnter ou VIAJAR.", AdmDungeonNames[destination]);
+	InfoWindow_DrawLongText(longTextMidPos.Left, longTextMidPos.Top - 70, description, C_0_White);
+	InfoWindow_DrawRect(Screen_LeftBorder + admSpawnButton.Left, Screen_TopBorder + admSpawnButton.Top, admSpawnButton.Width, admSpawnButton.Heigth, CursorIntoDisplayObject(admSpawnButton) ? 8 : 0);
+	DrawLevelInfoText(admSpawnButton.Left + 28, admSpawnButton.Top + 17, "VIAJAR", Dungeon == (DUNGEON)destination ? C_7_Grey : C_0_White);
+	DrawLevelInfoText(InfoWindowRect.Left + 45, InfoWindowRect.Top + 255, "Setas: selecionar | Esc: fechar", C_0_White);
+	InfoWindow_DrawRect(Screen_LeftBorder + admPrevPageButton.Left, Screen_TopBorder + admPrevPageButton.Top, admPrevPageButton.Width, admPrevPageButton.Heigth, CursorIntoDisplayObject(admPrevPageButton) ? 8 : 0);
+	InfoWindow_DrawRect(Screen_LeftBorder + admNextPageButton.Left, Screen_TopBorder + admNextPageButton.Top, admNextPageButton.Width, admNextPageButton.Heigth, CursorIntoDisplayObject(admNextPageButton) ? 8 : 0);
+	DrawLevelInfoText(admPrevPageButton.Left + 15, admPrevPageButton.Top + 16, "< ANTERIOR", C_0_White);
+	DrawLevelInfoText(admNextPageButton.Left + 17, admNextPageButton.Top + 16, "PROXIMA >", C_0_White);
+	for (size_t i = 0; i < countof(textlist) && listStartFromIndex + i < gc_listIndexes.size(); ++i) {
+		const char* name = AdmDungeonNames[gc_listIndexes[listStartFromIndex + i]];
+		DrawLevelInfoText(textlist[i].Left + 10, textlist[i].Top + 12, name, textliststates[i] ? (textliststates[i] == 1 ? C_1_Blue : C_4_Orange) : C_0_White);
+	}
+	char page[64];
+	sprintf(page, "%u-%u / %u", unsigned(listStartFromIndex + 1), unsigned(min(listStartFromIndex + rowInList, gc_listIndexes.size())), unsigned(gc_listIndexes.size()));
+	DrawLevelInfoText(InfoWindowRect.Left + 458, InfoWindowRect.Top + 395, page, C_3_Gold);
+}
+
 // ---- th2 -------------------------------------------------------------------------------
 void __fastcall InfoWindow_Draw()
 {
+	if (IsAdmDungeonWindow) { AdmDungeonWindow_Draw(); return; }
 	if( IsAdmItemWindow ){
 		IW_TransparentBackground(InfoWindowRect.Left + Screen_LeftBorder + 16, InfoWindowRect.Top + Screen_TopBorder + 16, IW_width - 32, IW_height - 32);
 		IW_DrawRegularCel(Screen_LeftBorder + InfoWindowRect.Left, Screen_TopBorder + InfoWindowRect.Top + IW_height, IW_IMG_background, 1, 640);
@@ -459,6 +625,23 @@ void __fastcall InfoWindow_MouseDown()
 // ---- th2 -------------------------------------------------------------------------------
 void __fastcall InfoWindow_MouseUp()
 {
+	if (IsAdmDungeonWindow && IsLeftButtonDown) {
+		if (CursorIntoDisplayObject(admSpawnButton)) {
+			IsLeftButtonDown = false;
+			AdmDungeonWindow_Travel();
+			return;
+		}
+		if (CursorIntoDisplayObject(admPrevPageButton) || CursorIntoDisplayObject(admNextPageButton)) {
+			if (CursorIntoDisplayObject(admPrevPageButton))
+				listStartFromIndex = listStartFromIndex >= rowInList ? listStartFromIndex - rowInList : 0;
+			else listStartFromIndex = min(listStartFromIndex + rowInList, listStartLastIndex);
+			lastSelectedInListIndex = 0;
+			memset(textliststates, 0, sizeof(textliststates)); textliststates[0] = 1;
+			IsLeftButtonDown = false;
+			PlayGlobalSound(S_75_I_TITLEMOV);
+			return;
+		}
+	}
 	if( IsAdmItemWindow && !gc_listIndexes.empty() ){
 		if( CursorIntoDisplayObject(admTestModeButton) ){
 			AdmIgnoreNumericItemRequirements = !AdmIgnoreNumericItemRequirements;
@@ -553,18 +736,39 @@ void __fastcall InfoWindow_MouseUp()
 // ---- th2 -------------------------------------------------------------------------------
 void InfoWindow_Open()
 {
+	IsAdmDungeonWindow = false;
 	InfoWindow_LoadGameChangerList();
 	IsAdmItemWindow = false;
 	IsInfoWindowVisible = true;
 }
 
+void AdmDungeonWindow_Open()
+{
+	if (MaxCountOfPlayersInGame != 1 || IsPlayerDead
+		|| Players[CurrentPlayerIndex].CurAction == PCA_10_NEW_LEVEL) return;
+	IsAdmItemWindow = false;
+	IsAdmDungeonWindow = true;
+	AdmItemSearchMode = false;
+	IsLeftButtonDown = false;
+	closeButtonState = 0;
+	gc_listIndexes.clear();
+	for (int i = 0; i < int(countof(AdmDungeonNames)); ++i) gc_listIndexes.emplace_back(i);
+	InfoWindow_ResetListSelection();
+	// Select the current destination, including special quest maps.
+	int current = static_cast<DUNGEON>(Dungeon);
+	if (current >= 0 && current < int(countof(AdmDungeonNames))) {
+		listStartFromIndex = min((size_t(current) / rowInList) * rowInList, listStartLastIndex);
+		lastSelectedInListIndex = size_t(current) - listStartFromIndex;
+		memset(textliststates, 0, sizeof(textliststates));
+		textliststates[lastSelectedInListIndex] = 1;
+	}
+	IsInfoWindowVisible = true;
+}
+
 void AdmItemWindow_Open()
 {
-#if CHEATS
-	if( count_UniqueItems == 0 ) return;
-#else
-	if( !DevelopMode || count_UniqueItems == 0 ) return;
-#endif
+	IsAdmDungeonWindow = false;
+	if( MaxCountOfPlayersInGame != 1 || count_UniqueItems == 0 ) return;
 	AdmItemSearchMode = false;
 	AdmItemSearch[0] = 0;
 	AdmItemJumpId = 0;
@@ -581,6 +785,7 @@ void AdmItemWindow_Open()
 // ---- th2 -------------------------------------------------------------------------------
 void InfoWindow_Close()
 {
+	IsAdmDungeonWindow = false;
 	IsInfoWindowVisible = false;
 	IsAdmItemWindow = false;
 	AdmItemSearchMode = false;
@@ -623,6 +828,13 @@ static void AdmSelectUniqueId(int id)
 
 bool AdmItemWindow_HandleKey(int key)
 {
+	if (IsAdmDungeonWindow && IsInfoWindowVisible) {
+		if (key == VK_27_ESC_KEY) { InfoWindow_Close(); return true; }
+		if (key == VK_13_RETURN_KEY) { AdmDungeonWindow_Travel(); return true; }
+		if (key == VK_38_UP_ARROW_KEY) { InfoWindow_Prev(); return true; }
+		if (key == VK_40_DOWN_ARROW_KEY) { InfoWindow_Next(); return true; }
+		return true;
+	}
 	if( !IsAdmItemWindow || !IsInfoWindowVisible ) return false;
 	if( key == 191 ){
 		AdmItemSearchMode = true;

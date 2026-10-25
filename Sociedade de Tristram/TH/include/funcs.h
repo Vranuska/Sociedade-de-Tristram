@@ -2433,6 +2433,7 @@ void __fastcall InfoWindow_MouseMove();
 void __fastcall InfoWindow_MouseDown();
 void InfoWindow_Open();
 void AdmItemWindow_Open();
+void AdmDungeonWindow_Open();
 bool AdmItemWindow_HandleKey(int key);
 void InfoWindow_Close();
 void __fastcall InfoWindow_MouseUp();

@@ -112,8 +112,9 @@ static constexpr int MEMORY_RESCUED = 84;
 static constexpr int MEMORY_ENDING = 85;
 static int MemoryCombatTicks = 0;
 static int MemoryAimRow = 0, MemoryAimCol = 0;
-static const int MemoryObjectRows[4] = {36, 50, 42, 44};
-static const int MemoryObjectCols[4] = {38, 38, 50, 44};
+static constexpr int MEMORY_WARDENS = 86; // Two defeated minibosses, bits 0 and 1.
+static const int MemoryObjectRows[10] = {36, 50, 42, 44, 24, 42, 80, 68, 82, 74};
+static const int MemoryObjectCols[10] = {38, 38, 50, 44, 38, 80, 50, 38, 38, 50};
 static int FindMemoryGuardian()
 {
     for( int i = 0; i < MonstersCount; ++i ){
@@ -129,61 +130,129 @@ static void SpawnMemoryGuardian()
     if( Dungeon != DUN_115_FORGOTTEN_HOUSE || MemoryState() != 2
         || ((unsigned char)AdditionalStateData.unused[MEMORY_CLUES] & 7) != 7 || FindMemoryGuardian() >= 0 ) return;
     const int sprite = AddMonsterTypeToDungeon(BM_29_HIDDEN, MPF_2_DONT);
-    if( sprite < 0 || !IsCellFreeForMonster(50, 48) ) return;
-    const int index = AddMonster(50, 48, 0, sprite, 1);
+    if( sprite < 0 || !IsCellFreeForMonster(78, 44) ) return;
+    const int index = AddMonster(78, 44, 0, sprite, 1);
     if( index < 0 ) return;
     Monster& monster = Monsters[index];
-    monster.Name = "A Quarta Batida";
+    monster.Name = "O Hospede sem Rosto";
     // Bound the multiplication even if a later balance patch raises base health.
-    monster.BaseLife = std::min(monster.BaseLife, 100000000) * 3;
+    monster.BaseLife = std::min(monster.BaseLife, 100000000) * 5;
     monster.CurrentLife = monster.BaseLife;
     MemoryCombatTicks = 0;
+}
+static void SpawnMemoryHouseMonster(int base, int row, int col, const char* name, int lifeMultiplier)
+{
+    const int sprite = AddMonsterTypeToDungeon(base, MPF_2_DONT);
+    if( sprite < 0 || !IsCellFreeForMonster(row, col) ) return;
+    const int index = AddMonster(row, col, 0, sprite, 1);
+    if( index < 0 ) return;
+    Monster& monster = Monsters[index];
+    monster.Name = name;
+    monster.BaseLife = std::min(monster.BaseLife, 100000000) * lifeMultiplier;
+    monster.CurrentLife = monster.BaseLife;
+}
+static void SpawnMemoryHouseEncounters()
+{
+    if( !MemoryAvailable() || MemoryState() != 2 ) return;
+    const unsigned char defeated = (unsigned char)AdditionalStateData.unused[MEMORY_WARDENS];
+    if( !(defeated & 1) ) SpawnMemoryHouseMonster(BM_50_SKELETON_LORD, 24, 44, "O Escrivao das Tres Mortes", 3);
+    if( !(defeated & 2) ) SpawnMemoryHouseMonster(BM_169_ZOMBIE, 44, 76, "A Ama de Cinzas", 4);
+    static const int positions[10][2] = {
+        {24,36}, {26,48}, {36,24}, {48,24}, {36,70}, {50,82}, {68,36}, {84,36}, {68,50}, {84,50}
+    };
+    for( int i = 0; i < 10; ++i )
+        SpawnMemoryHouseMonster(BM_9_SKELETON_WARRIOR, positions[i][0], positions[i][1], "Lembranca sem Dono", 1);
+}
+// Monster name pointers are not serialized; restore names after loading this floor.
+static void MemoryRestoreEncounterNames()
+{
+    for( int i = 0; i < MonstersCount; ++i ){
+        Monster& monster = Monsters[MonsterIndexes[i]];
+        if( !monster.SpritePtr ) continue;
+        switch( monster.SpritePtr->baseMonsterIndex ){
+        case BM_50_SKELETON_LORD: monster.Name = "O Escrivao das Tres Mortes"; break;
+        case BM_169_ZOMBIE: monster.Name = "A Ama de Cinzas"; break;
+        case BM_9_SKELETON_WARRIOR: monster.Name = "Lembranca sem Dono"; break;
+        case BM_29_HIDDEN: monster.Name = "O Hospede sem Rosto"; break;
+        }
+    }
 }
 void MemoryGenerateHouse()
 {
     LoadQuestDungeonMainMapChurch("Levels\\L1Data\\ForgottenHouse.DUN", 40, 34);
     LoadPalette("Levels\\L1Data\\zContrastique.pal");
     AddMonsterTypeToDungeon(BM_29_HIDDEN, MPF_2_DONT);
-    for( int i = 0; i < 4; ++i ) AddObject(BO_52_BOOK1, MemoryObjectRows[i], MemoryObjectCols[i]);
+    for( int i = 0; i < 10; ++i ) AddObject(BO_52_BOOK1, MemoryObjectRows[i], MemoryObjectCols[i]);
     AddObject(BO_9_CANDLE2, 37, 39);
     AddObject(BO_9_CANDLE2, 51, 39);
     AddObject(BO_9_CANDLE2, 43, 51);
     AddWarp(40, 33, WM_1028_RETURN_FROM_QUEST_DUNGEON, DUN_0_TOWN);
     MemoryCombatTicks = 0;
+    SpawnMemoryHouseEncounters();
     SpawnMemoryGuardian();
+}
+static bool MemoryNearClue(const Player& player, int clue)
+{
+    // Echoes of the lessons stand inside the larger final arena.
+    return (abs(player.Row - MemoryObjectRows[clue]) <= 3 && abs(player.Col - MemoryObjectCols[clue]) <= 3)
+        || (abs(player.Row - MemoryObjectRows[7 + clue]) <= 3 && abs(player.Col - MemoryObjectCols[7 + clue]) <= 3);
 }
 void MemoryUpdateGuardian()
 {
     if( Dungeon != DUN_115_FORGOTTEN_HOUSE || !MemoryAvailable() || MemoryState() != 2 ) return;
+    MemoryRestoreEncounterNames();
     const int index = FindMemoryGuardian();
     if( index < 0 ) return;
     Monster& monster = Monsters[index];
-    monster.Name = "A Quarta Batida"; // Name is a runtime pointer, rebuilt after LoadLevel.
+    monster.Name = "O Hospede sem Rosto"; // Name is a runtime pointer, rebuilt after LoadLevel.
     const Player& player = Players[CurrentPlayerIndex];
     // The reflection makes the hidden creature visible. The bowl quenches its fourth beat.
-    if( abs(player.Row - 36) <= 3 && abs(player.Col - 38) <= 3 ) monster.flag &= ~MF_1_INVISIBLE;
+    if( MemoryNearClue(player, 0) ) monster.flag &= ~MF_1_INVISIBLE;
     if( CurrentDialogIndex != PD_0_None || player.CurLife <= 0 ) return;
-    const int beat = ++MemoryCombatTicks % 80;
-    if( beat == 20 ){
+    // More urgent repetitions as the guest loses the shape it borrowed.
+    const int phase = monster.CurrentLife <= monster.BaseLife / 3 ? 2 :
+        monster.CurrentLife <= monster.BaseLife / 3 * 2 ? 1 : 0;
+    const int beatLength = 20 - phase * 4;
+    const int beat = ++MemoryCombatTicks % (beatLength * 4);
+    if( beat == beatLength ){
         MemoryAimRow = player.Row; MemoryAimCol = player.Col;
         PlayGlobalSound(S_76_I_TITLSLCT);
-    }else if( beat == 40 ) PlayGlobalSound(S_76_I_TITLSLCT);
-    else if( beat == 60 ){
+    }else if( beat == beatLength * 2 ) PlayGlobalSound(S_76_I_TITLSLCT);
+    else if( beat == beatLength * 3 ){
         PlayGlobalSound(S_76_I_TITLSLCT);
-        ErrorPlrMsg("Tres batidas. A quarta procura onde voce estava.");
-    }else if( beat == 0 && !(abs(player.Row - 50) <= 3 && abs(player.Col - 38) <= 3) ){
+        ErrorPlrMsg(phase == 0 ? "Tres batidas. A quarta procura onde voce estava." :
+            phase == 1 ? "O Hospede perde o rosto. As batidas se aproximam." : "A casa prende o folego. Saia da lembranca marcada.");
+    }else if( beat == 0 && !MemoryNearClue(player, 1) ){
         const int missile = CastMissile(monster.Row, monster.Col, MemoryAimRow, MemoryAimCol,
             monster.Orientation, MI_1_FIREBOLT, CT_1_MONSTER_AND_TRAP, index, 8 + Difficulty * 4, 0, 0);
         if( missile >= 0 ) Missiles[missile].Damage = (8 + Difficulty * 4) * 64;
+        // Side echoes widen the attack, while the bowl still suppresses the entire volley.
+        for( int side = 0; side < phase; ++side ){
+            const int echo = CastMissile(monster.Row, monster.Col, MemoryAimRow + (side == 0 ? 2 : -2), MemoryAimCol,
+                monster.Orientation, MI_1_FIREBOLT, CT_1_MONSTER_AND_TRAP, index, 8 + Difficulty * 4, 0, 0);
+            if( echo >= 0 ) Missiles[echo].Damage = (8 + Difficulty * 4) * 64;
+        }
     }
 }
 void MemoryGuardianKilled(int monsterIndex)
 {
     if( Dungeon != DUN_115_FORGOTTEN_HOUSE || !MemoryAvailable() || MemoryState() != 2 ) return;
     const Monster& monster = Monsters[monsterIndex];
-    if( !monster.SpritePtr || monster.SpritePtr->baseMonsterIndex != BM_29_HIDDEN ) return;
+    if( !monster.SpritePtr ) return;
+    const int base = monster.SpritePtr->baseMonsterIndex;
+    const int warden = base == BM_50_SKELETON_LORD ? 1 : base == BM_169_ZOMBIE ? 2 : 0;
+    if( warden ){
+        if( !((unsigned char)AdditionalStateData.unused[MEMORY_WARDENS] & warden) ){
+            AdditionalStateData.unused[MEMORY_WARDENS] |= (char)warden;
+            SpawnSomething(BI_0_GOLD, monster.Row, monster.Col, 0, 0, 0, 0, 500 * (Difficulty + 1));
+            ErrorPlrMsg(warden == 1 ? "O Escrivao caiu. Leia o registro que ele guardava." : "A Ama se calou. O caderno do abrigo ficou para tras.");
+        }
+        return;
+    }
+    if( base != BM_29_HIDDEN ) return;
+    SpawnSomething(BI_0_GOLD, monster.Row, monster.Col, 0, 0, 0, 0, 1500 * (Difficulty + 1));
     AdditionalStateData.unused[MEMORY_STATE] = 3;
-    ErrorPlrMsg("A quarta batida cessou. Leia o nome no centro da casa.");
+    ErrorPlrMsg("O Hospede perdeu seu lugar. Leia o nome no centro da casa.");
 }
 bool MemoryCaretakerRescued()
 {
@@ -194,8 +263,8 @@ const char* MemoryObjectLabel(int objectIndex)
     if( Dungeon != DUN_115_FORGOTTEN_HOUSE || objectIndex < 0 || objectIndex >= MaxObjects_127 ) return nullptr;
     const Object& object = Objects[objectIndex];
     if( object.BaseObjectIndex != BO_52_BOOK1 ) return nullptr;
-    static const char* names[4] = { "Lembranca do Espelho", "Lembranca da Tigela", "Lembranca da Cadeira", "Nome sob as Cinzas" };
-    for( int i = 0; i < 4; ++i )
+    static const char* names[10] = { "Lembranca do Espelho", "Lembranca da Tigela", "Lembranca da Cadeira", "Nome sob as Cinzas", "Registro das Tres Mortes", "Caderno do Abrigo", "A Conviteira", "Eco do Espelho", "Eco da Tigela", "Eco da Cadeira" };
+    for( int i = 0; i < 10; ++i )
         if( object.Row == MemoryObjectRows[i] && object.Col == MemoryObjectCols[i] ) return names[i];
     return nullptr;
 }
@@ -206,10 +275,10 @@ bool MemoryOperateObject(int playerIndex, int objectIndex)
     const Object& object = Objects[objectIndex];
     if( object.BaseObjectIndex != BO_52_BOOK1 ) return false;
     if( MaeraBondOperateObject(playerIndex, objectIndex) ) return true;
-    for( int i = 0; i < 4; ++i ){
+    for( int i = 0; i < 10; ++i ){
         if( object.Row != MemoryObjectRows[i] || object.Col != MemoryObjectCols[i] ) continue;
         if( playerIndex == CurrentPlayerIndex ){
-            MemorySpeaker = 4 + i;
+            MemorySpeaker = i >= 7 ? 4 + i - 7 : 4 + i;
             MemoryCaller = PD_0_None;
             ChangeTownerDialog(PD_31_ForgottenHouse);
         }
@@ -404,7 +473,7 @@ void ForgottenHouseMenu()
               "A agua apaga a chama antes que ela encontre voce.", "Fique junto da tigela quando a cancao terminar.", "A lembranca espera sua resposta." },
             { "Uma cadeira vazia canta com a voz de Farnham.", "Tres batidas para entrar. Uma para ficar.",
               "A primeira memoriza onde voce esta.", "A quarta ataca essa lembranca, nao seus passos.",
-              "Mude de lugar depois de ouvir a primeira.", "Reunir as tres lembrancas acordara a entidade.", "A mulher ainda espera debaixo de seu nome." }
+              "Mude de lugar depois de ouvir a primeira.", "As tres lembrancas chamam o Hospede a ala leste.", "Ele espera na camara de hospedes, a leste." }
         };
         MemoryLines(texts[MemorySpeaker-4]);
         if( state == 2 ) SetDialogRow(PT_DialogRows_NoIndent, 14, true, "Devolver esta lembranca a casa", C_1_Blue, true);
@@ -425,6 +494,32 @@ void ForgottenHouseMenu()
                 "A tigela tem agua suficiente para dois animais.", "A porta de saida continua aberta.", "", "" };
             MemoryLines(lines);
         }
+    }
+    if( MemorySpeaker >= 8 && MemorySpeaker <= 10 ){
+        static const char* const records[3][7] = {
+            { "O Escrivao registrou a mesma mulher tres vezes.",
+              "Na primeira, morreu a filha. Na segunda, a mae.",
+              "Na terceira, morreu quem ainda sabia o nome.",
+              "Tres obitos inventados para esconder uma vida.",
+              "Na margem, outra letra: Nao basta apagar o nome.",
+              "E preciso retirar a cadeira que o espera.",
+              "A tinta cheira as ervas da cabana de Adria." },
+            { "Maera anotava quantos animais voltavam a noite.",
+              "Um dia, contou uma sombra a mais que os corpos.",
+              "A Ama mandou deixar uma tigela para o hospede.",
+              "A mulher recusou. O hospede aprendeu a ter fome.",
+              "Entao ela rasgou o proprio nome do caderno.",
+              "Nao para fugir. Para que ele nao seguisse os outros.",
+              "Na ultima pagina: Nenhum lugar a mesa e uma divida." },
+            { "A carta nao tem destinatario. Tem uma cadeira.",
+              "Adria escreveu: Lembrem-se de quem falta.",
+              "Cada lembranca devolvida prepara um lugar.",
+              "O Hospede so entra onde alguem espera por ele.",
+              "Tres batidas pedem entrada. A quarta aceita.",
+              "Ao devolver a casa, voce terminou o convite.",
+              "No verso: Nao lhe deem o rosto que ele pedir." }
+        };
+        MemoryLines(records[MemorySpeaker-8]);
     }
     if( MemorySpeaker == 0 && state == 4 ){
         const char* lines[7] = { "Adria: Ela voltou. Isso deveria bastar.",

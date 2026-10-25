@@ -3087,11 +3087,37 @@ void SwitchGodMode()
 	#endif
 }
 
+// Test tools are available in both Debug and Release single-player builds.
+static bool HandleEquipmentTestShortcut(UINT msg, WPARAM key, LPARAM flags)
+{
+	if (msg != WM_KEYDOWN && msg != WM_SYSKEYDOWN) return false;
+	if (key != VK_77_M_KEY && key != VK_78_N_KEY && key != VK_68_D_KEY) return false;
+	if (!(GetKeyState(VK_MENU) & 0x8000) || (GetKeyState(VK_CONTROL) & 0x8000)) return false;
+	if (MaxCountOfPlayersInGame != 1 || IsPlayerDead || TalkPanelMode
+		|| IsGoldSplitPanelVisible || IsGameMenuActive() || CurrentDialogIndex) return false;
+	// Consume held-key repeats without repeatedly granting levels or resetting the browser.
+	if (flags & (1L << 30)) return true;
+	if (key == VK_68_D_KEY) {
+		AdmDungeonWindow_Open();
+	} else if (key == VK_77_M_KEY) {
+		AdmItemWindow_Open();
+	} else {
+		Player& player = Players[CurrentPlayerIndex];
+		if (player.CharLevel < PlayerMaxLevel()) {
+			NextPlayerLevel(CurrentPlayerIndex);
+			if (player.Xp < LevelUp(player.CharLevel - 1))
+				player.Xp = LevelUp(player.CharLevel - 1);
+		}
+	}
+	return true;
+}
+
 //int CurShrine;
 // main window proc, используется в игровом процессе, вызывается как Handler1 в CallHandler1IfExists
 //----- (00409A1A) --------------------------------------------------------
 int __stdcall GameWindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+	if (HandleEquipmentTestShortcut(msg, wParam, lParam)) return 0;
 	//if( SyncTH && ! Th2InMessageQueue ){
 	//	PostMessageA( hWnd, msg, wParam, lParam );
 	//	return 0;
@@ -3241,15 +3267,6 @@ int __stdcall GameWindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 							CreateBoss( um, 0, 0 );
 						}
 						break; }
-					case VK_78_N_KEY:
-						NextPlayerLevel(CurrentPlayerIndex);
-						if( Players[ CurrentPlayerIndex ].Xp < LevelUp( Players[ CurrentPlayerIndex ].CharLevel - 1 ) ){
-							Players[ CurrentPlayerIndex ].Xp = LevelUp( Players[ CurrentPlayerIndex ].CharLevel - 1 );
-						}
-						if( Players[ CurrentPlayerIndex ].CharLevel == PlayerMaxLevel() ){
-							Players[ CurrentPlayerIndex ].Xp = LevelUp( PlayerMaxLevel() - 1 );
-						}
-						break; // Alt + N, level up
 					case VK_65_A_KEY: // Alt + A
 						//DotAcidMechanic = !DotAcidMechanic;
 						//IsAutoPickup = !IsAutoPickup; //disabling/enabling auto-selection (for now, only gold)
@@ -3278,16 +3295,9 @@ int __stdcall GameWindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 						//PutStartItemToInventory( CurrentPlayerIndex, 401 );
 						//PutStartItemToInventory( CurrentPlayerIndex, 402 );
 						break;
-					case VK_77_M_KEY: // Alt + M, ADM item browser
-						AdmItemWindow_Open();
-						break;
 					case VK_73_I_KEY: // Alt + I goto next dungeon
 						{DUNGEON next = DUN_28_POISONED_WATER_SUPPLY;//Dungeon + 1;
 						StartNewLvl( CurrentPlayerIndex, next > DUN_24_CRYPT_4 ? WM_1029_GOTO_QUEST_DUNGEON : WM_1031_GOTO_DUNGEON, next);
-						break;}
-					case VK_68_D_KEY: // Alt + D goto dungeon
-						{DUNGEON next = (DUNGEON)HowMuchGoldYouWantToRemove;
-						StartNewLvl( CurrentPlayerIndex, next > DUN_24_CRYPT_4 ? WM_1029_GOTO_QUEST_DUNGEON : WM_1031_GOTO_DUNGEON, next );
 						break;}
 					case VK_87_W_KEY: // Alt + W, switching light table generation methods
 						OriginalLightLevels = !OriginalLightLevels;
