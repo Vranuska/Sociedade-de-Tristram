@@ -1,15 +1,17 @@
 ﻿#include "stdafx.h"
+#include "UiKit.h"
 
 DisplayObject MainPanelRect;
 DisplayObject InventoryPanelRect;
 DisplayObject GoldSplitPanelRect;
-DisplayObject InventoryOrganizeButton;
-DisplayObject InventoryStoreFilterButton;
-DisplayObject InventoryStoreAllButton;
-DisplayObject InventoryCompanionButton;
-DisplayObject InventoryCompanionSummonButton;
-DisplayObject InventorySigilsButton;
 static bool InventorySigilsPageOpen = false;
+// Geometry of every control of this window lives in ONE UiInventoryLayout. Drawing, hover and
+// clicking all read it; there are no per-button DisplayObjects any more.
+static UiInventoryLayout InvLayout;
+static UiInvFlags        InvLayoutFlags;
+static int               InvLayoutKey[4];
+static bool              InvLayoutValid = false;
+static_assert( CELL_SIZE == UiCellSize, "UiKit assumes 28px cells" );
 static int InventoryStoreFilter = 0;
 static int InventoryOrganizeMode = 0;
 int HowMuchGoldYouWantToRemove;// 004D1108
@@ -122,23 +124,34 @@ void SetupInvPanel(int playerIndex)
 
 void SetupInventoryQoLButtons()
 {
-	// InventoryPanelRect is calculated after SetupInvPanel(), so these controls
-	// are positioned only after the panel rectangle itself is ready.
-	SetupDisplayObject(InventoryOrganizeButton, InventoryPanelRect.Left + 8, InventoryPanelRect.Top + 429, 92, 18);
-	SetupDisplayObject(InventoryStoreFilterButton, InventoryPanelRect.Left + 102, InventoryPanelRect.Top + 429, 116, 18);
-	SetupDisplayObject(InventoryStoreAllButton, InventoryPanelRect.Left + 220, InventoryPanelRect.Top + 429, 82, 18);
-	SetupDisplayObject(InventoryCompanionButton, InventoryPanelRect.Left + 102, InventoryPanelRect.Top + 429, 116, 18);
-	SetupDisplayObject(InventoryCompanionSummonButton, InventoryPanelRect.Left + 220, InventoryPanelRect.Top + 429, 82, 18);
-    // A narrow tab outside the existing organization and companion controls.
-    SetupDisplayObject(InventorySigilsButton, InventoryPanelRect.Left + 305, InventoryPanelRect.Top + 429, 14, 18);
+	// Called when the panel rectangle changes (resolution change). The layout is rebuilt lazily by
+	// InvLayoutNow(), which also compares the panel rectangle, so it can never be stale.
+	InvLayoutValid = false;
 }
 
-static bool CursorInInventoryQoLButton(const DisplayObject& button)
+static UiInvFlags CurrentInvFlags()
 {
-    // Bitmap glyphs extend above the text baseline. Include the complete glyph
-    // area and padding, while keeping adjacent controls horizontally separate.
-    return CursorX >= button.Left && CursorX <= button.Right
-        && CursorY >= button.Top - 16 && CursorY <= button.Down + 2;
+	UiInvFlags f;
+	f.stash           = IsStashPanelVisible;
+	f.sigilsPage      = InventorySigilsPageOpen && !IsStashPanelVisible;
+	f.companionActive = !IsStashPanelVisible && CompanionHasActive();
+	return f;
+}
+
+static const UiInventoryLayout& InvLayoutNow()
+{
+	const UiInvFlags f = CurrentInvFlags();
+	if( !InvLayoutValid || f != InvLayoutFlags
+	 || InvLayoutKey[0] != InventoryPanelRect.Left  || InvLayoutKey[1] != InventoryPanelRect.Top
+	 || InvLayoutKey[2] != InventoryPanelRect.Width || InvLayoutKey[3] != InventoryPanelRect.Heigth ){
+		InvLayout = UiInventoryLayout::Build(InventoryPanelRect.Left, InventoryPanelRect.Top,
+			InventoryPanelRect.Width, InventoryPanelRect.Heigth, f);
+		InvLayoutFlags = f;
+		InvLayoutKey[0] = InventoryPanelRect.Left;  InvLayoutKey[1] = InventoryPanelRect.Top;
+		InvLayoutKey[2] = InventoryPanelRect.Width; InvLayoutKey[3] = InventoryPanelRect.Heigth;
+		InvLayoutValid = true;
+	}
+	return InvLayout;
 }
 
 // The five reserved Sigils already have stable base IDs and are serialized
@@ -176,23 +189,28 @@ static void SocietySigilRefreshCount(Player& player)
     }
 }
 
+// True over the Sigils page (its rows, or the blocker that keeps clicks away from the backpack).
 static bool SocietySigilCursorOverBackpack()
 {
-    return CursorX >= InventoryPanelRect.Left + 17
-        && CursorX < InventoryPanelRect.Right
-        && CursorY >= InventoryPanelRect.Top + 222
-        && CursorY < InventoryPanelRect.Top + 426;
+	const int id = InvLayoutNow().Pick(CursorX, CursorY);
+	return id == UiInv_SigilPage || UiInventoryLayout::SigilRowOf(id) >= 0;
 }
 
+// Row hit-test reads the very rectangles UiDrawSigilPage() paints.
 static int SocietySigilRowUnderCursor()
 {
-    const int left = InventoryPanelRect.Left + 18;
-    const int top = InventoryPanelRect.Top + 235;
-    if( CursorX < left || CursorX >= left + 285
-        || CursorY < top || CursorY >= top + SocietySigilSlots * 36 ){
-        return -1;
-    }
-    return (CursorY - top) / 36;
+	return UiInventoryLayout::SigilRowOf(InvLayoutNow().Pick(CursorX, CursorY));
+}
+
+// READ-ONLY view of what TalismanSlots[slotIndex] really contains. It never writes.
+// It uses the same predicates as the bind click, so the page cannot show "empty"
+// while the click answers "already bound".
+static UiSigilState SocietySigilState(const Player& player, int slotIndex)
+{
+    if( slotIndex < 0 || slotIndex >= SocietySigilSlots ) return UiSigilState::Unavailable;
+    const Item& item = player.TalismanSlots[slotIndex];
+    return UiClassifySigilSlot(slotIndex, item.ItemCode == IC_M1_NONE, SocietySigilSlotEmpty(item),
+        item.baseItemIndex - BI_2504_SIGIL_VEIL, MaxCountOfPlayersInGame == 1);
 }
 
 static void SocietySigilSlotClick(Player& player, int index)
@@ -234,54 +252,52 @@ static void SocietySigilSlotClick(Player& player, int index)
     PlayGlobalSound(S_56_I_INVGRAB);
 }
 
-static void SocietySigilsDrawPage(const Player& player)
+static_assert( SocietySigilSlots == UiSigilCount, "Sigil row count mismatch" );
+
+static void SocietySigilsDrawPage(const Player& player, const UiInventoryLayout& L, int hoverId)
 {
-    static const char* names[SocietySigilSlots] = {
-        "Veu", "Ferro", "Arcano", "Pacto", "Brasas"
-    };
-    static const char* bonuses[SocietySigilSlots] = {
-        "+2 defesa, +3 resistencias",
-        "+3% dano, +5 precisao",
-        "+4% magias elementais",
-        "+5% dano de invocacoes",
-        "+6% magias de fogo"
-    };
-    DrawText(InventoryPanelRect.Left + 18, InventoryPanelRect.Top + 223,
-        InventoryPanelRect.Right - 12, "SIGILOS - vincular e retirar", C_3_Gold);
-    for( int i = 0; i < SocietySigilSlots; ++i ){
-        const int rowTop = InventoryPanelRect.Top + 235 + i * 36;
-        const int x = InventoryPanelRect.Left + 20;
-        const bool bound = SocietySigilIsBound(player, i);
-        ShadowItemSlot(x, rowTop + CELL_SIZE, CELL_SIZE, CELL_SIZE,
-            bound ? blColor.main : blColor.notavailable);
-        if( bound ){
-            const Item& item = player.TalismanSlots[i];
-            int sprite = item.GraphicValue + CM_12_ITEMS_PICS_START;
-            const int width = ItemWidthTable[sprite];
-            if( width > 0 ){
-                CEL_Draw(x, rowTop + CELL_SIZE, GetItemSprites(sprite), sprite,
-                    width, 0, 8, item.mirrorImage << 1, -1);
-            }
-        }
-        char label[80];
-        sprintf(label, "%s: %s", names[i], bound ? "vinculado" : "vazio");
-        DrawText(x + 38, rowTop + 19, InventoryPanelRect.Right - 10,
-            label, bound ? C_3_Gold : C_0_White);
-        DrawText(x + 38, rowTop + 32, InventoryPanelRect.Right - 10,
-            bonuses[i], bound ? C_3_Gold : C_0_White);
-    }
-    DrawText(InventoryPanelRect.Left + 20, InventoryPanelRect.Top + 422,
-        InventoryPanelRect.Right - 15, "Bonus apenas em jogo solo", C_5_Yellow);
+	// UI text only. Accents are written correctly; UiDrawText folds them until the bitmap font
+	// receives accented glyphs. "Afinidade" is a descriptive label chosen for this page.
+	static const char* names[SocietySigilSlots]      = { "Véu", "Ferro", "Arcano", "Pacto", "Brasas" };
+	static const char* affinities[SocietySigilSlots] = { "Proteção", "Combate", "Magia", "Invocação", "Fogo" };
+	static const char* bonuses[SocietySigilSlots]    = {
+		"+2 defesa, +3 resistências", "+3% dano, +5 precisão", "+4% magias elementais",
+		"+5% dano de invocações", "+6% magias de fogo"
+	};
+	UiSigilRowView rows[UiSigilCount];
+	for( int i = 0; i < UiSigilCount; ++i ){
+		rows[i].name        = names[i];
+		rows[i].affinity    = affinities[i];
+		rows[i].state       = SocietySigilState(player, i);     // read-only classification
+		rows[i].description = rows[i].state == UiSigilState::UnknownContent ? "Dados antigos preservados" : bonuses[i];
+	}
+	UiDrawSigilPage(L, rows, hoverId);
+
+	// Item sprites: only for a slot that holds its own Sigil, and only if the sprite is valid and
+	// fits the icon well. CEL_Draw takes SURFACE coordinates (borders included); the old code passed
+	// panel coordinates, which drew the sprite 128px left and 160px up of its row.
+	for( int i = 0; i < UiSigilCount; ++i ){
+		if( rows[i].state != UiSigilState::Bound ) continue;
+		const Item& item = player.TalismanSlots[i];
+		int sprite = item.GraphicValue + CM_12_ITEMS_PICS_START;
+		if( sprite < 0 || sprite >= MAX_9000_ITEM_PICS ) continue;
+		const int width = ItemWidthTable[sprite];
+		const int height = ItemHeightTable[sprite];
+		const UiRect& icon = L.sigilIcons[i];
+		if( width <= 0 || height <= 0 || width > icon.w || height > icon.h ) continue;
+		char* cel = GetItemSprites(sprite);
+		if( !cel ) continue;
+		CEL_Draw(icon.x + (icon.w - width) / 2 + Screen_LeftBorder,
+		         icon.Bottom() - (icon.h - height) / 2 + Screen_TopBorder,
+		         cel, sprite, width, 0, 8, item.mirrorImage << 1, -1);
+	}
 }
 
 bool InventoryPanel_CursorOnControls()
 {
-    return (!IsStashPanelVisible && CursorInInventoryQoLButton(InventorySigilsButton))
-        || CursorInInventoryQoLButton(InventoryOrganizeButton)
-        || (IsStashPanelVisible && (CursorInInventoryQoLButton(InventoryStoreFilterButton)
-            || CursorInInventoryQoLButton(InventoryStoreAllButton)))
-        || (!IsStashPanelVisible && (CursorInInventoryQoLButton(InventoryCompanionButton)
-            || (CompanionHasActive() && CursorInInventoryQoLButton(InventoryCompanionSummonButton))));
+	// Buttons and tabs only. Hidden controls are not in the layout, so they cannot intercept clicks.
+	if( !IsINVPanelVisible ) return false;
+	return UiInventoryLayout::IsControl(InvLayoutNow().Pick(CursorX, CursorY));
 }
 
 static bool InventoryIsPotionOrOil(const Item& item)
@@ -427,37 +443,27 @@ void Inventory_LButtonClick()
 {
 	int playerIndex = CurrentPlayerIndex;
 	Player& player = Players[playerIndex];
-    if( !IsStashPanelVisible && CursorInInventoryQoLButton(InventorySigilsButton) ){
-        InventorySigilsPageOpen = !InventorySigilsPageOpen;
-        PlayGlobalSound(S_75_I_TITLEMOV);
-        return;
-    }
-    if( InventorySigilsPageOpen && !IsStashPanelVisible
-        && SocietySigilCursorOverBackpack() ){
-        SocietySigilSlotClick(player, SocietySigilRowUnderCursor());
-        return;
-    }
-	// The complete label rectangle must remain clickable even when an item icon
-	// from the last inventory row is detected below it.
-	if (CursorInInventoryQoLButton(InventoryOrganizeButton)) {
-		InventoryPanel_AutoOrganize();
-		return;
-	}
-	if (!IsStashPanelVisible && CompanionHasActive() && CursorInInventoryQoLButton(InventoryCompanionSummonButton)) {
-        CompanionToggleSummoned();
-        return;
-    }
-	if (!IsStashPanelVisible && CursorInInventoryQoLButton(InventoryCompanionButton)) {
-		CompanionOpenPanel();
-		return;
-	}
-	if (IsStashPanelVisible && CursorInInventoryQoLButton(InventoryStoreFilterButton)) {
-		InventoryPanel_CycleStoreFilter();
-		return;
-	}
-	if (IsStashPanelVisible && CursorInInventoryQoLButton(InventoryStoreAllButton)) {
-		StashPanel_StoreAllInventoryItems();
-		return;
+	{
+		// ONE decision per click: the topmost control under the cursor gets it, nothing else does.
+		const int hit = InvLayoutNow().Pick(CursorX, CursorY);
+		switch( hit ){
+		case UiInv_TabInventory:
+			if( InventorySigilsPageOpen ){ InventorySigilsPageOpen = false; PlayGlobalSound(S_75_I_TITLEMOV); }
+			return;
+		case UiInv_TabSigils:
+			if( !InventorySigilsPageOpen ){ InventorySigilsPageOpen = true; PlayGlobalSound(S_75_I_TITLEMOV); }
+			return;
+		case UiInv_Organize:    InventoryPanel_AutoOrganize();        return;
+		case UiInv_Companions:  CompanionOpenPanel();                 return;
+		case UiInv_Summon:      CompanionToggleSummoned();            return;
+		case UiInv_StoreFilter: InventoryPanel_CycleStoreFilter();    return;
+		case UiInv_StoreAll:    StashPanel_StoreAllInventoryItems();  return;
+		case UiInv_SigilPage:   return;                               // consumed: never reaches the backpack
+		default: {
+			const int row = UiInventoryLayout::SigilRowOf(hit);
+			if( row >= 0 ){ SocietySigilSlotClick(player, row); return; }   // existing function, unchanged
+		}
+		}
 	}
 	// An Aquamarine held on the cursor can be dropped directly over any valid
 	// equipment.  The stone is consumed only after the socket survives UpdateItem.
@@ -1172,23 +1178,44 @@ void DrawINVPanel()
 {
 	// вместо захардкоденых констант поставлены предвычесленные с учетом разрешения координаты
 
-	Surface_DrawCEL(InventoryPanelRect.Left + Screen_LeftBorder, InventoryPanelRect.Down + Screen_TopBorder, InvPanelCEL, 1, InventoryPanelRect.Width);// Тут рисуется сама картинка инвентаря
-    if( !IsStashPanelVisible ){
-        DrawText(InventorySigilsButton.Left, InventorySigilsButton.Top + 13,
-            InventorySigilsButton.Right, "S", InventorySigilsPageOpen ? C_3_Gold : C_0_White);
-    }
-	DrawText(InventoryOrganizeButton.Left, InventoryOrganizeButton.Top + 13, InventoryOrganizeButton.Right, "ORGANIZAR", C_0_White);
-	if (!IsStashPanelVisible) {
-		if( CompanionHasActive() ) DrawText(InventoryCompanionSummonButton.Left, InventoryCompanionSummonButton.Top + 13, InventoryCompanionSummonButton.Right, CompanionIsSummoned() ? "DISPENSAR" : "CHAMAR", C_3_Gold);
-		const char* petLabel = "COMPANHEIROS";
-		DrawText(InventoryCompanionButton.Left, InventoryCompanionButton.Top + 13, InventoryCompanionButton.Right, petLabel, C_2_Red);
+	// Iron-and-wine window: stone, frame, slot wells and the bottom bar are drawn from UiKit using the
+	// SAME layout the click handler reads. The legacy InvPanelCEL background is no longer drawn; the
+	// item, tint and tooltip code below is unchanged and works on top of the wells.
+	const UiInventoryLayout& L = InvLayoutNow();
+	const int hoverId = L.Pick(CursorX, CursorY);
+	{
+		UiSlotWell wells[IS_count + 2];
+		int wellCount = 0;
+		for( const Slot& slot: Slots ){
+			if( slot.base.slotType == SL_INV ) continue;           // backpack and belt are not equipment wells
+			if( wellCount >= IS_count ) break;
+			const BaseSlot& b = slot.base;
+			wells[wellCount++].rect = UiRect(InventoryPanelRect.Left + b.x, InventoryPanelRect.Top + b.y,
+				CELL_SIZE * b.c, CELL_SIZE * b.r);
+		}
+		for( int i = 0; i < 6; i += 3 ){   // plates under the weapon-swap images (WpnSwapBtnsRects is {x, bottom y, w, h})
+			const RECT& r = WpnSwapBtnsRects[i];
+			UiSlotWell& plate = wells[wellCount++];
+			plate.rect = UiRect(InventoryPanelRect.Left + r.left, InventoryPanelRect.Top + r.top - r.bottom, r.right * 3, r.bottom);
+			plate.plate = true;
+		}
+		UiDrawInventoryBackdrop(L, wells, wellCount, !(InventorySigilsPageOpen && !IsStashPanelVisible));
 	}
-	if (IsStashPanelVisible) {
-		static const char* filterNames[] = { "TUDO", "POCOES", "LIVROS", "PERG/RELIQ", "PEDRAS", "EQUIP", "ACESSORIOS" };
-		char filterLabel[32];
-		sprintf(filterLabel, "TIPO:%s", filterNames[InventoryStoreFilter]);
-		DrawText(InventoryStoreFilterButton.Left, InventoryStoreFilterButton.Top + 13, InventoryStoreFilterButton.Right, filterLabel, C_0_White);
-		DrawText(InventoryStoreAllButton.Left, InventoryStoreAllButton.Top + 13, InventoryStoreAllButton.Right, "GUARDAR", C_3_Gold);
+	{
+		static const char* filterNames[] = { "TUDO", "POÇÕES", "LIVROS", "PERG/RELIQ", "PEDRAS", "EQUIP", "ACESSÓRIOS" };
+		const int filterCount = (int)(sizeof(filterNames) / sizeof(filterNames[0]));
+		char filterLabel[40];
+		sprintf(filterLabel, "TIPO:%s", filterNames[(InventoryStoreFilter >= 0 && InventoryStoreFilter < filterCount) ? InventoryStoreFilter : 0]);
+		UiBarView bar;
+		bar.hoverId           = hoverId;
+		bar.mouseDown         = (GetAsyncKeyState(VK_LBUTTON) & 0x8000) != 0;
+		bar.sigilsPage        = InventorySigilsPageOpen && !IsStashPanelVisible;
+		bar.stash             = IsStashPanelVisible;
+		bar.companionActive   = !IsStashPanelVisible && CompanionHasActive();
+		bar.companionSummoned = bar.companionActive && CompanionIsSummoned();
+		bar.filterLabel       = filterLabel;
+		bar.gold              = Players[CurrentPlayerIndex].TotalGold;
+		UiDrawInventoryBar(L, bar);
 	}
 
 	Player& player = Players[CurrentPlayerIndex];
@@ -1328,10 +1355,7 @@ void DrawINVPanel()
 	// а координаты вычисляются на основе индекса клетки
 
     if( InventorySigilsPageOpen && !IsStashPanelVisible ){
-        SocietySigilsDrawPage(player);
-        char dest[32];
-        sprintf(dest, "ouro: %i", player.TotalGold);
-        DrawLevelInfoText(InventoryPanelRect.Right - 300, InventoryPanelRect.Top + 448, dest, 3);
+        SocietySigilsDrawPage(player, L, hoverId);
         return;
     }
 
@@ -1394,12 +1418,6 @@ void DrawINVPanel()
 		}
 		CEL_Draw(x, y, itemsCELArray, graphicValue, itemWidthTable, 0, 8, (int)!(inventorySlot.IsReqMet || InventoryTurnOffRedColorItems /* || itemUnderRegularCursor*/) | inventorySlot.mirrorImage << 1, colorOfBorder);
 	}
-	
-	// Total gold text
-	char dest[32];
-    int gold = Players[CurrentPlayerIndex].TotalGold;
-	sprintf(dest, "ouro: %i", gold);
-    DrawLevelInfoText(InventoryPanelRect.Right - 300, InventoryPanelRect.Top + 448, dest, 3);
 }
 
 // This might be the function handling splitting gold piles. (drawing the window)

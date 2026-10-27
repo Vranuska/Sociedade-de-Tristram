@@ -181,6 +181,7 @@
     <ClCompile Include="src\palette.cpp" />
     <ClCompile Include="src\Panel.cpp" />
     <ClCompile Include="src\UiKit.cpp" />
+    <ClCompile Include="src\UiNotify.cpp" />
     <ClCompile Include="src\Path.cpp" />
     <ClCompile Include="src\Perks.cpp" />
     <ClCompile Include="src\Player.cpp" />

@@ -7533,19 +7533,25 @@ void ClearPlayerStatusMessages()
 
 // отрисовка сообщений чата на экране
 //----- (0045F14B) --------------------------------------------------------
+void UiNotifyDrawSystemMessages(); // UiNotify.cpp
+
 void DrawPlayerStatusMessages()
 {
 	static const char colorTable[PlayersMax_4 + 1] = { C_0_White, C_0_White, C_0_White, C_0_White, C_3_Gold };
 	int x = 10 + Screen_LeftBorder;
 	int y = 70 + Screen_TopBorder;
 	unsigned int rightTextCoordinate = 620;
-    for( int i = 0; i < MaxMessages_8; i++ ){
+	// System notices (ErrorPlrMsg and friends) are drawn as a compact stack: chronological order, no
+	// empty rows, repeats merged, at most 3 lines, expiring after 5s. Their text is not changed.
+	UiNotifyDrawSystemMessages();
+	for( int i = 0; i < MaxMessages_8; i++ ){
 		auto& msg = PlayerStatusMessages[i];
-        if( msg.str ){
-            DrawPlayerDescriptionText(x, y, rightTextCoordinate, msg.str, colorTable[msg.playerIndex]);
+		if( msg.str ){
+			// Chat lines keep their original position and wrapping.
+			if( msg.playerIndex != PlayersMax_4 ) DrawPlayerDescriptionText(x, y, rightTextCoordinate, msg.str, colorTable[msg.playerIndex]);
 			y += 35;
-        }
-    }
+		}
+	}
 }
 
 //----- (0045F1D8) --------------------------------------------------------
