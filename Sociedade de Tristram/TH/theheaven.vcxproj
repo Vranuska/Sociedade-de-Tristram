@@ -180,6 +180,7 @@
     <ClCompile Include="src\Object.cpp" />
     <ClCompile Include="src\palette.cpp" />
     <ClCompile Include="src\Panel.cpp" />
+    <ClCompile Include="src\UiKit.cpp" />
     <ClCompile Include="src\Path.cpp" />
     <ClCompile Include="src\Perks.cpp" />
     <ClCompile Include="src\Player.cpp" />
@@ -264,6 +265,8 @@
     <ClInclude Include="include\engine.h" />
     <ClInclude Include="include\game.h" />
     <ClInclude Include="include\Item.h" />
+    <ClInclude Include="include\UiCore.h" />
+    <ClInclude Include="include\UiKit.h" />
     <ClInclude Include="include\msg.h" />
     <ClInclude Include="include\multi.h" />
     <ClInclude Include="include\reflect.h" />
