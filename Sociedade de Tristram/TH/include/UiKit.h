@@ -95,3 +95,7 @@ void UiDrawSigilPage(const UiInventoryLayout& L, const UiSigilRowView* rows, int
 
 // Stack of system notices anchored at (x, y), newest at the bottom.
 void UiDrawNotifications(int x, int y, const UiNotifyLine* lines, int count);
+
+// Gothic character sheet chrome. Coordinates are relative to the character panel.
+// Draw before the live attribute/stat values so gameplay text remains on top.
+void UiDrawCharacterBackdrop(const UiRect& panel);
