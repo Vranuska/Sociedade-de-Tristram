@@ -577,3 +577,45 @@ void UiDrawNotifications(int x, int y, const UiNotifyLine* lines, int count)
         cy += plate.h + 4;
     }
 }
+
+
+// Character sheet: palette-safe Gothic metalwork with a restrained crimson accent.
+// Drawn under the original live text; no change to gameplay hitboxes or stat logic.
+void UiDrawCharacterBackdrop(const UiRect& panel)
+{
+    if (!panel.Valid()) return;
+    UiThemeRefresh();
+    const UiPalette& P = UiPal();
+
+    UiFillRect(panel, P.stone[0]);
+    UiFrameRect(panel, P.iron[3]);
+    UiFrameRect(UiRect(panel.x + 2, panel.y + 2, panel.w - 4, panel.h - 4), P.gold[1]);
+
+    // Upper identity band and the section dividers respect the existing 320px sheet.
+    UiFillRect(UiRect(panel.x + 5, panel.y + 5, panel.w - 10, 46), P.stone[1]);
+    UiFillRect(UiRect(panel.x + 5, panel.y + 50, panel.w - 10, 2), P.wine[2]);
+    UiFillRect(UiRect(panel.x + 5, panel.y + 117, panel.w - 10, 1), P.gold[1]);
+
+    // Two inset stat columns. These deliberately stay behind all existing text.
+    const int leftX = panel.x + 12;
+    const int rightX = panel.x + 181;
+    const int leftW = 163;
+    const int rightW = panel.w - 193;
+    if (leftW > 0 && rightW > 0 && panel.h > 135) {
+        UiFillRect(UiRect(leftX, panel.y + 124, leftW, panel.h - 132), P.stone[1]);
+        UiFillRect(UiRect(rightX, panel.y + 124, rightW, panel.h - 132), P.stone[1]);
+        UiFrameRect(UiRect(leftX, panel.y + 124, leftW, panel.h - 132), P.iron[2]);
+        UiFrameRect(UiRect(rightX, panel.y + 124, rightW, panel.h - 132), P.iron[2]);
+        UiFillRect(UiRect(leftX + 1, panel.y + 125, 2, panel.h - 134), P.wine[1]);
+        UiFillRect(UiRect(rightX + 1, panel.y + 125, 2, panel.h - 134), P.gold[1]);
+    }
+
+    // Small ornamental corner pins.
+    const int inset = 7;
+    for (int i = 0; i < 4; ++i) {
+        const int x = panel.x + (i & 1 ? panel.w - inset - 1 : inset);
+        const int y = panel.y + (i & 2 ? panel.h - inset - 1 : inset);
+        UiFillRect(UiRect(x - 2, y - 2, 5, 5), P.iron[4]);
+        UiFillRect(UiRect(x - 1, y - 1, 3, 3), P.gold[2]);
+    }
+}
