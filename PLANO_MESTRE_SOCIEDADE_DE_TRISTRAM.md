@@ -194,3 +194,18 @@
 
 ---
 **Nota de fidelidade:** este documento compila decisões e fatos conhecidos de conversas anteriores. Detalhes não recuperados (por exemplo, a especificação integral das seis quests, custos exatos de respec e regras definitivas de XP dos companions) foram mantidos como pendências, não inventados. Atualizar este arquivo conforme cada funcionalidade for especificada e testada.
+
+
+## 13. Nova direcao narrativa: A Casa que Tristram Esqueceu (30/10/2026)
+
+**Status: conceito criativo em desenvolvimento, nao implementado.** A narrativa antiga da entidade vinda de um animal foi rejeitada. Nao reaproveitar seu enredo como historia aprovada.
+
+- A pessoa que morava na casa **servia conscientemente a um demonio**. Sua identidade, suas motivacoes e o demonio patrono ainda precisam ser definidos em conjunto.
+- Essa pessoa **iniciou e alimentou a corrupcao de Tristram** com atos graduais: manipulacao dos moradores, traicoes, rituais e preparacao de uma passagem infernal. O portal e a ruina da cidade devem ter causalidade clara, nao surgir por acaso.
+- A casa e o ponto de origem da conspiracao; a investigacao revela pistas concretas de como o mal se infiltrou na vida cotidiana da cidade.
+- A passagem permite testemunhar **um vislumbre de Tristram destruida**, inspirado na cidade em ruinas de **Diablo II, Ato I**, acessada pelo portal vermelho no resgate de Deckard Cain.
+- A visao mostra a ruina pela corrupcao: moradores mortos ou transformados, ambiente macabro, **Griswold corrompido** e possibilidade de **Açougueiro** como encontro distinto. Griswold e Butcher nao sao o mesmo monstro.
+- O jogador pode conhecer os moradores ainda vivos no presente e encontrar versoes arruinadas na visao; isso deve ter peso emocional.
+- Nao afirmar que a visao e viagem temporal literal ou destino inevitavel antes da definicao do roteiro; uma manifestacao infernal do futuro e alternativa.
+- A quest deve conter exploracao de varios espacos da cidade, historia ambiental, encontros variados, batalhas com mecanicas, recompensa e saida clara; nao uma unica sala vazia.
+- **Antes de implementar**, escrever sinopse, personagens, demonio patrono, motivacao, cronologia compativel com Diablo I e II, regras da passagem, atos e desfecho; apresentar para aprovacao.
